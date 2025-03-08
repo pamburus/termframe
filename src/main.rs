@@ -90,23 +90,23 @@ fn save(surface: &mut Surface) {
         "\n"
     ));
 
-    let margin_x = 12.0;
-    let margin_y = 14.0;
+    let padding = (12.0, 14.0);
     let font_size = 12.0;
     let cell_width = 7.2;
     let line_interval = 1.2;
     let cell_height = font_size * line_interval;
-    let extra = 0.25;
+    let stroke = 0.25;
+    let offset_y = 1.0;
 
     buf.push_str(&format!(r#"<g font-size="{font_size}">"#));
 
     for (row, line) in surface.screen_lines().iter().enumerate() {
         for cluster in line.cluster(None) {
             if let Some((color, opacity)) = color(cluster.attrs.background()) {
-                let x = margin_x + cluster.first_cell_idx as f64 * cell_width - extra;
-                let y = margin_y + row as f64 * cell_height - extra;
-                let width = cluster.width as f64 * cell_width + extra * 2.0;
-                let height = cell_height + extra * 2.0;
+                let x = padding.0 + cluster.first_cell_idx as f64 * cell_width - stroke;
+                let y = padding.1 + row as f64 * cell_height - stroke + offset_y;
+                let width = cluster.width as f64 * cell_width + stroke * 2.0;
+                let height = cell_height + stroke * 2.0;
 
                 let opacity = if opacity < 1.0 {
                     format!(r#" opacity="{:.1}""#, opacity)
@@ -123,12 +123,13 @@ fn save(surface: &mut Surface) {
 
     buf.push_str("\n");
 
-    let (mx, my) = (margin_x, margin_y as f64 + font_size);
     buf.push_str(&format!(
-        r##"<text x="{mx}" y="{my:.0}" fill="#acb2be" xml:space="preserve">"##,
+        r##"<text x="{x:.1}" y="{y:.1}" fill="#acb2be" xml:space="preserve">"##,
+        x = padding.0,
+        y = padding.1 + font_size,
     ));
 
-    let nl = &format!(r#" x="{mx}" dy="{line_interval:.1}em""#);
+    let nl = &format!(r#" x="{x:.1}" dy="{line_interval:.1}em""#, x = padding.0);
     let mut offset = "";
     for line in surface.screen_lines().iter() {
         let mut pos = 0;

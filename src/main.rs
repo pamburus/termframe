@@ -108,8 +108,14 @@ fn save(surface: &mut Surface) {
                 let width = cluster.width as f64 * cell_width + extra * 2.0;
                 let height = cell_height + extra * 2.0;
 
+                let opacity = if opacity < 1.0 {
+                    format!(r#" opacity="{:.1}""#, opacity)
+                } else {
+                    "".into()
+                };
+
                 buf.push_str(&format!(
-                    r#"<rect x="{x:.1}" y="{y:.1}" width="{width:.1}" height="{height:.1}" fill="{color}" opacity="{opacity}" />"#,
+                    r#"<rect x="{x:.1}" y="{y:.1}" width="{width:.1}" height="{height:.1}" fill="{color}"{opacity} />"#,
                 ));
             }
         }
@@ -119,10 +125,10 @@ fn save(surface: &mut Surface) {
 
     let (mx, my) = (margin_x, margin_y as f64 + font_size);
     buf.push_str(&format!(
-        r#"<text x="{mx}" y="{my:.0}" xml:space="preserve">"#,
+        r##"<text x="{mx}" y="{my:.0}" fill="#acb2be" xml:space="preserve">"##,
     ));
 
-    let nl = &format!(r#"x="{mx}" dy="{line_interval:.1}em""#);
+    let nl = &format!(r#" x="{mx}" dy="{line_interval:.1}em""#);
     let mut offset = "";
     for line in surface.screen_lines().iter() {
         let mut pos = 0;
@@ -135,12 +141,67 @@ fn save(surface: &mut Surface) {
                 offset = "";
             }
 
-            // And then the text:
-            let (color, opacity) =
-                color(cluster.attrs.foreground()).unwrap_or(("white".into(), 1.0));
+            let (fill, opacity) = color(cluster.attrs.foreground())
+                .map(|(c, o)| {
+                    (
+                        format!(r#" fill="{c}""#),
+                        if o < 1.0 {
+                            format!(r#" opacity="{c}""#)
+                        } else {
+                            "".into()
+                        },
+                    )
+                })
+                .unwrap_or_default();
+
             let text = &cluster.text;
+
+            let weight = match cluster.attrs.intensity() {
+                termwiz::cell::Intensity::Bold => r#" font-weight="bold""#,
+                _ => "",
+            };
+
+            let style = if cluster.attrs.italic() {
+                r#" font-style="italic""#
+            } else {
+                ""
+            };
+
+            let decoration = if cluster.attrs.underline() != termwiz::cell::Underline::None {
+                r#" text-decoration="underline""#
+            } else if cluster.attrs.strikethrough() {
+                r#" text-decoration="line-through""#
+            } else {
+                ""
+            };
+
+            let decoration = decoration.to_owned()
+                + &if cluster.attrs.underline_color() != termwiz::color::ColorAttribute::Default {
+                    let (c, _) = color(cluster.attrs.underline_color()).unwrap();
+                    format!(r#" text-decoration-color="{c}""#, c = c)
+                } else {
+                    "".into()
+                };
+
+            let decoration = decoration
+                + &if cluster.attrs.underline() != termwiz::cell::Underline::None {
+                    format!(
+                        r#" text-decoration-style="{style}""#,
+                        style = match cluster.attrs.underline() {
+                            termwiz::cell::Underline::None => "",
+                            termwiz::cell::Underline::Single => "solid",
+                            termwiz::cell::Underline::Double => "double",
+                            termwiz::cell::Underline::Curly => "wavy",
+                            termwiz::cell::Underline::Dotted => "dotted",
+                            termwiz::cell::Underline::Dashed => "dashed",
+                        }
+                    )
+                } else {
+                    "".into()
+                };
+
             buf.push_str(&format!(
-                r#"<tspan {offset} fill="{color}" opacity="{opacity}">{text}</tspan>"#,
+                r#"<tspan{offset}{fill}{opacity}{weight}{style}{decoration}>{text}</tspan>"#,
             ));
             offset = "";
 

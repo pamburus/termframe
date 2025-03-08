@@ -96,16 +96,20 @@ fn save(surface: &mut Surface) {
     let cell_width = 7.2;
     let line_interval = 1.2;
     let cell_height = font_size * line_interval;
+    let extra = 0.25;
+
+    buf.push_str(&format!(r#"<g font-size="{font_size}">"#));
 
     for (row, line) in surface.screen_lines().iter().enumerate() {
         for cluster in line.cluster(None) {
             if let Some((color, opacity)) = color(cluster.attrs.background()) {
-                let x = margin_x + cluster.first_cell_idx as f64 * cell_width;
-                let y = margin_y + row as f64 * cell_height;
-                let width = cluster.width as f64 * cell_width;
+                let x = margin_x + cluster.first_cell_idx as f64 * cell_width - extra;
+                let y = margin_y + row as f64 * cell_height - extra;
+                let width = cluster.width as f64 * cell_width + extra * 2.0;
+                let height = cell_height + extra * 2.0;
 
                 buf.push_str(&format!(
-                    r#"<rect x="{x:.1}" y="{y:.1}" width="{width:.1}" height="{cell_height:.1}" fill="{color}" opacity="{opacity}" />"#,
+                    r#"<rect x="{x:.1}" y="{y:.1}" width="{width:.1}" height="{height:.1}" fill="{color}" opacity="{opacity}" />"#,
                 ));
             }
         }
@@ -115,7 +119,7 @@ fn save(surface: &mut Surface) {
 
     let (mx, my) = (margin_x, margin_y as f64 + font_size);
     buf.push_str(&format!(
-        r#"<text x="{mx}" y="{my:.0}" font-size="{font_size}" xml:space="preserve">"#,
+        r#"<text x="{mx}" y="{my:.0}" xml:space="preserve">"#,
     ));
 
     let nl = &format!(r#"x="{mx}" dy="{line_interval:.1}em""#);
@@ -146,7 +150,7 @@ fn save(surface: &mut Surface) {
     }
 
     buf.push_str("</text>");
-
+    buf.push_str("</g>");
     buf.push_str("</svg>");
 
     // Write to file.

@@ -148,8 +148,12 @@ fn save(surface: &Surface) {
             fg = fg.to_hex_string(),
         ));
 
+        let mut last_cluster_was_blank = false;
+        let mut prev_len = 0;
         let mut pos = 0;
         for cluster in line.cluster(None) {
+            prev_len = buf.len();
+
             let n = cluster.first_cell_idx - pos;
             if n > 0 {
                 buf.push_str(&format!(r#"<tspan>"#));
@@ -175,6 +179,7 @@ fn save(surface: &Surface) {
             };
 
             let text = &cluster.text;
+            last_cluster_was_blank = text.find(|x| x != ' ').is_none();
 
             let weight = match cluster.attrs.intensity() {
                 termwiz::cell::Intensity::Bold => r#" font-weight="bold""#,
@@ -230,6 +235,10 @@ fn save(surface: &Surface) {
 
             pos += cluster.width;
         }
+        if last_cluster_was_blank {
+            buf.truncate(prev_len);
+        }
+
         buf.push_str("</text>");
     }
 

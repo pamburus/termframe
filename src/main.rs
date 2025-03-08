@@ -133,23 +133,24 @@ fn save(surface: &Surface) {
 
     buf.push_str("\n");
 
-    buf.push_str(&format!(
-        r##"<text x="{x:.1}" y="{y:.1}" fill="#acb2be" xml:space="preserve">"##,
-        x = padding.0,
-        y = padding.1 + font_size,
-    ));
+    let width = surface.dimensions().0 as f64 * cell_width;
 
-    let nl = &format!(r#" x="{x:.1}" dy="{line_interval:.1}em""#, x = padding.0);
-    let mut offset = "";
-    for line in surface.screen_lines().iter() {
+    for (row, line) in surface.screen_lines().iter().enumerate() {
+        let x = padding.0;
+        let y = padding.1 + font_size + row as f64 * cell_height;
+
+        buf.push_str(&format!(
+            r##"<text x="{x:.1}" y="{y:.1}" width="{width}" height="{cell_height}" fill="{fg}" xml:space="preserve">"##,
+            fg = fg.to_hex_string(),
+        ));
+
         let mut pos = 0;
         for cluster in line.cluster(None) {
             let n = cluster.first_cell_idx - pos;
             if n > 0 {
-                buf.push_str(&format!(r#"<tspan {}>"#, offset));
+                buf.push_str(&format!(r#"<tspan>"#));
                 buf.push_str(&" ".repeat(n));
                 buf.push_str(r#"</tspan">"#);
-                offset = "";
             }
 
             let mut color = if cluster.attrs.reverse() {
@@ -220,16 +221,14 @@ fn save(surface: &Surface) {
                 };
 
             buf.push_str(&format!(
-                r#"<tspan{offset}{fill}{weight}{style}{decoration}>{text}</tspan>"#,
+                r#"<tspan{fill}{weight}{style}{decoration}>{text}</tspan>"#,
             ));
-            offset = "";
 
             pos += cluster.width;
         }
-        offset = nl;
+        buf.push_str("</text>");
     }
 
-    buf.push_str("</text>");
     buf.push_str("</g>");
     buf.push_str("</svg>");
 

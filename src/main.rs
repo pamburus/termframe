@@ -80,48 +80,86 @@ fn apply_action_to_surface(surface: &mut Surface, action: Action) {
 
 fn save(surface: &mut Surface) {
     let mut buf = String::new();
-    buf.push_str(r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#);
-    buf.push_str(r#"<svg xmlns="http://www.w3.org/2000/svg">"#);
-    buf.push_str(r##"<rect width="100%" height="100%" fill="#282C30"/>"##);
+    buf.push_str(concat!(
+        r#"<svg version="1.1" xmlns="http://www.w3.org/2000/svg">"#,
+        "\n"
+    ));
+    buf.push_str(STYLE);
+    buf.push_str(concat!(
+        r##"<rect width="100%" height="100%" fill="#282C30"/>"##,
+        "\n"
+    ));
 
-    let cell_width = 7.225;
+    let margin_x = 8.0;
+    let margin_y = 8.0;
     let font_size = 12.0;
-    let cell_height = font_size * 1.2;
+    let cell_width = 7.2;
+    let line_interval = 1.2;
+    let cell_height = font_size * line_interval;
 
     for (row, line) in surface.screen_lines().iter().enumerate() {
         for cluster in line.cluster(None) {
-            let x = cluster.first_cell_idx as f32 * cell_width;
-            let y = row as f32 * cell_height;
-            let width = cluster.width as f32 * cell_width;
+            if let Some((color, opacity)) = color(cluster.attrs.background()) {
+                let x = margin_x + cluster.first_cell_idx as f32 * cell_width;
+                let y = margin_y + row as f32 * cell_height;
+                let width = cluster.width as f32 * cell_width;
 
-            if let Some(color) = color(cluster.attrs.background()) {
                 buf.push_str(&format!(
-                    r#"<rect x="{}" y="{}" width="{}" height="{}" fill="{}" />"#,
-                    x, y, width, cell_height, color,
+                    r#"<rect x="{}" y="{}" width="{}" height="{}" fill="{}" opacity="{}" />"#,
+                    x, y, width, cell_height, color, opacity,
                 ));
+            }
+        }
+    }
+
+    buf.push_str("\n");
+
+    buf.push_str(&format!(
+        r#"<text x="{}" y="{}" font-size="{}" xml:space="preserve">"#,
+        margin_x,
+        margin_y as f32 + font_size,
+        font_size
+    ));
+
+    let nl = &format!(r#"x="{}" dy="{}em""#, margin_x, line_interval);
+    let mut offset = "";
+    for line in surface.screen_lines().iter() {
+        let mut pos = 0;
+        for cluster in line.cluster(None) {
+            let n = cluster.first_cell_idx - pos;
+            if n > 0 {
+                buf.push_str(&format!(r#"<tspan {}>"#, offset));
+                buf.push_str(&" ".repeat(n));
+                buf.push_str(r#"</tspan">"#);
+                offset = "";
             }
 
             // And then the text:
+            let (color, opacity) =
+                color(cluster.attrs.foreground()).unwrap_or(("white".into(), 1.0));
             buf.push_str(&format!(
-                r#"<text x="{}" y="{}" fill="{}" font-family="monospace" font-size="{}">{}</text>"#,
-                x,
-                y + cell_height * 0.8, // Adjust vertical alignment as needed.
-                color(cluster.attrs.foreground()).unwrap_or("white".into()),
-                font_size,
-                &cluster.text,
+                r#"<tspan {} fill="{}" opacity="{}">{}</tspan>"#,
+                offset, color, opacity, &cluster.text,
             ));
+            offset = "";
+
+            pos += cluster.width;
         }
+        offset = nl;
     }
+
+    buf.push_str("</text>");
+
     buf.push_str("</svg>");
 
     // Write to file.
     std::fs::write("output.svg", buf).expect("Unable to write SVG file");
 }
 
-fn color(attr: ColorAttribute) -> Option<String> {
+fn color(attr: ColorAttribute) -> Option<(String, f32)> {
     match attr {
         ColorAttribute::Default => None,
-        ColorAttribute::PaletteIndex(idx) => Some(
+        ColorAttribute::PaletteIndex(idx) => Some((
             match idx {
                 0 => "black",
                 1 => "red",
@@ -142,14 +180,19 @@ fn color(attr: ColorAttribute) -> Option<String> {
                 _ => "white",
             }
             .into(),
-        ),
+            1.0,
+        )),
         ColorAttribute::TrueColorWithDefaultFallback(c)
-        | ColorAttribute::TrueColorWithPaletteFallback(c, _) => Some(format!(
-            "#{:02x}{:02x}{:02x}{:02x}",
-            (c.0 * 255.0) as u8,
-            (c.1 * 255.0) as u8,
-            (c.2 * 255.0) as u8,
-            (c.3 * 255.0) as u8,
+        | ColorAttribute::TrueColorWithPaletteFallback(c, _) => Some((
+            format!(
+                "#{:02x}{:02x}{:02x}",
+                (c.0 * 255.0) as u8,
+                (c.1 * 255.0) as u8,
+                (c.2 * 255.0) as u8,
+            ),
+            c.3,
         )),
     }
 }
+
+const STYLE: &str = include_str!("assets/style.html");

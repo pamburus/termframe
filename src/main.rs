@@ -90,8 +90,8 @@ fn save(surface: &mut Surface) {
         "\n"
     ));
 
-    let margin_x = 8.0;
-    let margin_y = 8.0;
+    let margin_x = 12.0;
+    let margin_y = 14.0;
     let font_size = 12.0;
     let cell_width = 7.2;
     let line_interval = 1.2;
@@ -100,13 +100,12 @@ fn save(surface: &mut Surface) {
     for (row, line) in surface.screen_lines().iter().enumerate() {
         for cluster in line.cluster(None) {
             if let Some((color, opacity)) = color(cluster.attrs.background()) {
-                let x = margin_x + cluster.first_cell_idx as f32 * cell_width;
-                let y = margin_y + row as f32 * cell_height;
-                let width = cluster.width as f32 * cell_width;
+                let x = margin_x + cluster.first_cell_idx as f64 * cell_width;
+                let y = margin_y + row as f64 * cell_height;
+                let width = cluster.width as f64 * cell_width;
 
                 buf.push_str(&format!(
-                    r#"<rect x="{}" y="{}" width="{}" height="{}" fill="{}" opacity="{}" />"#,
-                    x, y, width, cell_height, color, opacity,
+                    r#"<rect x="{x:.1}" y="{y:.1}" width="{width:.1}" height="{cell_height:.1}" fill="{color}" opacity="{opacity}" />"#,
                 ));
             }
         }
@@ -114,14 +113,12 @@ fn save(surface: &mut Surface) {
 
     buf.push_str("\n");
 
+    let (mx, my) = (margin_x, margin_y as f64 + font_size);
     buf.push_str(&format!(
-        r#"<text x="{}" y="{}" font-size="{}" xml:space="preserve">"#,
-        margin_x,
-        margin_y as f32 + font_size,
-        font_size
+        r#"<text x="{mx}" y="{my:.0}" font-size="{font_size}" xml:space="preserve">"#,
     ));
 
-    let nl = &format!(r#"x="{}" dy="{}em""#, margin_x, line_interval);
+    let nl = &format!(r#"x="{mx}" dy="{line_interval:.1}em""#);
     let mut offset = "";
     for line in surface.screen_lines().iter() {
         let mut pos = 0;
@@ -137,9 +134,9 @@ fn save(surface: &mut Surface) {
             // And then the text:
             let (color, opacity) =
                 color(cluster.attrs.foreground()).unwrap_or(("white".into(), 1.0));
+            let text = &cluster.text;
             buf.push_str(&format!(
-                r#"<tspan {} fill="{}" opacity="{}">{}</tspan>"#,
-                offset, color, opacity, &cluster.text,
+                r#"<tspan {offset} fill="{color}" opacity="{opacity}">{text}</tspan>"#,
             ));
             offset = "";
 

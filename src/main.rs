@@ -7,7 +7,7 @@ use termwiz::{
 };
 
 fn main() {
-    let mut surface = Surface::new(120, 60);
+    let mut surface = Surface::new(80, 60);
 
     let mut parser = Parser::new();
     let mut reader = io::BufReader::new(io::stdin().lock());
@@ -223,23 +223,23 @@ fn color(attr: ColorAttribute) -> Option<(String, f32)> {
         ColorAttribute::Default => None,
         ColorAttribute::PaletteIndex(idx) => Some((
             match idx {
-                0 => "black",
-                1 => "red",
-                2 => "green",
-                3 => "yellow",
-                4 => "blue",
-                5 => "magenta",
-                6 => "cyan",
-                7 => "white",
-                8 => "bright-black",
-                9 => "bright-red",
-                10 => "bright-green",
-                11 => "bright-yellow",
-                12 => "bright-blue",
-                13 => "bright-magenta",
-                14 => "bright-cyan",
-                15 => "bright-white",
-                _ => "white",
+                0 => "#282c34",  // black
+                1 => "#d17277",  // red
+                2 => "#a1c281",  // green
+                3 => "#de9b64",  // yellow
+                4 => "#74ade9",  // blue
+                5 => "#bb7cd7",  // magenta
+                6 => "#29a9bc",  // cyan
+                7 => "#acb2be",  // white
+                8 => "#676f82",  // bright black
+                9 => "#e6676d",  // bright red
+                10 => "#a9d47f", // bright green
+                11 => "#de9b64", // bright yellow
+                12 => "#66acff", // bright blue
+                13 => "#c671eb", // bright magenta
+                14 => "#69c6d1", // bright cyan
+                15 => "#cccccc", // bright white
+                _ => "#808080",
             }
             .into(),
             1.0,

@@ -604,6 +604,7 @@ dependencies = [
 name = "termshot"
 version = "0.1.0"
 dependencies = [
+ "csscolorparser",
  "termwiz",
 ]
 

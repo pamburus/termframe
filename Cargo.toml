@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 termwiz = "0"
+csscolorparser = "0"

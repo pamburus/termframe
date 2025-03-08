@@ -1,4 +1,8 @@
-use std::io::{self, BufRead};
+use csscolorparser::Color;
+use std::{
+    io::{self, BufRead},
+    str::FromStr,
+};
 use termwiz::{
     cell::AttributeChange,
     color::ColorAttribute,
@@ -7,7 +11,7 @@ use termwiz::{
 };
 
 fn main() {
-    let mut surface = Surface::new(80, 60);
+    let mut surface = Surface::new(160, 60);
 
     let mut parser = Parser::new();
     let mut reader = io::BufReader::new(io::stdin().lock());
@@ -79,20 +83,23 @@ fn apply_action_to_surface(surface: &mut Surface, action: Action) {
 }
 
 fn save(surface: &mut Surface) {
+    let background = "#282C30";
+    let bg = Color::from_str(background).unwrap();
+    let fg = Color::from_str("#acb2be").unwrap();
+
     let mut buf = String::new();
     buf.push_str(concat!(
         r#"<svg version="1.1" xmlns="http://www.w3.org/2000/svg">"#,
         "\n"
     ));
     buf.push_str(STYLE);
-    buf.push_str(concat!(
-        r##"<rect width="100%" height="100%" fill="#282C30"/>"##,
-        "\n"
+    buf.push_str(&format!(
+        r##"<rect width="100%" height="100%" fill="{background}"/>\n"##
     ));
 
     let padding = (12.0, 14.0);
     let font_size = 12.0;
-    let cell_width = 7.2;
+    let cell_width = font_size * 0.6;
     let line_interval = 1.2;
     let cell_height = font_size * line_interval;
     let stroke = 0.25;
@@ -102,20 +109,17 @@ fn save(surface: &mut Surface) {
 
     for (row, line) in surface.screen_lines().iter().enumerate() {
         for cluster in line.cluster(None) {
-            if let Some((color, opacity)) = color(cluster.attrs.background()) {
+            if let Some(mut color) = color(cluster.attrs.background()) {
+                color.a = 1.0;
+                let color = color.to_hex_string();
+
                 let x = padding.0 + cluster.first_cell_idx as f64 * cell_width - stroke;
                 let y = padding.1 + row as f64 * cell_height - stroke + offset_y;
                 let width = cluster.width as f64 * cell_width + stroke * 2.0;
                 let height = cell_height + stroke * 2.0;
 
-                let opacity = if opacity < 1.0 {
-                    format!(r#" opacity="{:.1}""#, opacity)
-                } else {
-                    "".into()
-                };
-
                 buf.push_str(&format!(
-                    r#"<rect x="{x:.1}" y="{y:.1}" width="{width:.1}" height="{height:.1}" fill="{color}"{opacity} />"#,
+                    r#"<rect x="{x:.1}" y="{y:.1}" width="{width:.1}" height="{height:.1}" fill="{color}" />"#,
                 ));
             }
         }
@@ -142,18 +146,13 @@ fn save(surface: &mut Surface) {
                 offset = "";
             }
 
-            let (fill, opacity) = color(cluster.attrs.foreground())
-                .map(|(c, o)| {
-                    (
-                        format!(r#" fill="{c}""#),
-                        if o < 1.0 {
-                            format!(r#" opacity="{c}""#)
-                        } else {
-                            "".into()
-                        },
-                    )
-                })
-                .unwrap_or_default();
+            let mut fg = color(cluster.attrs.foreground()).unwrap_or(fg.clone());
+            if cluster.attrs.intensity() == termwiz::cell::Intensity::Half {
+                fg = bg.interpolate_lab(&fg, 0.5);
+            };
+            fg.a = 1.0;
+
+            let fill = format!(r#" fill="{c}""#, c = fg.to_hex_string());
 
             let text = &cluster.text;
 
@@ -178,8 +177,12 @@ fn save(surface: &mut Surface) {
 
             let decoration = decoration.to_owned()
                 + &if cluster.attrs.underline_color() != termwiz::color::ColorAttribute::Default {
-                    let (c, _) = color(cluster.attrs.underline_color()).unwrap();
-                    format!(r#" text-decoration-color="{c}""#, c = c)
+                    if let Some(mut color) = color(cluster.attrs.underline_color()) {
+                        color.a = 1.0;
+                        format!(r#" text-decoration-color="{c}""#, c = color.to_hex_string())
+                    } else {
+                        "".into()
+                    }
                 } else {
                     "".into()
                 };
@@ -202,7 +205,7 @@ fn save(surface: &mut Surface) {
                 };
 
             buf.push_str(&format!(
-                r#"<tspan{offset}{fill}{opacity}{weight}{style}{decoration}>{text}</tspan>"#,
+                r#"<tspan{offset}{fill}{weight}{style}{decoration}>{text}</tspan>"#,
             ));
             offset = "";
 
@@ -219,10 +222,10 @@ fn save(surface: &mut Surface) {
     std::fs::write("output.svg", buf).expect("Unable to write SVG file");
 }
 
-fn color(attr: ColorAttribute) -> Option<(String, f32)> {
+fn color(attr: ColorAttribute) -> Option<Color> {
     match attr {
         ColorAttribute::Default => None,
-        ColorAttribute::PaletteIndex(idx) => Some((
+        ColorAttribute::PaletteIndex(idx) => Some(
             match idx {
                 0 => "#282c34",  // black
                 1 => "#d17277",  // red
@@ -242,19 +245,13 @@ fn color(attr: ColorAttribute) -> Option<(String, f32)> {
                 15 => "#cccccc", // bright white
                 _ => "#808080",
             }
-            .into(),
-            1.0,
-        )),
+            .try_into()
+            .unwrap(),
+        ),
         ColorAttribute::TrueColorWithDefaultFallback(c)
-        | ColorAttribute::TrueColorWithPaletteFallback(c, _) => Some((
-            format!(
-                "#{:02x}{:02x}{:02x}",
-                (c.0 * 255.0) as u8,
-                (c.1 * 255.0) as u8,
-                (c.2 * 255.0) as u8,
-            ),
-            c.3,
-        )),
+        | ColorAttribute::TrueColorWithPaletteFallback(c, _) => {
+            Some(Color::new(c.0.into(), c.1.into(), c.2.into(), c.3.into()))
+        }
     }
 }
 

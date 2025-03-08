@@ -29,7 +29,7 @@ fn main() {
         reader.consume(len);
     }
 
-    save(&mut surface);
+    save(&surface);
 }
 
 // A function to convert an Action into a vector of Changes.
@@ -82,7 +82,7 @@ fn apply_action_to_surface(surface: &mut Surface, action: Action) {
     };
 }
 
-fn save(surface: &mut Surface) {
+fn save(surface: &Surface) {
     let background = "#282C30";
     let bg = Color::from_str(background).unwrap();
     let fg = Color::from_str("#acb2be").unwrap();
@@ -109,7 +109,13 @@ fn save(surface: &mut Surface) {
 
     for (row, line) in surface.screen_lines().iter().enumerate() {
         for cluster in line.cluster(None) {
-            if let Some(mut color) = color(cluster.attrs.background()) {
+            let color = if cluster.attrs.reverse() {
+                Some(to_color(cluster.attrs.foreground()).unwrap_or(fg.clone()))
+            } else {
+                to_color(cluster.attrs.background())
+            };
+
+            if let Some(mut color) = color {
                 color.a = 1.0;
                 let color = color.to_hex_string();
 
@@ -146,13 +152,22 @@ fn save(surface: &mut Surface) {
                 offset = "";
             }
 
-            let mut fg = color(cluster.attrs.foreground()).unwrap_or(fg.clone());
-            if cluster.attrs.intensity() == termwiz::cell::Intensity::Half {
-                fg = bg.interpolate_lab(&fg, 0.5);
+            let mut color = if cluster.attrs.reverse() {
+                to_color(cluster.attrs.background()).unwrap_or(bg.clone())
+            } else {
+                to_color(cluster.attrs.foreground()).unwrap_or(fg.clone())
             };
-            fg.a = 1.0;
 
-            let fill = format!(r#" fill="{c}""#, c = fg.to_hex_string());
+            if cluster.attrs.intensity() == termwiz::cell::Intensity::Half {
+                color = bg.interpolate_lab(&color, 0.5);
+            };
+            color.a = 1.0;
+
+            let fill = if color == fg {
+                "".into()
+            } else {
+                format!(r#" fill="{c}""#, c = color.to_hex_string())
+            };
 
             let text = &cluster.text;
 
@@ -177,7 +192,7 @@ fn save(surface: &mut Surface) {
 
             let decoration = decoration.to_owned()
                 + &if cluster.attrs.underline_color() != termwiz::color::ColorAttribute::Default {
-                    if let Some(mut color) = color(cluster.attrs.underline_color()) {
+                    if let Some(mut color) = to_color(cluster.attrs.underline_color()) {
                         color.a = 1.0;
                         format!(r#" text-decoration-color="{c}""#, c = color.to_hex_string())
                     } else {
@@ -222,7 +237,7 @@ fn save(surface: &mut Surface) {
     std::fs::write("output.svg", buf).expect("Unable to write SVG file");
 }
 
-fn color(attr: ColorAttribute) -> Option<Color> {
+fn to_color(attr: ColorAttribute) -> Option<Color> {
     match attr {
         ColorAttribute::Default => None,
         ColorAttribute::PaletteIndex(idx) => Some(

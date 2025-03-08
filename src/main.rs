@@ -136,6 +136,10 @@ fn save(surface: &Surface) {
     let width = surface.dimensions().0 as f64 * cell_width;
 
     for (row, line) in surface.screen_lines().iter().enumerate() {
+        if line.is_whitespace() {
+            continue;
+        }
+
         let x = padding.0;
         let y = padding.1 + font_size + row as f64 * cell_height;
 

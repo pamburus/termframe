@@ -102,7 +102,7 @@ fn save(surface: &Surface) {
     let cell_width = font_size * 0.6;
     let line_interval = 1.2;
     let cell_height = font_size * line_interval;
-    let stroke = 0.25;
+    let stroke = 0.2;
     let bg_offset_y = (font_size - cell_height) / 2.0 + 2.0;
 
     buf.push_str(&format!(r#"<g font-size="{font_size}">"#));
@@ -120,7 +120,7 @@ fn save(surface: &Surface) {
                 let color = color.to_hex_string();
 
                 let x = padding.0 + cluster.first_cell_idx as f64 * cell_width - stroke;
-                let y = padding.1 + row as f64 * cell_height - stroke + bg_offset_y;
+                let y = padding.1 + row as f64 * cell_height - stroke;
                 let width = cluster.width as f64 * cell_width + stroke * 2.0;
                 let height = cell_height + stroke * 2.0;
 
@@ -141,11 +141,12 @@ fn save(surface: &Surface) {
         }
 
         let x = padding.0;
-        let y = padding.1 + font_size + row as f64 * cell_height;
+        let y = padding.1 + row as f64 * cell_height;
 
         buf.push_str(&format!(
-            r##"<text x="{x:.1}" y="{y:.1}" width="{width}" height="{cell_height}" fill="{fg}" xml:space="preserve">"##,
+            r##"<svg x="{x:.1}" y="{y:.1}" width="{width}" height="{cell_height}" overflow="hidden"><text fill="{fg}" y="{text_y}" xml:space="preserve">"##,
             fg = fg.to_hex_string(),
+            text_y = font_size-bg_offset_y,
         ));
 
         let mut last_cluster_was_blank = false;
@@ -239,7 +240,7 @@ fn save(surface: &Surface) {
             buf.truncate(prev_len);
         }
 
-        buf.push_str("</text>");
+        buf.push_str("</text></svg>");
     }
 
     buf.push_str("</g>");

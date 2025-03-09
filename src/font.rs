@@ -105,20 +105,20 @@ pub struct Font<'a> {
 }
 
 impl<'a> Font<'a> {
-    pub fn width(&self) -> f64 {
-        self.inner.hhea_table.advance_width_max as f64 / self.em() as f64
+    pub fn width(&self) -> f32 {
+        self.inner.hhea_table.advance_width_max as f32 / self.em() as f32
     }
 
-    pub fn ascender(&self) -> f64 {
-        self.inner.hhea_table.ascender as f64 / self.em() as f64
+    pub fn ascender(&self) -> f32 {
+        self.inner.hhea_table.ascender as f32 / self.em() as f32
     }
 
-    pub fn descender(&self) -> f64 {
-        self.inner.hhea_table.descender as f64 / self.em() as f64
+    pub fn descender(&self) -> f32 {
+        self.inner.hhea_table.descender as f32 / self.em() as f32
     }
 
-    pub fn line_gap(&self) -> f64 {
-        self.inner.hhea_table.line_gap as f64 / self.em() as f64
+    pub fn line_gap(&self) -> f32 {
+        self.inner.hhea_table.line_gap as f32 / self.em() as f32
     }
 
     pub fn weight(&self) -> u16 {

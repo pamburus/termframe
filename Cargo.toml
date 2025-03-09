@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+askama = "0"
+askama_escape = "0"
 allsorts = "0"
 anyhow = "1"
 clap = { version = "4", features = ["wrap_help", "derive", "env", "string"] }
@@ -17,6 +19,7 @@ env_logger = "0"
 known-folders = "1"
 log = "0"
 serde = { version = "1", features = ["derive"] }
+svg = { git = "https://github.com/pamburus/svg.git", branch = "feature/text-ws" }
 termwiz = "0"
 ureq = "3"
 url = "2"

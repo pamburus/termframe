@@ -1,0 +1,6 @@
+@font-face {
+	font-family: {{ font.family }};
+	font-weight: {{ font.weight }};
+	font-style: {{ font.style }};
+	src: url({{ font.url }});
+}

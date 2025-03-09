@@ -14,6 +14,7 @@ use termwiz::surface::Surface;
 use config::Settings;
 use font::Font;
 use parse::parse;
+use render::svg::SvgRenderer;
 use theme::Theme;
 
 mod appdirs;
@@ -21,6 +22,7 @@ mod cli;
 mod config;
 mod font;
 mod parse;
+mod render;
 mod theme;
 
 fn main() {
@@ -61,7 +63,7 @@ fn run() -> Result<()> {
     .unwrap();
 
     let font = ff.font().unwrap();
-    println!(
+    eprintln!(
         "weight={weight} italic={italic} bold={bold} width={w} gap={g} ascender={a} descender={d}",
         weight = font.weight(),
         italic = font.italic(),
@@ -71,6 +73,28 @@ fn run() -> Result<()> {
         a = font.ascender(),
         d = font.descender()
     );
+
+    let options = render::Options {
+        font: render::FontOptions {
+            family: opt.font_family,
+            size: opt.font_size,
+            metrics: render::FontMetrics {
+                width: font.width(),
+                ascender: font.ascender(),
+                descender: font.descender(),
+            },
+        },
+        line_height: opt.line_height,
+        padding: render::Padding {
+            x: opt.padding,
+            y: opt.padding,
+        },
+        theme: Theme::default().into(),
+        stroke: 0.2,
+    };
+
+    let renderer = SvgRenderer::new(options);
+    renderer.render(&surface, &mut std::io::stdout())?;
 
     save(&surface, &font);
     Ok(())
@@ -90,10 +114,10 @@ fn save(surface: &Surface, font: &Font) {
         background = theme.bg.to_hex_string()
     ));
 
-    let padding = (12.0, 12.0);
+    let padding = (0.0, 0.0);
     let font_size = 12.0;
     let cell_width = font_size * font.width();
-    let line_interval = 1.2;
+    let line_interval = 1.0;
     let cell_height = font_size * line_interval;
     let stroke = 0.2;
     let bg_offset_y = (font_size - cell_height) / 2.0 + 2.0;
@@ -112,9 +136,9 @@ fn save(surface: &Surface, font: &Font) {
                 color.a = 1.0;
                 let color = color.to_hex_string();
 
-                let x = padding.0 + cluster.first_cell_idx as f64 * cell_width - stroke;
-                let y = padding.1 + row as f64 * cell_height - stroke;
-                let width = cluster.width as f64 * cell_width + stroke * 2.0;
+                let x = padding.0 + cluster.first_cell_idx as f32 * cell_width - stroke;
+                let y = padding.1 + row as f32 * cell_height - stroke;
+                let width = cluster.width as f32 * cell_width + stroke * 2.0;
                 let height = cell_height + stroke * 2.0;
 
                 buf.push_str(&format!(
@@ -126,7 +150,7 @@ fn save(surface: &Surface, font: &Font) {
 
     buf.push_str("\n");
 
-    let width = surface.dimensions().0 as f64 * cell_width;
+    let width = surface.dimensions().0 as f32 * cell_width;
 
     for (row, line) in surface.screen_lines().iter().enumerate() {
         if line.is_whitespace() {
@@ -134,7 +158,7 @@ fn save(surface: &Surface, font: &Font) {
         }
 
         let x = padding.0;
-        let y = padding.1 + row as f64 * cell_height;
+        let y = padding.1 + row as f32 * cell_height;
 
         buf.push_str(&format!(
             r##"<svg x="{x:.1}" y="{y:.1}" width="{width}" height="{cell_height}" overflow="hidden"><text fill="{fg}" y="{text_y}" xml:space="preserve">"##,

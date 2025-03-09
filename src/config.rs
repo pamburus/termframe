@@ -23,7 +23,7 @@ pub struct Settings {
     pub line_height: f32,
     pub theme: String,
     pub fonts: Fonts,
-    pub padding: String,
+    pub padding: f32,
 }
 
 impl Settings {

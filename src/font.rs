@@ -12,6 +12,7 @@ use url::Url;
 
 // ---
 
+#[allow(dead_code)]
 pub struct FontFile {
     location: Location,
     data: ReadScopeOwned,
@@ -47,6 +48,7 @@ impl FontFile {
         Ok(Self { location, data })
     }
 
+    #[allow(dead_code)]
     pub fn location(&self) -> &Location {
         &self.location
     }

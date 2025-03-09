@@ -1,0 +1,19 @@
+terminal:
+  width: 160
+  height: 80
+
+font:
+  family: "JetBrains Mono"
+  size: 12
+
+line-height: 1.2
+padding: 4
+theme: "one-dark"
+
+fonts:
+  - family: "JetBrains Mono"
+    files:
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Regular.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Italic.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Bold.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-BoldItalic.woff2"

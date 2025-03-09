@@ -1,21 +1,60 @@
 // std imports
-use std::io::{self};
+use std::{
+    io::{self, stdout},
+    process,
+};
 
 // third-party imports
+use anyhow::Result;
+use clap::{CommandFactory, Parser};
+use env_logger::{self as logger};
 use termwiz::surface::Surface;
 
 // local imports
+use config::Settings;
 use font::Font;
 use parse::parse;
 use theme::Theme;
 
+mod appdirs;
+mod cli;
+mod config;
 mod font;
 mod parse;
 mod theme;
 
 fn main() {
+    if let Err(err) = run() {
+        eprintln!("ERROR: {:?}", err);
+        process::exit(1);
+    }
+}
+
+fn run() -> Result<()> {
+    #[allow(unused_variables)]
+    let settings = bootstrap()?;
+
+    let opt = cli::Opt::parse_from(wild::args());
+
+    if opt.help {
+        return Ok(cli::Opt::command().print_help()?);
+    }
+
+    if let Some(shell) = opt.shell_completions {
+        let mut cmd = cli::Opt::command();
+        let name = cmd.get_name().to_string();
+        clap_complete::generate(shell, &mut cmd, name, &mut stdout());
+        return Ok(());
+    }
+
+    if opt.man_page {
+        let man = clap_mangen::Man::new(cli::Opt::command());
+        man.render(&mut stdout())?;
+        return Ok(());
+    }
+
     let input = io::BufReader::new(io::stdin().lock());
-    let surface = parse(512, 60, input);
+    let surface = parse(opt.width, opt.height, input);
     let ff = font::FontFile::load(
         "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-BoldItalic.woff2".into(),
     )
@@ -34,6 +73,7 @@ fn main() {
     );
 
     save(&surface, &font);
+    Ok(())
 }
 
 fn save(surface: &Surface, font: &Font) {
@@ -203,4 +243,36 @@ fn save(surface: &Surface, font: &Font) {
     std::fs::write("output.svg", buf).expect("Unable to write SVG file");
 }
 
+// ---
+
+fn bootstrap() -> Result<Settings> {
+    if std::env::var(TERMSHOT_DEBUG_LOG).is_ok() {
+        logger::Builder::from_env(TERMSHOT_DEBUG_LOG)
+            .format_timestamp_micros()
+            .init();
+        log::debug!("logging initialized");
+    } else {
+        logger::Builder::new()
+            .filter_level(log::LevelFilter::Warn)
+            .format_timestamp_millis()
+            .init()
+    }
+
+    let opt = cli::BootstrapOpt::parse().args;
+
+    let (offset, no_default_configs) = opt
+        .config
+        .iter()
+        .rposition(|x| x == "" || x == "-")
+        .map(|x| (x + 1, true))
+        .unwrap_or_default();
+    let configs = &opt.config[offset..];
+
+    let settings = config::at(configs).no_default(no_default_configs).load()?;
+    config::global::initialize(settings.clone());
+
+    Ok(settings)
+}
+
+const TERMSHOT_DEBUG_LOG: &str = "TERMSHOT_DEBUG_LOG";
 const STYLE: &str = include_str!("assets/style.html");

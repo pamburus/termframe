@@ -1,91 +1,25 @@
-use csscolorparser::Color;
-use std::{
-    io::{self, BufRead},
-    str::FromStr,
-};
-use termwiz::{
-    cell::AttributeChange,
-    color::ColorAttribute,
-    escape::{Action, CSI, ControlCode, csi::Sgr, parser::Parser},
-    surface::{Change, SEQ_ZERO, Surface},
-};
+// std imports
+use std::io::{self};
+
+// third-party imports
+use termwiz::surface::Surface;
+
+// local imports
+use parse::parse;
+use theme::Theme;
+
+mod parse;
+mod theme;
 
 fn main() {
-    let mut surface = Surface::new(160, 60);
-
-    let mut parser = Parser::new();
-    let mut reader = io::BufReader::new(io::stdin().lock());
-
-    while let Ok(buffer) = reader.fill_buf() {
-        if buffer.is_empty() {
-            break;
-        }
-
-        parser.parse(buffer, |action| {
-            apply_action_to_surface(&mut surface, action);
-        });
-
-        let len = buffer.len();
-        reader.consume(len);
-    }
+    let input = io::BufReader::new(io::stdin().lock());
+    let surface = parse(160, 60, input);
 
     save(&surface);
 }
 
-// A function to convert an Action into a vector of Changes.
-fn apply_action_to_surface(surface: &mut Surface, action: Action) {
-    match action {
-        Action::Print(ch) => surface.add_change(ch),
-        Action::PrintString(s) => surface.add_change(s),
-        Action::Control(code) => match code {
-            ControlCode::LineFeed => surface.add_change("\r\n"),
-            ControlCode::CarriageReturn | ControlCode::HorizontalTab => {
-                surface.add_change(code as u8 as char)
-            }
-            _ => SEQ_ZERO,
-        },
-        Action::CSI(csi) => {
-            match csi {
-                CSI::Sgr(sgr) => match sgr {
-                    Sgr::Reset => surface.add_change(Change::AllAttributes(Default::default())),
-                    Sgr::Intensity(intensity) => {
-                        surface.add_change(Change::Attribute(AttributeChange::Intensity(intensity)))
-                    }
-                    Sgr::Underline(underline) => {
-                        surface.add_change(Change::Attribute(AttributeChange::Underline(underline)))
-                    }
-                    Sgr::UnderlineColor(_) => SEQ_ZERO,
-                    Sgr::Blink(_) => SEQ_ZERO,
-                    Sgr::Inverse(inverse) => {
-                        surface.add_change(Change::Attribute(AttributeChange::Reverse(inverse)))
-                    }
-                    Sgr::Foreground(color) => surface
-                        .add_change(Change::Attribute(AttributeChange::Foreground(color.into()))),
-                    Sgr::Background(color) => surface
-                        .add_change(Change::Attribute(AttributeChange::Background(color.into()))),
-                    Sgr::Italic(italic) => {
-                        surface.add_change(Change::Attribute(AttributeChange::Italic(italic)))
-                    }
-                    Sgr::StrikeThrough(enabled) => surface
-                        .add_change(Change::Attribute(AttributeChange::StrikeThrough(enabled))),
-                    Sgr::Invisible(enabled) => {
-                        surface.add_change(Change::Attribute(AttributeChange::Invisible(enabled)))
-                    }
-                    Sgr::Font(_) => SEQ_ZERO,
-                    Sgr::VerticalAlign(_) => SEQ_ZERO,
-                    Sgr::Overline(_) => SEQ_ZERO,
-                },
-                _ => SEQ_ZERO,
-            }
-        }
-        _ => SEQ_ZERO,
-    };
-}
-
 fn save(surface: &Surface) {
-    let background = "#282C30";
-    let bg = Color::from_str(background).unwrap();
-    let fg = Color::from_str("#acb2be").unwrap();
+    let theme = Theme::default();
 
     let mut buf = String::new();
     buf.push_str(concat!(
@@ -94,7 +28,8 @@ fn save(surface: &Surface) {
     ));
     buf.push_str(STYLE);
     buf.push_str(&format!(
-        r##"<rect width="100%" height="100%" fill="{background}"/>\n"##
+        r##"<rect width="100%" height="100%" fill="{background}"/>\n"##,
+        background = theme.bg.to_hex_string()
     ));
 
     let padding = (12.0, 14.0);
@@ -110,9 +45,9 @@ fn save(surface: &Surface) {
     for (row, line) in surface.screen_lines().iter().enumerate() {
         for cluster in line.cluster(None) {
             let color = if cluster.attrs.reverse() {
-                Some(to_color(cluster.attrs.foreground()).unwrap_or(fg.clone()))
+                Some(theme.resolve_fg(cluster.attrs.foreground()))
             } else {
-                to_color(cluster.attrs.background())
+                theme.resolve(cluster.attrs.background())
             };
 
             if let Some(mut color) = color {
@@ -145,7 +80,7 @@ fn save(surface: &Surface) {
 
         buf.push_str(&format!(
             r##"<svg x="{x:.1}" y="{y:.1}" width="{width}" height="{cell_height}" overflow="hidden"><text fill="{fg}" y="{text_y}" xml:space="preserve">"##,
-            fg = fg.to_hex_string(),
+            fg = theme.fg.to_hex_string(),
             text_y = font_size-bg_offset_y,
         ));
 
@@ -163,17 +98,17 @@ fn save(surface: &Surface) {
             }
 
             let mut color = if cluster.attrs.reverse() {
-                to_color(cluster.attrs.background()).unwrap_or(bg.clone())
+                theme.resolve_bg(cluster.attrs.background())
             } else {
-                to_color(cluster.attrs.foreground()).unwrap_or(fg.clone())
+                theme.resolve_fg(cluster.attrs.foreground())
             };
 
             if cluster.attrs.intensity() == termwiz::cell::Intensity::Half {
-                color = bg.interpolate_lab(&color, 0.5);
+                color = theme.bg.interpolate_lab(&color, 0.5);
             };
             color.a = 1.0;
 
-            let fill = if color == fg {
+            let fill = if color == theme.fg {
                 "".into()
             } else {
                 format!(r#" fill="{c}""#, c = color.to_hex_string())
@@ -203,7 +138,7 @@ fn save(surface: &Surface) {
 
             let decoration = decoration.to_owned()
                 + &if cluster.attrs.underline_color() != termwiz::color::ColorAttribute::Default {
-                    if let Some(mut color) = to_color(cluster.attrs.underline_color()) {
+                    if let Some(mut color) = theme.resolve(cluster.attrs.underline_color()) {
                         color.a = 1.0;
                         format!(r#" text-decoration-color="{c}""#, c = color.to_hex_string())
                     } else {
@@ -248,39 +183,6 @@ fn save(surface: &Surface) {
 
     // Write to file.
     std::fs::write("output.svg", buf).expect("Unable to write SVG file");
-}
-
-fn to_color(attr: ColorAttribute) -> Option<Color> {
-    match attr {
-        ColorAttribute::Default => None,
-        ColorAttribute::PaletteIndex(idx) => Some(
-            match idx {
-                0 => "#282c34",  // black
-                1 => "#d17277",  // red
-                2 => "#a1c281",  // green
-                3 => "#de9b64",  // yellow
-                4 => "#74ade9",  // blue
-                5 => "#bb7cd7",  // magenta
-                6 => "#29a9bc",  // cyan
-                7 => "#acb2be",  // white
-                8 => "#676f82",  // bright black
-                9 => "#e6676d",  // bright red
-                10 => "#a9d47f", // bright green
-                11 => "#de9b64", // bright yellow
-                12 => "#66acff", // bright blue
-                13 => "#c671eb", // bright magenta
-                14 => "#69c6d1", // bright cyan
-                15 => "#cccccc", // bright white
-                _ => "#808080",
-            }
-            .try_into()
-            .unwrap(),
-        ),
-        ColorAttribute::TrueColorWithDefaultFallback(c)
-        | ColorAttribute::TrueColorWithPaletteFallback(c, _) => {
-            Some(Color::new(c.0.into(), c.1.into(), c.2.into(), c.3.into()))
-        }
-    }
 }
 
 const STYLE: &str = include_str!("assets/style.html");

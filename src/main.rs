@@ -5,20 +5,38 @@ use std::io::{self};
 use termwiz::surface::Surface;
 
 // local imports
+use font::Font;
 use parse::parse;
 use theme::Theme;
 
+mod font;
 mod parse;
 mod theme;
 
 fn main() {
     let input = io::BufReader::new(io::stdin().lock());
-    let surface = parse(160, 60, input);
+    let surface = parse(512, 60, input);
+    let ff = font::FontFile::load(
+        "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-BoldItalic.woff2".into(),
+    )
+    .unwrap();
 
-    save(&surface);
+    let font = ff.font().unwrap();
+    println!(
+        "weight={weight} italic={italic} bold={bold} width={w} gap={g} ascender={a} descender={d}",
+        weight = font.weight(),
+        italic = font.italic(),
+        bold = font.bold(),
+        w = font.width(),
+        g = font.line_gap(),
+        a = font.ascender(),
+        d = font.descender()
+    );
+
+    save(&surface, &font);
 }
 
-fn save(surface: &Surface) {
+fn save(surface: &Surface, font: &Font) {
     let theme = Theme::default();
 
     let mut buf = String::new();
@@ -32,9 +50,9 @@ fn save(surface: &Surface) {
         background = theme.bg.to_hex_string()
     ));
 
-    let padding = (12.0, 14.0);
+    let padding = (12.0, 12.0);
     let font_size = 12.0;
-    let cell_width = font_size * 0.6;
+    let cell_width = font_size * font.width();
     let line_interval = 1.2;
     let cell_height = font_size * line_interval;
     let stroke = 0.2;

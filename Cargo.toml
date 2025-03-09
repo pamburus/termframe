@@ -4,5 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-termwiz = "0"
+allsorts = "0"
+anyhow = "1"
 csscolorparser = "0"
+termwiz = "0"
+ureq = "3"
+url = "2"

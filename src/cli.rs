@@ -56,6 +56,11 @@ pub struct Opt {
     #[arg(long, overrides_with = "end")]
     pub end: Option<usize>,
 
+    /// Output file.
+    /// If not specified, prints to stdout.
+    #[arg(long, short = 'o', overrides_with = "output")]
+    pub output: Option<String>,
+
     /// Print help.
     #[arg(long, default_value_t = false, action = ArgAction::SetTrue)]
     pub help: bool,
@@ -71,6 +76,10 @@ pub struct Opt {
     /// Print man page and exit.
     #[arg(long)]
     pub man_page: bool,
+
+    /// File to process
+    #[arg(name = "FILE")]
+    pub file: std::path::PathBuf,
 }
 
 // ---

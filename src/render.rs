@@ -13,6 +13,7 @@ pub mod svg;
 pub type Result<T> = anyhow::Result<T>;
 
 pub trait Render {
+    #[allow(dead_code)]
     fn render(&self, surface: &Surface, target: &mut dyn std::io::Write) -> Result<()>;
 }
 

@@ -66,8 +66,7 @@ impl Default for &'static Settings {
 
 // ---
 
-#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
-pub struct Fonts(pub Vec<FontFace>);
+pub type Fonts = Vec<FontFace>;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct FontFace {

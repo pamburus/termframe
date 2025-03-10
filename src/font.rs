@@ -78,6 +78,13 @@ impl Location {
             Err(_) => Self::File(PathBuf::from(s.as_ref())),
         }
     }
+
+    pub fn url(&self) -> Option<&Url> {
+        match self {
+            Self::Url(url) => Some(url),
+            Self::File(_) => None,
+        }
+    }
 }
 
 impl From<PathBuf> for Location {
@@ -98,6 +105,7 @@ impl From<&str> for Location {
     }
 }
 
+#[allow(dead_code)]
 pub struct Font<'a> {
     inner: allsorts::Font<DynamicFontTableProvider<'a>>,
     head: HeadTable,
@@ -117,10 +125,12 @@ impl<'a> Font<'a> {
         self.inner.hhea_table.descender as f32 / self.em() as f32
     }
 
+    #[allow(dead_code)]
     pub fn line_gap(&self) -> f32 {
         self.inner.hhea_table.line_gap as f32 / self.em() as f32
     }
 
+    #[allow(dead_code)]
     pub fn weight(&self) -> u16 {
         self.os2.us_weight_class
     }

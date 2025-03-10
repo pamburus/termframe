@@ -53,35 +53,60 @@ fn run() -> Result<()> {
         return Ok(());
     }
 
+    let mut metrics: Option<render::FontMetrics> = None;
+    let mut faces = Vec::new();
+    for font in settings.fonts {
+        if font.family == opt.font_family {
+            for file in font.files {
+                let file = font::FontFile::load(file.as_str().into()).unwrap();
+                let font = file.font().unwrap();
+                if let Some(metrics) = &mut metrics {
+                    if metrics.width != font.width()
+                        || metrics.ascender != font.ascender()
+                        || metrics.descender != font.descender()
+                    {
+                        return Err(anyhow::anyhow!("inconsistent font metrics"));
+                    }
+                } else {
+                    metrics = Some(render::FontMetrics {
+                        width: font.width(),
+                        ascender: font.ascender(),
+                        descender: font.descender(),
+                    })
+                };
+                faces.push(render::FontFace {
+                    weight: if font.bold() {
+                        render::FontWeight::Bold
+                    } else {
+                        render::FontWeight::Normal
+                    },
+                    style: if font.italic() {
+                        render::FontStyle::Italic
+                    } else {
+                        render::FontStyle::Normal
+                    },
+                    url: file.location().url().unwrap().to_string(),
+                });
+            }
+        }
+    }
+
+    let metrics = metrics.unwrap_or_else(|| render::FontMetrics {
+        width: 0.6,
+        ascender: 0.0,
+        descender: 0.0,
+    });
+
     let file = std::fs::File::open(&opt.file)?;
     let input = io::BufReader::new(file);
     let surface = parse(opt.width, opt.height, input);
-    let ff = font::FontFile::load(
-        "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-BoldItalic.woff2".into(),
-    )
-    .unwrap();
-
-    let font = ff.font().unwrap();
-    eprintln!(
-        "weight={weight} italic={italic} bold={bold} width={w} gap={g} ascender={a} descender={d}",
-        weight = font.weight(),
-        italic = font.italic(),
-        bold = font.bold(),
-        w = font.width(),
-        g = font.line_gap(),
-        a = font.ascender(),
-        d = font.descender()
-    );
 
     let options = render::Options {
         font: render::FontOptions {
             family: opt.font_family,
             size: opt.font_size,
-            metrics: render::FontMetrics {
-                width: font.width(),
-                ascender: font.ascender(),
-                descender: font.descender(),
-            },
+            metrics,
+            faces,
         },
         line_height: opt.line_height,
         padding: render::Padding {

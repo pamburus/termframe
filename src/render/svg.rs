@@ -51,14 +51,12 @@ impl SvgRenderer {
             .set("height", "100%")
             .set("fill", opt.theme.bg.to_hex_string());
 
-        let style = element::Style::new(
-            styles::Screen {
-                font_family: &format!("{:?}", opt.font.family.as_str()),
-                font_size: opt.font.size,
-                fill: &opt.theme.fg.to_hex_string(),
-            }
-            .render()?,
-        );
+        let mut font_faces = std::collections::HashMap::new();
+        for face in &opt.font.faces {
+            font_faces.insert((face.weight, face.style), &face.url);
+        }
+
+        let mut used_font_styles = std::collections::HashSet::new();
 
         let mut group = element::Group::new().set("class", "screen");
 
@@ -112,7 +110,14 @@ impl SvgRenderer {
                 }
 
                 for (text, mut range) in subdivide(&line, &cluster) {
+                    if text.trim().is_empty() {
+                        continue;
+                    }
+
                     let mut span = element::TSpan::new(text);
+
+                    let mut font_weight = super::FontWeight::Normal;
+                    let mut font_style = super::FontStyle::Normal;
 
                     let x = range.start;
                     if x != pos {
@@ -143,10 +148,12 @@ impl SvgRenderer {
 
                     if cluster.attrs.intensity() == Intensity::Bold {
                         span = span.set("font-weight", "bold");
+                        font_weight = super::FontWeight::Bold;
                     }
 
                     if cluster.attrs.italic() {
                         span = span.set("font-style", "italic");
+                        font_style = super::FontStyle::Italic;
                     }
 
                     if cluster.attrs.underline() != Underline::None {
@@ -177,6 +184,8 @@ impl SvgRenderer {
                         );
                     }
 
+                    used_font_styles.insert((font_weight, font_style));
+
                     tl = tl.add(span);
                     pos = x + range.len();
                 }
@@ -185,6 +194,49 @@ impl SvgRenderer {
             sl = sl.add(tl);
             group = group.add(sl);
         }
+
+        let font_family_quoted = &format!("{:?}", opt.font.family.as_str());
+        let faces: Vec<_> = used_font_styles
+            .iter()
+            .filter_map(|(weight, style)| {
+                let url = font_faces.get(&(*weight, *style))?;
+
+                Some(styles::FontFace {
+                    font_family: font_family_quoted.clone(),
+                    font_weight: match weight {
+                        super::FontWeight::Normal => "normal".into(),
+                        super::FontWeight::Bold => "bold".into(),
+                        super::FontWeight::Custom(w) => w.to_string(),
+                    },
+                    font_style: match style {
+                        super::FontStyle::Normal => "normal".into(),
+                        super::FontStyle::Italic => "italic".into(),
+                        super::FontStyle::Oblique => "oblique".into(),
+                    },
+                    src_url: url.to_string(),
+                })
+            })
+            .collect();
+
+        let faces = faces
+            .iter()
+            .map(|face| {
+                face.render()
+                    .map_err(Into::into)
+                    .map(|x| x.trim().to_owned())
+            })
+            .collect::<Result<Vec<_>>>()?;
+
+        let style = element::Style::new(
+            styles::Screen {
+                font_family: &font_family_quoted,
+                font_size: opt.font.size,
+                fill: &opt.theme.fg.to_hex_string(),
+            }
+            .render()?
+                + "\n"
+                + &faces.join("\n"),
+        );
 
         let doc = Document::new()
             .set("viewBox", r2p((-pad.x, -pad.y, outer.0, outer.1), FP))
@@ -335,5 +387,14 @@ mod styles {
         pub font_family: &'a str,
         pub font_size: f32,
         pub fill: &'a str,
+    }
+
+    #[derive(Template)]
+    #[template(path = "styles/font-face.css")]
+    pub struct FontFace {
+        pub font_family: String,
+        pub font_weight: String,
+        pub font_style: String,
+        pub src_url: String,
     }
 }

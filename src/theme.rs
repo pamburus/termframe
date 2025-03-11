@@ -8,6 +8,7 @@ use std::{
 use csscolorparser::Color;
 use termwiz::color::ColorAttribute;
 
+#[derive(Debug, Clone)]
 pub struct Theme {
     pub bg: Color,
     pub fg: Color,
@@ -62,7 +63,7 @@ impl Default for Theme {
 
 // ---
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Palette([Color; 256]);
 
 impl Deref for Palette {

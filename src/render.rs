@@ -17,6 +17,7 @@ pub trait Render {
     fn render(&self, surface: &Surface, target: &mut dyn std::io::Write) -> Result<()>;
 }
 
+#[derive(Debug, Clone)]
 pub struct Options {
     pub font: FontOptions,
     pub line_height: f32,
@@ -25,6 +26,7 @@ pub struct Options {
     pub stroke: f32,
 }
 
+#[derive(Debug, Clone)]
 pub struct FontOptions {
     pub family: String,
     pub size: f32,
@@ -32,12 +34,14 @@ pub struct FontOptions {
     pub faces: Vec<FontFace>,
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct FontMetrics {
     pub width: f32,
     pub ascender: f32,
     pub descender: f32,
 }
 
+#[derive(Debug, Clone)]
 pub struct FontFace {
     pub weight: FontWeight,
     pub style: FontStyle,

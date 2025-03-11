@@ -53,61 +53,12 @@ fn run() -> Result<()> {
         return Ok(());
     }
 
-    let mut metrics: Option<render::FontMetrics> = None;
-    let mut faces = Vec::new();
-    for font in settings.fonts {
-        if font.family == opt.font_family {
-            for file in font.files {
-                let file = font::FontFile::load(file.as_str().into()).unwrap();
-                let font = file.font().unwrap();
-                if let Some(metrics) = &mut metrics {
-                    if metrics.width != font.width()
-                        || metrics.ascender != font.ascender()
-                        || metrics.descender != font.descender()
-                    {
-                        return Err(anyhow::anyhow!("inconsistent font metrics"));
-                    }
-                } else {
-                    metrics = Some(render::FontMetrics {
-                        width: font.width(),
-                        ascender: font.ascender(),
-                        descender: font.descender(),
-                    })
-                };
-                faces.push(render::FontFace {
-                    weight: if font.bold() {
-                        render::FontWeight::Bold
-                    } else {
-                        render::FontWeight::Normal
-                    },
-                    style: if font.italic() {
-                        render::FontStyle::Italic
-                    } else {
-                        render::FontStyle::Normal
-                    },
-                    url: file.location().url().unwrap().to_string(),
-                });
-            }
-        }
-    }
-
-    let metrics = metrics.unwrap_or_else(|| render::FontMetrics {
-        width: 0.6,
-        ascender: 0.0,
-        descender: 0.0,
-    });
-
     let file = std::fs::File::open(&opt.file)?;
     let input = io::BufReader::new(file);
     let surface = parse(opt.width, opt.height, input);
 
     let options = render::Options {
-        font: render::FontOptions {
-            family: opt.font_family,
-            size: opt.font_size,
-            metrics,
-            faces,
-        },
+        font: make_font_options(&settings, &opt)?,
         line_height: opt.line_height,
         padding: render::Padding {
             x: opt.padding,
@@ -160,4 +111,71 @@ fn bootstrap() -> Result<Settings> {
     Ok(settings)
 }
 
+// ---
+
+fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::FontOptions> {
+    let mut faces = Vec::new();
+
+    let mut width = None;
+    let mut ascender: f32 = 0.0;
+    let mut descender: f32 = 0.0;
+
+    for font in &settings.fonts {
+        if font.family == opt.font_family {
+            for file in &font.files {
+                let file = font::FontFile::load(file.as_str().into()).unwrap();
+                let font = file.font().unwrap();
+
+                if let Some(width) = &mut width {
+                    if *width != font.width() {
+                        return Err(anyhow::anyhow!("inconsistent font width"));
+                    }
+                    ascender = ascender.max(font.ascender());
+                    descender = descender.min(font.descender());
+                } else {
+                    width = Some(font.width());
+                    ascender = font.ascender();
+                    descender = font.descender();
+                };
+
+                faces.push(render::FontFace {
+                    weight: if font.bold() {
+                        render::FontWeight::Bold
+                    } else {
+                        render::FontWeight::Normal
+                    },
+                    style: if font.italic() {
+                        render::FontStyle::Italic
+                    } else {
+                        render::FontStyle::Normal
+                    },
+                    url: file.location().url().unwrap().to_string(),
+                });
+            }
+        }
+    }
+
+    let metrics = if let Some(width) = width {
+        render::FontMetrics {
+            width,
+            ascender,
+            descender,
+        }
+    } else {
+        DEFAULT_FONT_METRICS
+    };
+
+    Ok(render::FontOptions {
+        family: opt.font_family.clone(),
+        size: opt.font_size,
+        metrics,
+        faces,
+    })
+}
+
 const TERMSHOT_DEBUG_LOG: &str = "TERMSHOT_DEBUG_LOG";
+const DEFAULT_FONT_METRICS: render::FontMetrics = render::FontMetrics {
+    width: 0.6,
+    ascender: 0.0,
+    descender: 0.0,
+};

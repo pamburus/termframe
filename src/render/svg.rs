@@ -1,8 +1,12 @@
 // std imports
-use std::ops::Range;
+use std::{
+    collections::{HashMap, HashSet},
+    ops::Range,
+};
 
 // third-party imports
 use askama::Template;
+use closure::closure;
 use svg::{Document, node::element};
 use termwiz::{
     cell::{Intensity, Underline},
@@ -29,20 +33,20 @@ impl SvgRenderer {
     pub fn render(&self, surface: &Surface, target: &mut dyn std::io::Write) -> Result<()> {
         let opt = &self.options;
 
-        const FP: u8 = 3; // floating point precision
+        let fp = opt.precision; // floating point precision
         let dimensions = surface.dimensions(); // surface dimensions in cells
         let size = (
             // terminal surface size in pixels
-            (dimensions.0 as f32 * opt.font.size * opt.font.metrics.width).r2p(FP),
-            (dimensions.1 as f32 * opt.font.size * opt.line_height).r2p(FP),
+            (dimensions.0 as f32 * opt.font.size * opt.font.metrics.width).r2p(fp),
+            (dimensions.1 as f32 * opt.font.size * opt.line_height).r2p(fp),
         );
-        let pad = opt.padding.r2p(FP); // padding in pixels
-        let outer = (size.0 + pad.x * 2.0, size.1 + pad.y * 2.0).r2p(FP); // outer dimensions in pixels
-        let lh = opt.line_height.r2p(FP); // line height in em
-        let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(FP); // text y-offset in em
-        let fw = opt.font.metrics.width.r2p(FP); // font width in em
-        let cw = (opt.font.size * opt.font.metrics.width).r2p(FP); // column width in pixels
-        let ch = (opt.font.size * opt.line_height).r2p(FP); // column height in pixels
+        let pad = opt.padding.r2p(fp); // padding in pixels
+        let outer = (size.0 + pad.x * 2.0, size.1 + pad.y * 2.0).r2p(fp); // outer dimensions in pixels
+        let lh = opt.line_height.r2p(fp); // line height in em
+        let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
+        let fw = opt.font.metrics.width.r2p(fp); // font width in em
+        let cw = (opt.font.size * opt.font.metrics.width).r2p(fp); // column width in pixels
+        let ch = (opt.font.size * opt.line_height).r2p(fp); // column height in pixels
 
         let background = element::Rectangle::new()
             .set("x", -pad.x)
@@ -51,12 +55,15 @@ impl SvgRenderer {
             .set("height", "100%")
             .set("fill", opt.theme.bg.to_hex_string());
 
-        let mut font_faces = std::collections::HashMap::new();
+        let mut font_faces: HashMap<_, Vec<_>> = HashMap::new();
         for face in &opt.font.faces {
-            font_faces.insert((face.weight, face.style), &face.url);
+            font_faces
+                .entry((face.weight, face.style))
+                .or_default()
+                .push(&face.url);
         }
 
-        let mut used_font_styles = std::collections::HashSet::new();
+        let mut used_font_styles = HashSet::new();
 
         let mut group = element::Group::new().set("class", "screen");
 
@@ -71,10 +78,10 @@ impl SvgRenderer {
                 if let Some(mut color) = color {
                     color.a = 1.0;
 
-                    let x = (cluster.first_cell_idx as f32 * cw - opt.stroke).r2p(FP);
-                    let y = (row as f32 * ch - opt.stroke).r2p(FP);
-                    let width = (cluster.width as f32 * cw + opt.stroke * 2.0).r2p(FP);
-                    let height = (ch + opt.stroke * 2.0).r2p(FP);
+                    let x = (cluster.first_cell_idx as f32 * cw - opt.stroke).r2p(fp);
+                    let y = (row as f32 * ch - opt.stroke).r2p(fp);
+                    let width = (cluster.width as f32 * cw + opt.stroke * 2.0).r2p(fp);
+                    let height = (ch + opt.stroke * 2.0).r2p(fp);
 
                     let rect = element::Rectangle::new()
                         .set("x", x)
@@ -94,10 +101,10 @@ impl SvgRenderer {
             }
 
             let mut sl = element::SVG::new()
-                .set("y", format!("{}em", (row as f32 * lh).r2p(FP)))
+                .set("y", format!("{}em", (row as f32 * lh).r2p(fp)))
                 .set("width", size.0)
                 .set("height", format!("{}em", lh))
-                .set("overflow", "hidden");
+                .set("overflow", "visible");
 
             let mut tl = element::Text::new("")
                 .set("y", format!("{}em", tyo))
@@ -121,10 +128,10 @@ impl SvgRenderer {
 
                     let x = range.start;
                     if x != pos {
-                        span = span.set("x", format!("{}em", (x as f32 * fw).r2p(FP)));
+                        span = span.set("x", format!("{}em", (x as f32 * fw).r2p(fp)));
                     }
 
-                    if line.get_cell(x).map(|x| x.width()).unwrap_or(0) > 1 {
+                    if line.get_cell(x).map(|cell| cell.width()).unwrap_or(0) > 1 {
                         // Make width invalid to force explicit x position attribute in the next span.
                         // This is needed because characters with width > 1 are not monospaced and can overlap
                         // with the next character.
@@ -197,25 +204,28 @@ impl SvgRenderer {
 
         let font_family_quoted = &format!("{:?}", opt.font.family.as_str());
         let faces: Vec<_> = used_font_styles
-            .iter()
+            .into_iter()
             .filter_map(|(weight, style)| {
-                let url = font_faces.get(&(*weight, *style))?;
-
-                Some(styles::FontFace {
-                    font_family: font_family_quoted.clone(),
-                    font_weight: match weight {
-                        super::FontWeight::Normal => "normal".into(),
-                        super::FontWeight::Bold => "bold".into(),
-                        super::FontWeight::Custom(w) => w.to_string(),
-                    },
-                    font_style: match style {
-                        super::FontStyle::Normal => "normal".into(),
-                        super::FontStyle::Italic => "italic".into(),
-                        super::FontStyle::Oblique => "oblique".into(),
-                    },
-                    src_url: url.to_string(),
+                font_faces.remove(&(weight, style)).map(|faces| {
+                    faces.into_iter().map(
+                        closure!(clone style, clone weight, |url| styles::FontFace {
+                            font_family: font_family_quoted.clone(),
+                            font_weight: match weight {
+                                super::FontWeight::Normal => "normal".into(),
+                                super::FontWeight::Bold => "bold".into(),
+                                super::FontWeight::Custom(w) => w.to_string(),
+                            },
+                            font_style: match style {
+                                super::FontStyle::Normal => "normal".into(),
+                                super::FontStyle::Italic => "italic".into(),
+                                super::FontStyle::Oblique => "oblique".into(),
+                            },
+                            src_url: url.to_string(),
+                        }),
+                    )
                 })
             })
+            .flatten()
             .collect();
 
         let faces = faces
@@ -239,7 +249,7 @@ impl SvgRenderer {
         );
 
         let doc = Document::new()
-            .set("viewBox", r2p((-pad.x, -pad.y, outer.0, outer.1), FP))
+            .set("viewBox", r2p((-pad.x, -pad.y, outer.0, outer.1), fp))
             .set("width", outer.0)
             .set("height", outer.1)
             .add(style)

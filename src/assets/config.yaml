@@ -7,6 +7,7 @@ font:
   size: 12
 
 line-height: 1.2
+precision: 3
 padding: 4
 theme: "one-dark"
 
@@ -17,3 +18,18 @@ fonts:
       - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Italic.woff2"
       - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Bold.woff2"
       - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-BoldItalic.woff2"
+
+  - family: "Roboto Mono"
+    files:
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x7DF4xlVMF-BfR8bXMIjhOm3CWWpCBC10HFw.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x7DF4xlVMF-BfR8bXMIjhOm3mWWpCBC10HFw.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x7DF4xlVMF-BfR8bXMIjhOm36WWpCBC10HFw.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x7DF4xlVMF-BfR8bXMIjhOm3KWWpCBC10HFw.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x7DF4xlVMF-BfR8bXMIjhOm3OWWpCBC10HFw.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x7DF4xlVMF-BfR8bXMIjhOm32WWpCBC10.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x5DF4xlVMF-BfR8bXMIjhGq3-cXbKDO1w.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x5DF4xlVMF-BfR8bXMIjhPq3-cXbKDO1w.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x5DF4xlVMF-BfR8bXMIjhIq3-cXbKDO1w.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x5DF4xlVMF-BfR8bXMIjhEq3-cXbKDO1w.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x5DF4xlVMF-BfR8bXMIjhFq3-cXbKDO1w.woff2"
+      - "https://fonts.gstatic.com/s/robotomono/v23/L0x5DF4xlVMF-BfR8bXMIjhLq3-cXbKD.woff2"

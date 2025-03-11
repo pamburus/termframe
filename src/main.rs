@@ -60,10 +60,12 @@ fn run() -> Result<()> {
     let options = render::Options {
         font: make_font_options(&settings, &opt)?,
         line_height: opt.line_height,
+        precision: opt.precision,
         padding: render::Padding {
             x: opt.padding,
             y: opt.padding,
         },
+
         theme: Theme::default().into(),
         stroke: 0.2,
     };
@@ -116,31 +118,22 @@ fn bootstrap() -> Result<Settings> {
 fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::FontOptions> {
     let mut faces = Vec::new();
 
-    let mut width: Option<(f32, &str)> = None;
+    let mut width: Option<f32> = None;
     let mut ascender: f32 = 0.0;
     let mut descender: f32 = 0.0;
 
     for font in &settings.fonts {
         if font.family == opt.font_family {
             for file in &font.files {
-                let font_file = file.as_str();
                 let file = font::FontFile::load(file.as_str().into()).unwrap();
                 let font = file.font().unwrap();
 
-                if let Some((width, location)) = &mut width {
-                    if *width != font.width() {
-                        return Err(anyhow::anyhow!(
-                            "inconsistent font width between files {f1} ({w1}) and {f2} ({w2})",
-                            f1 = location,
-                            f2 = font_file,
-                            w1 = width,
-                            w2 = font.width(),
-                        ));
-                    }
+                if let Some(width) = &mut width {
+                    *width = width.max(font.width());
                     ascender = ascender.max(font.ascender());
                     descender = descender.min(font.descender());
                 } else {
-                    width = Some((font.width(), font_file));
+                    width = Some(font.width());
                     ascender = font.ascender();
                     descender = font.descender();
                 };
@@ -162,7 +155,7 @@ fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::Font
         }
     }
 
-    let metrics = if let Some((width, _)) = width {
+    let metrics = if let Some(width) = width {
         render::FontMetrics {
             width,
             ascender,

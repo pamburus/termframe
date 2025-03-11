@@ -23,6 +23,7 @@ pub struct Options {
     pub line_height: f32,
     pub padding: Padding,
     pub theme: Rc<Theme>,
+    pub precision: u8,
     pub stroke: f32,
 }
 

@@ -21,6 +21,7 @@ pub struct Settings {
     pub terminal: TerminalSetting,
     pub font: FontSetting,
     pub line_height: f32,
+    pub precision: u8,
     pub theme: String,
     pub fonts: Fonts,
     pub padding: f32,

@@ -42,6 +42,10 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().line_height, overrides_with = "line_height")]
     pub line_height: f32,
 
+    /// Precision for floating point numbers.
+    #[arg(long, default_value_t = config::global::get().precision, overrides_with = "precision")]
+    pub precision: u8,
+
     /// Theme.
     #[arg(long, default_value = &config::global::get().theme, overrides_with = "theme")]
     pub theme: String,

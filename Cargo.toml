@@ -11,6 +11,7 @@ anyhow = "1"
 clap = { version = "4", features = ["wrap_help", "derive", "env", "string"] }
 clap_complete = "4"
 clap_mangen = "0"
+closure = "0"
 config = { version = "0", features = ["yaml", "json", "toml"] }
 csscolorparser = "0"
 dirs = "6"

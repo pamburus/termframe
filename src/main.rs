@@ -116,24 +116,31 @@ fn bootstrap() -> Result<Settings> {
 fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::FontOptions> {
     let mut faces = Vec::new();
 
-    let mut width = None;
+    let mut width: Option<(f32, &str)> = None;
     let mut ascender: f32 = 0.0;
     let mut descender: f32 = 0.0;
 
     for font in &settings.fonts {
         if font.family == opt.font_family {
             for file in &font.files {
+                let font_file = file.as_str();
                 let file = font::FontFile::load(file.as_str().into()).unwrap();
                 let font = file.font().unwrap();
 
-                if let Some(width) = &mut width {
+                if let Some((width, location)) = &mut width {
                     if *width != font.width() {
-                        return Err(anyhow::anyhow!("inconsistent font width"));
+                        return Err(anyhow::anyhow!(
+                            "inconsistent font width between files {f1} ({w1}) and {f2} ({w2})",
+                            f1 = location,
+                            f2 = font_file,
+                            w1 = width,
+                            w2 = font.width(),
+                        ));
                     }
                     ascender = ascender.max(font.ascender());
                     descender = descender.min(font.descender());
                 } else {
-                    width = Some(font.width());
+                    width = Some((font.width(), font_file));
                     ascender = font.ascender();
                     descender = font.descender();
                 };
@@ -155,7 +162,7 @@ fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::Font
         }
     }
 
-    let metrics = if let Some(width) = width {
+    let metrics = if let Some((width, _)) = width {
         render::FontMetrics {
             width,
             ascender,

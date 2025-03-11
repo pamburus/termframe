@@ -66,6 +66,7 @@ impl FontFile {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum Location {
     File(PathBuf),
     Url(Url),
@@ -83,6 +84,15 @@ impl Location {
         match self {
             Self::Url(url) => Some(url),
             Self::File(_) => None,
+        }
+    }
+}
+
+impl std::fmt::Display for Location {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::File(path) => write!(f, "{}", path.display()),
+            Self::Url(url) => write!(f, "{}", url),
         }
     }
 }

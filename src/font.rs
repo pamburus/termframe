@@ -4,8 +4,10 @@ use std::path::PathBuf;
 // third-party imports
 use allsorts::{
     binary::read::{ReadScope, ReadScopeOwned},
+    font::MatchingPresentation,
     font_data::{DynamicFontTableProvider, FontData},
     tables::{HeadTable, os2::Os2},
+    tag,
 };
 use anyhow::anyhow;
 use url::Url;
@@ -19,6 +21,7 @@ pub struct FontFile {
 }
 
 pub type Result<T> = anyhow::Result<T>;
+pub type Fixed = allsorts::tables::Fixed;
 
 impl FontFile {
     pub fn load(location: Location) -> Result<Self> {
@@ -123,8 +126,14 @@ pub struct Font<'a> {
 }
 
 impl<'a> Font<'a> {
-    pub fn width(&self) -> f32 {
-        self.inner.hhea_table.advance_width_max as f32 / self.em() as f32
+    pub fn width(&mut self) -> f32 {
+        let (glyph, _) = self
+            .inner
+            .lookup_glyph_index('0', MatchingPresentation::Required, None);
+        self.inner
+            .horizontal_advance(glyph)
+            .map(|x| x as f32 / self.em() as f32)
+            .unwrap_or(1.0)
     }
 
     pub fn ascender(&self) -> f32 {
@@ -153,7 +162,24 @@ impl<'a> Font<'a> {
         self.head.is_bold()
     }
 
+    pub fn weight_axis(&self) -> Option<(Fixed, Fixed)> {
+        self.axis(tag::WGHT)
+    }
+
+    pub fn has_italic_axis(&self) -> bool {
+        self.axis(tag::ITAL).is_some()
+    }
+
     fn em(&self) -> u16 {
         self.head.units_per_em
+    }
+
+    fn axis(&self, tag: u32) -> Option<(Fixed, Fixed)> {
+        self.inner
+            .variation_axes()
+            .ok()?
+            .into_iter()
+            .find(|rec| rec.axis_tag == tag)
+            .map(|rec| (rec.min_value, rec.max_value))
     }
 }

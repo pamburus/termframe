@@ -126,7 +126,7 @@ fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::Font
         if font.family == opt.font_family {
             for file in &font.files {
                 let file = font::FontFile::load(file.as_str().into()).unwrap();
-                let font = file.font().unwrap();
+                let mut font = file.font().unwrap();
 
                 if let Some(width) = &mut width {
                     *width = width.max(font.width());
@@ -139,15 +139,21 @@ fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::Font
                 };
 
                 faces.push(render::FontFace {
-                    weight: if font.bold() {
+                    weight: if let Some((min, max)) = font.weight_axis() {
+                        render::FontWeight::Variable(f32::from(min) as u16, f32::from(max) as u16)
+                    } else if font.bold() {
                         render::FontWeight::Bold
-                    } else {
+                    } else if font.weight() == 400 {
                         render::FontWeight::Normal
+                    } else {
+                        render::FontWeight::Fixed(font.weight())
                     },
                     style: if font.italic() {
-                        render::FontStyle::Italic
+                        Some(render::FontStyle::Italic)
+                    } else if font.has_italic_axis() {
+                        None
                     } else {
-                        render::FontStyle::Normal
+                        Some(render::FontStyle::Normal)
                     },
                     url: file.location().url().unwrap().to_string(),
                 });
@@ -175,7 +181,7 @@ fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::Font
 
 const TERMSHOT_DEBUG_LOG: &str = "TERMSHOT_DEBUG_LOG";
 const DEFAULT_FONT_METRICS: render::FontMetrics = render::FontMetrics {
-    width: 0.6,
+    width: 0.3,
     ascender: 0.0,
     descender: 0.0,
 };

@@ -1,12 +1,8 @@
 // std imports
-use std::{
-    collections::{HashMap, HashSet},
-    ops::Range,
-};
+use std::{collections::HashSet, ops::Range};
 
 // third-party imports
 use askama::Template;
-use closure::closure;
 use svg::{Document, node::element};
 use termwiz::{
     cell::{Intensity, Underline},
@@ -16,7 +12,7 @@ use termwiz::{
 };
 
 // local imports
-use super::{Padding, Render};
+use super::{FontFace, FontStyle, FontWeight, Padding, Render};
 
 // re-exports
 pub use super::{Options, Result};
@@ -44,7 +40,6 @@ impl SvgRenderer {
         let outer = (size.0 + pad.x * 2.0, size.1 + pad.y * 2.0).r2p(fp); // outer dimensions in pixels
         let lh = opt.line_height.r2p(fp); // line height in em
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
-        let fw = opt.font.metrics.width.r2p(fp); // font width in em
         let cw = (opt.font.size * opt.font.metrics.width).r2p(fp); // column width in pixels
         let ch = (opt.font.size * opt.line_height).r2p(fp); // column height in pixels
 
@@ -54,14 +49,6 @@ impl SvgRenderer {
             .set("width", "100%")
             .set("height", "100%")
             .set("fill", opt.theme.bg.to_hex_string());
-
-        let mut font_faces: HashMap<_, Vec<_>> = HashMap::new();
-        for face in &opt.font.faces {
-            font_faces
-                .entry((face.weight, face.style))
-                .or_default()
-                .push(&face.url);
-        }
 
         let mut used_font_styles = HashSet::new();
 
@@ -104,7 +91,7 @@ impl SvgRenderer {
                 .set("y", format!("{}em", (row as f32 * lh).r2p(fp)))
                 .set("width", size.0)
                 .set("height", format!("{}em", lh))
-                .set("overflow", "visible");
+                .set("overflow", "hidden");
 
             let mut tl = element::Text::new("")
                 .set("y", format!("{}em", tyo))
@@ -128,7 +115,7 @@ impl SvgRenderer {
 
                     let x = range.start;
                     if x != pos {
-                        span = span.set("x", format!("{}em", (x as f32 * fw).r2p(fp)));
+                        span = span.set("x", (x as f32 * cw).r2p(fp));
                     }
 
                     if line.get_cell(x).map(|cell| cell.width()).unwrap_or(0) > 1 {
@@ -203,30 +190,35 @@ impl SvgRenderer {
         }
 
         let font_family_quoted = &format!("{:?}", opt.font.family.as_str());
-        let faces: Vec<_> = used_font_styles
-            .into_iter()
-            .filter_map(|(weight, style)| {
-                font_faces.remove(&(weight, style)).map(|faces| {
-                    faces.into_iter().map(
-                        closure!(clone style, clone weight, |url| styles::FontFace {
-                            font_family: font_family_quoted.clone(),
-                            font_weight: match weight {
-                                super::FontWeight::Normal => "normal".into(),
-                                super::FontWeight::Bold => "bold".into(),
-                                super::FontWeight::Custom(w) => w.to_string(),
-                            },
-                            font_style: match style {
-                                super::FontStyle::Normal => "normal".into(),
-                                super::FontStyle::Italic => "italic".into(),
-                                super::FontStyle::Oblique => "oblique".into(),
-                            },
-                            src_url: url.to_string(),
-                        }),
-                    )
-                })
+        let match_any = |face| {
+            used_font_styles
+                .iter()
+                .any(|(weight, style)| match_font_face(face, *weight, *style))
+        };
+
+        let faces = &opt
+            .font
+            .faces
+            .iter()
+            .filter(|face| match_any(face))
+            .map(|face| styles::FontFace {
+                font_family: font_family_quoted.clone(),
+                font_weight: match face.weight {
+                    FontWeight::Normal => "normal".into(),
+                    FontWeight::Bold => "bold".into(),
+                    FontWeight::Fixed(w) => w.to_string(),
+                    FontWeight::Variable(min, max) => {
+                        format!("{min} {max}", min = f32::from(min), max = f32::from(max))
+                    }
+                },
+                font_style: face.style.map(|style| match style {
+                    FontStyle::Normal => "normal".into(),
+                    FontStyle::Italic => "italic".into(),
+                    FontStyle::Oblique => "oblique".into(),
+                }),
+                src_url: face.url.to_string(),
             })
-            .flatten()
-            .collect();
+            .collect::<Vec<_>>();
 
         let faces = faces
             .iter()
@@ -387,6 +379,29 @@ impl<'a> Iterator for Subclusters<'a> {
 
 // ---
 
+fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle) -> bool {
+    let target: u16 = match weight {
+        FontWeight::Normal => 400,
+        FontWeight::Bold => 700,
+        _ => 0,
+    };
+
+    let range = face.weight.range();
+    let range = std::ops::RangeInclusive::new(range.0, range.1);
+
+    if !range.contains(&target) {
+        return false;
+    }
+
+    if let Some(face_style) = &face.style {
+        *face_style == style
+    } else {
+        true
+    }
+}
+
+// ---
+
 mod styles {
     // third-party imports
     use askama::Template;
@@ -404,7 +419,7 @@ mod styles {
     pub struct FontFace {
         pub font_family: String,
         pub font_weight: String,
-        pub font_style: String,
+        pub font_style: Option<String>,
         pub src_url: String,
     }
 }

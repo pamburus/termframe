@@ -45,7 +45,7 @@ pub struct FontMetrics {
 #[derive(Debug, Clone)]
 pub struct FontFace {
     pub weight: FontWeight,
-    pub style: FontStyle,
+    pub style: Option<FontStyle>,
     pub url: String,
 }
 
@@ -62,7 +62,19 @@ pub enum FontStyle {
 pub enum FontWeight {
     Normal,
     Bold,
-    Custom(usize),
+    Fixed(u16),
+    Variable(u16, u16),
+}
+
+impl FontWeight {
+    pub fn range(&self) -> (u16, u16) {
+        match self {
+            Self::Normal => (400, 500),
+            Self::Bold => (600, 700),
+            Self::Fixed(weight) => (*weight, *weight),
+            Self::Variable(min, max) => (*min, *max),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]

@@ -1,5 +1,5 @@
 // std imports
-use std::rc::Rc;
+use std::{collections::HashSet, rc::Rc};
 
 // third-party imports
 use termwiz::surface::Surface;
@@ -47,6 +47,7 @@ pub struct FontFace {
     pub weight: FontWeight,
     pub style: Option<FontStyle>,
     pub url: String,
+    pub chars: Rc<dyn CharSet>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -81,4 +82,44 @@ impl FontWeight {
 pub struct Padding {
     pub x: f32,
     pub y: f32,
+}
+
+// ---
+
+pub trait CharSet: std::fmt::Debug {
+    fn has_char(&self, ch: char) -> bool;
+}
+
+impl CharSet for HashSet<char> {
+    fn has_char(&self, ch: char) -> bool {
+        self.contains(&ch)
+    }
+}
+
+// ---
+
+pub struct CharSetFn<F>(F);
+
+impl<F> std::fmt::Debug for CharSetFn<F>
+where
+    F: Fn(char) -> bool,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("CharSetFn").finish()
+    }
+}
+
+impl<F> CharSet for CharSetFn<F>
+where
+    F: Fn(char) -> bool,
+{
+    fn has_char(&self, ch: char) -> bool {
+        self.0(ch)
+    }
+}
+
+impl<F> CharSetFn<F> {
+    pub fn new(f: F) -> Self {
+        Self(f)
+    }
 }

@@ -50,7 +50,7 @@ impl SvgRenderer {
             .set("height", "100%")
             .set("fill", opt.theme.bg.to_hex_string());
 
-        let mut used_font_styles = HashSet::new();
+        let mut used_font_faces = HashSet::new();
 
         let mut group = element::Group::new().set("class", "screen");
 
@@ -178,7 +178,18 @@ impl SvgRenderer {
                         );
                     }
 
-                    used_font_styles.insert((font_weight, font_style));
+                    for ch in text.chars() {
+                        for (i, font) in opt.font.faces.iter().enumerate().rev() {
+                            if match_font_face(font, font_weight, font_style, ch) {
+                                if used_font_faces.insert(i) {
+                                    log::debug!(
+                                        "using font face #{i} weight={font_weight:?} style={font_style:?} because it requires at least character {ch:?}",
+                                    );
+                                }
+                                break;
+                            }
+                        }
+                    }
 
                     tl = tl.add(span);
                     pos = x + range.len();
@@ -190,18 +201,14 @@ impl SvgRenderer {
         }
 
         let font_family_quoted = &format!("{:?}", opt.font.family.as_str());
-        let match_any = |face| {
-            used_font_styles
-                .iter()
-                .any(|(weight, style)| match_font_face(face, *weight, *style))
-        };
 
         let faces = &opt
             .font
             .faces
             .iter()
-            .filter(|face| match_any(face))
-            .map(|face| styles::FontFace {
+            .enumerate()
+            .filter(|(i, _)| used_font_faces.contains(i))
+            .map(|(_, face)| styles::FontFace {
                 font_family: font_family_quoted.clone(),
                 font_weight: match face.weight {
                     FontWeight::Normal => "normal".into(),
@@ -379,7 +386,7 @@ impl<'a> Iterator for Subclusters<'a> {
 
 // ---
 
-fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle) -> bool {
+fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle, ch: char) -> bool {
     let target: u16 = match weight {
         FontWeight::Normal => 400,
         FontWeight::Bold => 700,
@@ -394,10 +401,12 @@ fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle) -> boo
     }
 
     if let Some(face_style) = &face.style {
-        *face_style == style
-    } else {
-        true
+        if *face_style != style {
+            return false;
+        }
     }
+
+    face.chars.has_char(ch)
 }
 
 // ---

@@ -1,7 +1,9 @@
 // std imports
 use std::{
+    collections::HashMap,
     io::{self, stdout},
     process,
+    rc::Rc,
 };
 
 // third-party imports
@@ -12,7 +14,7 @@ use env_logger::{self as logger};
 // local imports
 use config::Settings;
 use parse::parse;
-use render::svg::SvgRenderer;
+use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use theme::Theme;
 
 mod appdirs;
@@ -57,8 +59,10 @@ fn run() -> Result<()> {
     let input = io::BufReader::new(file);
     let surface = parse(opt.width, opt.height, input);
 
+    let content = surface.screen_chars_to_string();
+
     let options = render::Options {
-        font: make_font_options(&settings, &opt)?,
+        font: make_font_options(&settings, &opt, content.chars().filter(|c| *c != '\n'))?,
         line_height: opt.line_height,
         precision: opt.precision,
         padding: render::Padding {
@@ -115,50 +119,70 @@ fn bootstrap() -> Result<Settings> {
 
 // ---
 
-fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::FontOptions> {
+fn make_font_options<C>(
+    settings: &Settings,
+    opt: &cli::Opt,
+    chars: C,
+) -> Result<render::FontOptions>
+where
+    C: IntoIterator<Item = char>,
+{
     let mut faces = Vec::new();
 
     let mut width: Option<f32> = None;
     let mut ascender: f32 = 0.0;
     let mut descender: f32 = 0.0;
 
+    let mut files = Vec::new();
+
     for font in &settings.fonts {
         if font.family == opt.font_family {
             for file in &font.files {
                 let file = font::FontFile::load(file.as_str().into()).unwrap();
-                let mut font = file.font().unwrap();
-
-                if let Some(width) = &mut width {
-                    *width = width.max(font.width());
-                    ascender = ascender.max(font.ascender());
-                    descender = descender.min(font.descender());
-                } else {
-                    width = Some(font.width());
-                    ascender = font.ascender();
-                    descender = font.descender();
-                };
-
-                faces.push(render::FontFace {
-                    weight: if let Some((min, max)) = font.weight_axis() {
-                        render::FontWeight::Variable(f32::from(min) as u16, f32::from(max) as u16)
-                    } else if font.bold() {
-                        render::FontWeight::Bold
-                    } else if font.weight() == 400 {
-                        render::FontWeight::Normal
-                    } else {
-                        render::FontWeight::Fixed(font.weight())
-                    },
-                    style: if font.italic() {
-                        Some(render::FontStyle::Italic)
-                    } else if font.has_italic_axis() {
-                        None
-                    } else {
-                        Some(render::FontStyle::Normal)
-                    },
-                    url: file.location().url().unwrap().to_string(),
-                });
+                files.push(file);
             }
         }
+    }
+
+    let mut fonts = Vec::new();
+
+    for file in &files {
+        let font = file.font().unwrap();
+        let url = file.location().url().unwrap().to_string();
+        fonts.push((url, font));
+    }
+
+    let mut used: HashMap<char, u64> = HashMap::new();
+
+    for ch in chars {
+        let mut bitmap: u64 = 0;
+        for (i, (_, font)) in fonts.iter_mut().enumerate() {
+            if font.has_char(ch) {
+                bitmap |= 1 << i;
+            }
+        }
+        used.insert(ch, bitmap);
+    }
+
+    let used = Rc::new(used);
+
+    for (i, (url, font)) in fonts.iter_mut().enumerate() {
+        if let Some(width) = &mut width {
+            *width = width.max(font.width());
+            ascender = ascender.max(font.ascender());
+            descender = descender.min(font.descender());
+        } else {
+            width = Some(font.width());
+            ascender = font.ascender();
+            descender = font.descender();
+        };
+
+        let used = used.clone();
+        let chars = Rc::new(CharSetFn::new(move |ch| {
+            (used.get(&ch).copied().unwrap_or(0) & (1 << i) as u64) != 0
+        }));
+
+        faces.push(make_font_face(url, font, chars));
     }
 
     let metrics = if let Some(width) = width {
@@ -179,9 +203,36 @@ fn make_font_options(settings: &Settings, opt: &cli::Opt) -> Result<render::Font
     })
 }
 
+fn make_font_face(
+    url: &mut String,
+    font: &mut font::Font,
+    chars: Rc<dyn CharSet>,
+) -> render::FontFace {
+    render::FontFace {
+        weight: if let Some((min, max)) = font.weight_axis() {
+            render::FontWeight::Variable(f32::from(min) as u16, f32::from(max) as u16)
+        } else if font.bold() {
+            render::FontWeight::Bold
+        } else if font.weight() == 400 {
+            render::FontWeight::Normal
+        } else {
+            render::FontWeight::Fixed(font.weight())
+        },
+        style: if font.italic() {
+            Some(render::FontStyle::Italic)
+        } else if font.has_italic_axis() {
+            None
+        } else {
+            Some(render::FontStyle::Normal)
+        },
+        url: url.clone(),
+        chars,
+    }
+}
+
 const TERMSHOT_DEBUG_LOG: &str = "TERMSHOT_DEBUG_LOG";
 const DEFAULT_FONT_METRICS: render::FontMetrics = render::FontMetrics {
-    width: 0.3,
+    width: 0.6,
     ascender: 0.0,
     descender: 0.0,
 };

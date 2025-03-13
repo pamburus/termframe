@@ -170,6 +170,13 @@ impl<'a> Font<'a> {
         self.axis(tag::ITAL).is_some()
     }
 
+    pub fn has_char(&mut self, ch: char) -> bool {
+        self.inner
+            .lookup_glyph_index(ch, MatchingPresentation::NotRequired, None)
+            .0
+            != 0
+    }
+
     fn em(&self) -> u16 {
         self.head.units_per_em
     }

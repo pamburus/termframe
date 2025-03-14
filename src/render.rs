@@ -89,8 +89,8 @@ pub enum FontWeight {
 impl FontWeight {
     pub fn range(&self) -> (u16, u16) {
         match self {
-            Self::Normal => (400, 500),
-            Self::Bold => (600, 700),
+            Self::Normal => (400, 400),
+            Self::Bold => (600, 600),
             Self::Fixed(weight) => (*weight, *weight),
             Self::Variable(min, max) => (*min, *max),
         }

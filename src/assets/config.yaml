@@ -13,7 +13,8 @@ font:
 faint-opacity: 0.5
 line-height: 1.2
 precision: 3
-padding: 4
+padding: 1.0
+stroke: 0.01
 theme: "one-dark"
 
 fonts:

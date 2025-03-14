@@ -72,7 +72,7 @@ fn run() -> Result<()> {
         },
         faint_opacity: opt.faint_opacity,
         theme: Theme::default().into(),
-        stroke: 0.2,
+        stroke: opt.stroke,
     };
 
     let mut output: Box<dyn io::Write> = if let Some(output) = opt.output {

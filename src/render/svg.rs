@@ -34,29 +34,25 @@ impl SvgRenderer {
         let opt = &self.options;
 
         let fp = opt.precision; // floating point precision
+        let lh = opt.line_height.r2p(fp); // line height in em
+        let fw = opt.font.metrics.width.r2p(fp); // font width in em
         let dimensions = surface.dimensions(); // surface dimensions in cells
         let size = (
-            // terminal surface size in pixels
-            (dimensions.0 as f32 * opt.font.size * opt.font.metrics.width).r2p(fp),
-            (dimensions.1 as f32 * opt.font.size * opt.line_height).r2p(fp),
+            // terminal surface size in em
+            (dimensions.0 as f32 * fw).r2p(fp),
+            (dimensions.1 as f32 * lh).r2p(fp),
         );
         let pad = opt.padding.r2p(fp); // padding in pixels
-        let outer = (size.0 + pad.x * 2.0, size.1 + pad.y * 2.0).r2p(fp); // outer dimensions in pixels
-        let lh = opt.line_height.r2p(fp); // line height in em
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
-        let cw = (opt.font.size * opt.font.metrics.width).r2p(fp); // column width in pixels
-        let ch = (opt.font.size * opt.line_height).r2p(fp); // column height in pixels
 
         let background = element::Rectangle::new()
-            .set("x", -pad.x)
-            .set("y", -pad.y)
             .set("width", "100%")
             .set("height", "100%")
             .set("fill", opt.theme.bg.to_hex_string());
 
         let mut used_font_faces = HashSet::new();
 
-        let mut group = element::Group::new().set("class", "screen");
+        let mut group = element::Group::new();
 
         let default_weight = opt.font.weights.normal;
         if default_weight != FontWeight::Normal {
@@ -74,16 +70,16 @@ impl SvgRenderer {
                 if let Some(mut color) = color {
                     color.a = 1.0;
 
-                    let x = (cluster.first_cell_idx as f32 * cw - opt.stroke).r2p(fp);
-                    let y = (row as f32 * ch - opt.stroke).r2p(fp);
-                    let width = (cluster.width as f32 * cw + opt.stroke * 2.0).r2p(fp);
-                    let height = (ch + opt.stroke * 2.0).r2p(fp);
+                    let x = (cluster.first_cell_idx as f32 * fw - opt.stroke).r2p(fp);
+                    let y = (row as f32 * lh - opt.stroke).r2p(fp);
+                    let width = (cluster.width as f32 * fw + opt.stroke * 2.0).r2p(fp);
+                    let height = (lh + opt.stroke * 2.0).r2p(fp);
 
                     let rect = element::Rectangle::new()
-                        .set("x", x)
-                        .set("y", y)
-                        .set("width", width)
-                        .set("height", height)
+                        .set("x", format!("{}em", x))
+                        .set("y", format!("{}em", y))
+                        .set("width", format!("{}em", width))
+                        .set("height", format!("{}em", height))
                         .set("fill", color.to_hex_string());
 
                     group = group.add(rect);
@@ -98,7 +94,7 @@ impl SvgRenderer {
 
             let mut sl = element::SVG::new()
                 .set("y", format!("{}em", (row as f32 * lh).r2p(fp)))
-                .set("width", size.0)
+                .set("width", format!("{}em", size.0))
                 .set("height", format!("{}em", lh))
                 .set("overflow", "hidden");
 
@@ -124,7 +120,7 @@ impl SvgRenderer {
 
                     let x = range.start;
                     if x != pos {
-                        span = span.set("x", (x as f32 * cw).r2p(fp));
+                        span = span.set("x", format!("{}em", (x as f32 * fw).r2p(fp)));
                     }
 
                     if line.get_cell(x).map(|cell| cell.width()).unwrap_or(0) > 1 {
@@ -208,7 +204,7 @@ impl SvgRenderer {
                             if match_font_face(font, font_weight, font_style, ch) {
                                 if used_font_faces.insert(i) {
                                     log::debug!(
-                                        "using font face #{i} because it requires at least character {ch:?} with weight={font_weight:?} style={font_style:?}",
+                                        "using font face #{i} because it is required at least by character {ch:?} with weight={font_weight:?} style={font_style:?}",
                                     );
                                 }
                                 break;
@@ -261,24 +257,30 @@ impl SvgRenderer {
             })
             .collect::<Result<Vec<_>>>()?;
 
-        let style = element::Style::new(
-            styles::Screen {
-                font_family: &font_family_quoted,
-                font_size: opt.font.size,
-                fill: &opt.theme.fg.to_hex_string(),
-            }
-            .render()?
-                + "\n"
-                + &faces.join("\n"),
-        );
+        let style = element::Style::new(faces.join("\n"));
 
-        let doc = Document::new()
-            .set("viewBox", r2p((-pad.x, -pad.y, outer.0, outer.1), fp))
-            .set("width", outer.0)
-            .set("height", outer.1)
+        let screen = Document::new()
+            .set("x", format!("{}em", pad.x))
+            .set("y", format!("{}em", pad.y))
+            .set("width", format!("{}em", size.0))
+            .set("height", format!("{}em", size.1))
+            .set("font-size", opt.font.size.r2p(fp))
+            .set("font-family", opt.font.family.clone())
+            .set("fill", opt.theme.fg.to_hex_string())
             .add(style)
             .add(background)
             .add(group);
+
+        let doc = Document::new()
+            .set("width", (opt.font.size * (size.0 + pad.x * 2.0)).r2p(fp))
+            .set("height", (opt.font.size * (size.1 + pad.y * 2.0)).r2p(fp))
+            .add(
+                element::Rectangle::new()
+                    .set("fill", opt.theme.bg.to_hex_string())
+                    .set("width", "100%")
+                    .set("height", "100%"),
+            )
+            .add(screen);
 
         Ok(svg::write(target, &doc)?)
     }
@@ -440,8 +442,8 @@ where
 
 fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle, ch: char) -> bool {
     let target: (u16, u16) = match weight {
-        FontWeight::Normal => (400, 500),
-        FontWeight::Bold => (600, 700),
+        FontWeight::Normal => (400, 400),
+        FontWeight::Bold => (600, 600),
         FontWeight::Fixed(w) => (w, w),
         FontWeight::Variable(min, max) => (min, max),
     };

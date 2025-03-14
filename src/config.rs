@@ -26,6 +26,7 @@ pub struct Settings {
     pub theme: String,
     pub fonts: Fonts,
     pub padding: f32,
+    pub stroke: f32,
 }
 
 impl Settings {

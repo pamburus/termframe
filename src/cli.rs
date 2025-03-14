@@ -58,6 +58,10 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().precision, overrides_with = "precision")]
     pub precision: u8,
 
+    /// Stroke width for filled rectangles, fraction of font size.
+    #[arg(long, default_value_t = config::global::get().stroke, overrides_with = "stroke")]
+    pub stroke: f32,
+
     /// Theme.
     #[arg(long, default_value = &config::global::get().theme, overrides_with = "theme")]
     pub theme: String,

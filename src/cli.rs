@@ -47,6 +47,9 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "font_weight_faint")]
     pub font_weight_faint: FontWeight,
 
+    #[arg(long, num_args = 1, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts")]
+    pub embed_fonts: bool,
+
     #[arg(long, default_value_t = config::global::get().faint_opacity, overrides_with = "faint_opacity")]
     pub faint_opacity: f32,
 

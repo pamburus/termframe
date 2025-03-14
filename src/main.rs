@@ -8,6 +8,7 @@ use std::{
 
 // third-party imports
 use anyhow::{Context, Result};
+use base64::prelude::*;
 use clap::{CommandFactory, Parser};
 use env_logger::{self as logger};
 use rayon::prelude::*;
@@ -203,6 +204,17 @@ where
     } else {
         DEFAULT_FONT_METRICS
     };
+
+    if opt.embed_fonts {
+        for (i, file) in files.iter().enumerate() {
+            let data = file.data();
+            log::debug!(
+                "embedding font face #{i} with {len} bytes",
+                len = data.len()
+            );
+            faces[i].url = format!("data:font/otf;base64,{}", BASE64_STANDARD.encode(data));
+        }
+    }
 
     Ok(render::FontOptions {
         family: opt.font_family.clone(),

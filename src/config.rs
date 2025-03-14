@@ -25,6 +25,7 @@ pub struct Settings {
     pub precision: u8,
     pub theme: String,
     pub fonts: Fonts,
+    pub embed_fonts: bool,
     pub padding: f32,
     pub stroke: f32,
 }

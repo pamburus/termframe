@@ -6,6 +6,7 @@ use allsorts::{
     binary::read::{ReadScope, ReadScopeOwned},
     font::MatchingPresentation,
     font_data::{DynamicFontTableProvider, FontData},
+    subset::subset,
     tables::{HeadTable, os2::Os2},
     tag,
 };
@@ -49,6 +50,10 @@ impl FontFile {
     pub fn load_bytes(bytes: &[u8], location: Location) -> Result<Self> {
         let data = ReadScopeOwned::new(ReadScope::new(bytes));
         Ok(Self { location, data })
+    }
+
+    pub fn data(&self) -> &[u8] {
+        self.data.scope().data()
     }
 
     #[allow(dead_code)]
@@ -171,10 +176,26 @@ impl<'a> Font<'a> {
     }
 
     pub fn has_char(&mut self, ch: char) -> bool {
-        self.inner
-            .lookup_glyph_index(ch, MatchingPresentation::NotRequired, None)
-            .0
-            != 0
+        self.glyph_index(ch).is_some()
+    }
+
+    #[allow(dead_code)]
+    pub fn subset<C>(&mut self, chars: C) -> Result<Vec<u8>>
+    where
+        C: IntoIterator<Item = char>,
+    {
+        let mut glyphs = std::collections::HashSet::new();
+        glyphs.insert(0);
+
+        for ch in chars {
+            if let Some(index) = self.glyph_index(ch) {
+                glyphs.insert(index);
+            }
+        }
+
+        let glyphs = glyphs.into_iter().collect::<Vec<_>>();
+
+        Ok(subset(&self.inner.font_table_provider, &glyphs)?)
     }
 
     fn em(&self) -> u16 {
@@ -188,5 +209,13 @@ impl<'a> Font<'a> {
             .into_iter()
             .find(|rec| rec.axis_tag == tag)
             .map(|rec| (rec.min_value, rec.max_value))
+    }
+
+    fn glyph_index(&mut self, ch: char) -> Option<u16> {
+        let index = self
+            .inner
+            .lookup_glyph_index(ch, MatchingPresentation::NotRequired, None)
+            .0;
+        if index == 0 { None } else { Some(index) }
     }
 }

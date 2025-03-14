@@ -19,6 +19,7 @@ dirs-sys = "0"
 env_logger = "0"
 known-folders = "1"
 log = "0"
+rayon = "1"
 serde = { version = "1", features = ["derive"] }
 svg = { git = "https://github.com/pamburus/svg.git", branch = "feature/text-ws" }
 termwiz = "0"

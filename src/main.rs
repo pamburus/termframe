@@ -7,9 +7,10 @@ use std::{
 };
 
 // third-party imports
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{CommandFactory, Parser};
 use env_logger::{self as logger};
+use rayon::prelude::*;
 
 // local imports
 use config::Settings;
@@ -133,16 +134,16 @@ where
     let mut ascender: f32 = 0.0;
     let mut descender: f32 = 0.0;
 
-    let mut files = Vec::new();
-
-    for font in &settings.fonts {
-        if font.family == opt.font_family {
-            for file in &font.files {
-                let file = font::FontFile::load(file.as_str().into()).unwrap();
-                files.push(file);
-            }
-        }
-    }
+    let files = settings
+        .fonts
+        .par_iter()
+        .filter(|font| font.family == opt.font_family)
+        .flat_map(|font| &font.files)
+        .map(|file| {
+            font::FontFile::load(file.as_str().into())
+                .with_context(|| format!("failed to load font {file}"))
+        })
+        .collect::<Result<Vec<_>, _>>()?;
 
     let mut fonts = Vec::new();
 

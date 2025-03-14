@@ -1,5 +1,9 @@
 // std imports
-use std::{collections::HashSet, ops::Range};
+use std::{
+    cmp::{max, min},
+    collections::HashSet,
+    ops::{Range, RangeInclusive},
+};
 
 // third-party imports
 use askama::Template;
@@ -53,6 +57,11 @@ impl SvgRenderer {
         let mut used_font_faces = HashSet::new();
 
         let mut group = element::Group::new().set("class", "screen");
+
+        let default_weight = opt.font.weights.normal;
+        if default_weight != FontWeight::Normal {
+            group = group.set("font-weight", svg_weight(default_weight));
+        }
 
         for (row, line) in surface.screen_lines().iter().enumerate() {
             for cluster in line.cluster(None) {
@@ -132,7 +141,10 @@ impl SvgRenderer {
                     };
 
                     if cluster.attrs.intensity() == Intensity::Half {
-                        color = opt.theme.bg.interpolate_lab(&color, 0.5);
+                        color = opt
+                            .theme
+                            .bg
+                            .interpolate_lab(&color, opt.faint_opacity as f64);
                     }
                     color.a = 1.0;
 
@@ -140,9 +152,22 @@ impl SvgRenderer {
                         span = span.set("fill", color.to_hex_string());
                     }
 
-                    if cluster.attrs.intensity() == Intensity::Bold {
-                        span = span.set("font-weight", "bold");
-                        font_weight = super::FontWeight::Bold;
+                    match cluster.attrs.intensity() {
+                        Intensity::Normal => {}
+                        Intensity::Bold => {
+                            let weight = opt.font.weights.bold;
+                            if weight != default_weight {
+                                span = span.set("font-weight", svg_weight(weight));
+                                font_weight = weight;
+                            }
+                        }
+                        Intensity::Half => {
+                            let weight = opt.font.weights.faint;
+                            if weight != default_weight {
+                                span = span.set("font-weight", svg_weight(weight));
+                                font_weight = weight;
+                            }
+                        }
                     }
 
                     if cluster.attrs.italic() {
@@ -183,7 +208,7 @@ impl SvgRenderer {
                             if match_font_face(font, font_weight, font_style, ch) {
                                 if used_font_faces.insert(i) {
                                     log::debug!(
-                                        "using font face #{i} weight={font_weight:?} style={font_style:?} because it requires at least character {ch:?}",
+                                        "using font face #{i} because it requires at least character {ch:?} with weight={font_weight:?} style={font_style:?}",
                                     );
                                 }
                                 break;
@@ -386,17 +411,46 @@ impl<'a> Iterator for Subclusters<'a> {
 
 // ---
 
+trait Intersection {
+    fn intersection(&self, other: &Self) -> Option<Self>
+    where
+        Self: Sized;
+}
+
+impl<T> Intersection for RangeInclusive<T>
+where
+    T: Ord + Clone + Copy,
+{
+    fn intersection(&self, other: &Self) -> Option<Self>
+    where
+        Self: Sized,
+    {
+        let start = max(self.start().clone(), other.start().clone());
+        let end = min(self.end().clone(), other.end().clone());
+
+        if start <= end {
+            Some(start..=end)
+        } else {
+            None
+        }
+    }
+}
+
+// ---
+
 fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle, ch: char) -> bool {
-    let target: u16 = match weight {
-        FontWeight::Normal => 400,
-        FontWeight::Bold => 700,
-        _ => 0,
+    let target: (u16, u16) = match weight {
+        FontWeight::Normal => (400, 500),
+        FontWeight::Bold => (600, 700),
+        FontWeight::Fixed(w) => (w, w),
+        FontWeight::Variable(min, max) => (min, max),
     };
+    let target = RangeInclusive::new(target.0, target.1);
 
     let range = face.weight.range();
-    let range = std::ops::RangeInclusive::new(range.0, range.1);
+    let range = RangeInclusive::new(range.0, range.1);
 
-    if !range.contains(&target) {
+    if range.intersection(&target).is_none() {
         return false;
     }
 
@@ -407,6 +461,15 @@ fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle, ch: ch
     }
 
     face.chars.has_char(ch)
+}
+
+fn svg_weight(weight: FontWeight) -> String {
+    match weight {
+        FontWeight::Normal => "normal".into(),
+        FontWeight::Bold => "bold".into(),
+        FontWeight::Fixed(w) => w.to_string(),
+        FontWeight::Variable(_, max) => max.to_string(),
+    }
 }
 
 // ---

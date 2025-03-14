@@ -38,6 +38,18 @@ pub struct Opt {
     #[arg(long, num_args = 1)]
     pub font_file: Vec<String>,
 
+    #[arg(long, default_value_t = config::global::get().font.weights.normal.into(), overrides_with = "font_weight")]
+    pub font_weight: FontWeight,
+
+    #[arg(long, default_value_t = config::global::get().font.weights.bold.into(), overrides_with = "font_weight_bold")]
+    pub font_weight_bold: FontWeight,
+
+    #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "font_weight_faint")]
+    pub font_weight_faint: FontWeight,
+
+    #[arg(long, default_value_t = config::global::get().faint_opacity, overrides_with = "faint_opacity")]
+    pub faint_opacity: f32,
+
     /// Line height.
     #[arg(long, default_value_t = config::global::get().line_height, overrides_with = "line_height")]
     pub line_height: f32,
@@ -146,5 +158,59 @@ impl BootstrapOpt {
         }
 
         result
+    }
+}
+
+// ---
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum FontWeight {
+    Normal,
+    Bold,
+    Fixed(u16),
+}
+
+impl From<config::FontWeight> for FontWeight {
+    fn from(weight: config::FontWeight) -> Self {
+        match weight {
+            config::FontWeight::Normal => Self::Normal,
+            config::FontWeight::Bold => Self::Bold,
+            config::FontWeight::Fixed(weight) => Self::Fixed(weight),
+        }
+    }
+}
+
+impl Into<crate::render::FontWeight> for FontWeight {
+    fn into(self) -> crate::render::FontWeight {
+        match self {
+            Self::Normal => crate::render::FontWeight::Normal,
+            Self::Bold => crate::render::FontWeight::Bold,
+            Self::Fixed(weight) => crate::render::FontWeight::Fixed(weight),
+        }
+    }
+}
+
+impl std::str::FromStr for FontWeight {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "normal" => Ok(Self::Normal),
+            "bold" => Ok(Self::Bold),
+            s => match s.parse() {
+                Ok(weight) => Ok(Self::Fixed(weight)),
+                Err(_) => Err(format!("Invalid font weight: {}", s)),
+            },
+        }
+    }
+}
+
+impl ToString for FontWeight {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Normal => "normal".to_string(),
+            Self::Bold => "bold".to_string(),
+            Self::Fixed(weight) => weight.to_string(),
+        }
     }
 }

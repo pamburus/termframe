@@ -25,6 +25,7 @@ pub struct Options {
     pub theme: Rc<Theme>,
     pub precision: u8,
     pub stroke: f32,
+    pub faint_opacity: f32,
 }
 
 #[derive(Debug, Clone)]
@@ -33,13 +34,31 @@ pub struct FontOptions {
     pub size: f32,
     pub metrics: FontMetrics,
     pub faces: Vec<FontFace>,
+    pub weights: FontWeights,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct FontMetrics {
     pub width: f32,
     pub ascender: f32,
     pub descender: f32,
+}
+
+#[derive(Debug, Clone)]
+pub struct FontWeights {
+    pub normal: FontWeight,
+    pub bold: FontWeight,
+    pub faint: FontWeight,
+}
+
+impl Default for FontWeights {
+    fn default() -> Self {
+        Self {
+            normal: FontWeight::Normal,
+            bold: FontWeight::Bold,
+            faint: FontWeight::Normal,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

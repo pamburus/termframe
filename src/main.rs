@@ -69,7 +69,7 @@ fn run() -> Result<()> {
             x: opt.padding,
             y: opt.padding,
         },
-
+        faint_opacity: opt.faint_opacity,
         theme: Theme::default().into(),
         stroke: 0.2,
     };
@@ -182,7 +182,15 @@ where
             (used.get(&ch).copied().unwrap_or(0) & (1 << i) as u64) != 0
         }));
 
-        faces.push(make_font_face(url, font, chars));
+        let face = make_font_face(url, font, chars);
+
+        log::debug!(
+            "font face #{i}: weight={weight:?} style={style:?} url={url:?}",
+            weight = face.weight,
+            style = face.style
+        );
+
+        faces.push(face);
     }
 
     let metrics = if let Some(width) = width {
@@ -200,6 +208,11 @@ where
         size: opt.font_size,
         metrics,
         faces,
+        weights: render::FontWeights {
+            normal: opt.font_weight.into(),
+            bold: opt.font_weight_bold.into(),
+            faint: opt.font_weight_faint.into(),
+        },
     })
 }
 

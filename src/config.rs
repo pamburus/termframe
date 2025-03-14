@@ -20,6 +20,7 @@ use crate::appdirs::AppDirs;
 pub struct Settings {
     pub terminal: TerminalSetting,
     pub font: FontSetting,
+    pub faint_opacity: f32,
     pub line_height: f32,
     pub precision: u8,
     pub theme: String,
@@ -87,6 +88,50 @@ pub struct TerminalSetting {
 pub struct FontSetting {
     pub family: String,
     pub size: f32,
+    pub weights: FontWeightsSetting,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct FontWeightsSetting {
+    pub normal: FontWeight,
+    pub bold: FontWeight,
+    pub faint: FontWeight,
+}
+
+impl Default for FontWeightsSetting {
+    fn default() -> Self {
+        Self {
+            normal: FontWeight::Normal,
+            bold: FontWeight::Bold,
+            faint: FontWeight::Normal,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub enum FontWeight {
+    Normal,
+    Bold,
+    #[serde(untagged)]
+    Fixed(u16),
+}
+
+impl Default for FontWeight {
+    fn default() -> Self {
+        Self::Normal
+    }
+}
+
+impl ToString for FontWeight {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Normal => "normal".to_string(),
+            Self::Bold => "bold".to_string(),
+            Self::Fixed(weight) => weight.to_string(),
+        }
+    }
 }
 
 // ---

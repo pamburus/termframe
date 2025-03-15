@@ -1738,7 +1738,7 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 [[package]]
 name = "svg"
 version = "0.18.0"
-source = "git+https://github.com/pamburus/svg.git?branch=feature%2Ftext-ws#af8a122ac0468add0c77f69db5785ef89135bcbd"
+source = "git+https://github.com/pamburus/svg.git?rev=f9ac3f53d6747d8af57f16d447a7336779ddb722#f9ac3f53d6747d8af57f16d447a7336779ddb722"
 
 [[package]]
 name = "syn"

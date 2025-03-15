@@ -22,7 +22,7 @@ known-folders = "1"
 log = "0"
 rayon = "1"
 serde = { version = "1", features = ["derive"] }
-svg = { git = "https://github.com/pamburus/svg.git", branch = "feature/text-ws" }
+svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }
 termwiz = "0"
 ureq = "3"
 url = "2"

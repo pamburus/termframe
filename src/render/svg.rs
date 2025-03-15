@@ -7,7 +7,7 @@ use std::{
 
 // third-party imports
 use askama::Template;
-use svg::{Document, node::element};
+use svg::{Document, Node, node::element};
 use termwiz::{
     cell::{Intensity, Underline},
     cellcluster::CellCluster,
@@ -97,6 +97,7 @@ impl SvgRenderer {
                 .set("width", format!("{}em", size.0))
                 .set("height", format!("{}em", lh))
                 .set("overflow", "hidden");
+            sl.unassign("xmlns");
 
             let mut tl = element::Text::new("")
                 .set("y", format!("{}em", tyo))
@@ -259,7 +260,7 @@ impl SvgRenderer {
 
         let style = element::Style::new(faces.join("\n"));
 
-        let screen = Document::new()
+        let mut screen = element::SVG::new()
             .set("x", format!("{}em", pad.x))
             .set("y", format!("{}em", pad.y))
             .set("width", format!("{}em", size.0))
@@ -270,6 +271,7 @@ impl SvgRenderer {
             .add(style)
             .add(background)
             .add(group);
+        screen.unassign("xmlns");
 
         let doc = Document::new()
             .set("width", (opt.font.size * (size.0 + pad.x * 2.0)).r2p(fp))

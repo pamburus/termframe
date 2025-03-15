@@ -46,39 +46,15 @@ fn run() -> Result<()> {
     }
 
     if let Some(shell) = opt.shell_completions {
-        let mut cmd = cli::Opt::command();
-        let name = cmd.get_name().to_string();
-        clap_complete::generate(shell, &mut cmd, name, &mut stdout());
-        return Ok(());
+        return Ok(print_shell_completions(shell));
     }
 
     if opt.man_page {
-        let man = clap_mangen::Man::new(cli::Opt::command());
-        man.render(&mut stdout())?;
-        return Ok(());
+        return Ok(print_man_page()?);
     }
 
     if opt.list_window_styles {
-        let themes = WindowStyleConfig::list()?
-            .into_iter()
-            .sorted_by_key(|(name, info)| (info.origin, name.clone()));
-        for (origin, group) in themes.chunk_by(|(_, info)| info.origin).into_iter() {
-            let origin = match origin {
-                Origin::Stock => "stock",
-                Origin::Custom => "custom",
-            };
-            if stdout().is_terminal() {
-                println!("{}:", origin);
-            }
-            for (name, _) in group {
-                if stdout().is_terminal() {
-                    println!("  - {}", name);
-                } else {
-                    println!("{}", name);
-                }
-            }
-        }
-        return Ok(());
+        return Ok(list_window_styles()?);
     }
 
     let settings = Rc::new(opt.patch(settings));
@@ -110,6 +86,42 @@ fn run() -> Result<()> {
     renderer.render(&surface, &mut output)?;
 
     Ok(())
+}
+
+fn print_man_page() -> Result<(), anyhow::Error> {
+    let man = clap_mangen::Man::new(cli::Opt::command());
+    man.render(&mut stdout())?;
+    Ok(())
+}
+
+fn print_shell_completions(shell: clap_complete::Shell) {
+    let mut cmd = cli::Opt::command();
+    let name = cmd.get_name().to_string();
+    clap_complete::generate(shell, &mut cmd, name, &mut stdout());
+}
+
+fn list_window_styles() -> Result<(), anyhow::Error> {
+    let themes = WindowStyleConfig::list()?
+        .into_iter()
+        .sorted_by_key(|(name, info)| (info.origin, name.clone()));
+    Ok(
+        for (origin, group) in themes.chunk_by(|(_, info)| info.origin).into_iter() {
+            let origin = match origin {
+                Origin::Stock => "stock",
+                Origin::Custom => "custom",
+            };
+            if stdout().is_terminal() {
+                println!("{}:", origin);
+            }
+            for (name, _) in group {
+                if stdout().is_terminal() {
+                    println!("  - {}", name);
+                } else {
+                    println!("{}", name);
+                }
+            }
+        },
+    )
 }
 
 // ---

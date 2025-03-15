@@ -43,7 +43,6 @@ impl SvgRenderer {
             (dimensions.1 as f32 * lh).r2p(fp),
         );
         let pad = opt.padding.r2p(fp); // padding in pixels
-        let margin = opt.window.margin.r2p(fp); // margin in pixels
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
 
         let background = element::Rectangle::new()
@@ -246,164 +245,168 @@ impl SvgRenderer {
         let height = (size.1 + pad.top + pad.bottom).r2p(fp);
 
         let font_family_list = opt.font.family.join(", ");
-        let faces = collect_font_faces(opt, used_font_faces)?;
 
         let mut screen = element::SVG::new()
             .set("width", format!("{}em", width))
             .set("height", format!("{}em", height))
             .set("font-size", opt.font.size.r2p(fp))
             .set("font-family", font_family_list);
-
-        if faces.len() != 0 {
-            let style = element::Style::new(faces.join("\n"));
-            screen = screen.add(style);
-        }
-
         if !opt.window.enabled {
             screen = screen.add(background)
         }
-
         screen = screen.add(content);
 
-        let doc = if opt.window.enabled {
+        let mut doc = if opt.window.enabled {
             let width = (opt.font.size * width).r2p(fp);
             let height = (opt.font.size * height).r2p(fp);
 
             let mut screen = screen.set("y", opt.window.header.height.r2p(fp));
             screen.unassign("xmlns");
 
-            let height = (height + opt.window.header.height).r2p(fp);
-
-            let mut window = element::Group::new().set(
-                "transform",
-                format!("translate({mx},{my})", mx = margin.left, my = margin.top),
-            );
-
-            if opt.window.shadow.enabled {
-                window = window
-                    .add(
-                        element::Filter::new().set("id", "shadow").add(
-                            element::FilterEffectGaussianBlur::new()
-                                .set("stdDeviation", opt.window.shadow.blur.r2p(fp)),
-                        ),
-                    )
-                    .add(
-                        element::Rectangle::new()
-                            .set("width", width)
-                            .set("height", height)
-                            .set("x", (opt.window.shadow.x).r2p(fp))
-                            .set("y", (opt.window.shadow.y).r2p(fp))
-                            .set("fill", opt.window.shadow.color.to_hex_string())
-                            .set("rx", opt.window.border.radius.r2p(fp))
-                            .set("ry", opt.window.border.radius.r2p(fp))
-                            .set("filter", "url(#shadow)"),
-                    )
-            }
-
-            // background
-            window = window.add(
-                element::Rectangle::new()
-                    .set("fill", opt.theme.bg.to_hex_string())
-                    .set("rx", opt.window.border.radius.r2p(fp))
-                    .set("ry", opt.window.border.radius.r2p(fp))
-                    .set("width", width)
-                    .set("height", height),
-            );
-
-            // header
-            window = window
-                .add(
-                    element::ClipPath::new().set("id", "header").add(
-                        element::Rectangle::new()
-                            .set("width", width)
-                            .set("height", opt.window.header.height.r2p(fp)),
-                    ),
-                )
-                .add(
-                    element::Rectangle::new()
-                        .set("fill", opt.window.header.color.to_hex_string())
-                        .set("rx", opt.window.border.radius.r2p(fp))
-                        .set("ry", opt.window.border.radius.r2p(fp))
-                        .set("width", width)
-                        .set("height", 2.0 * opt.window.header.height.r2p(fp))
-                        .set("clip-path", "url(#header)"),
-                )
-                .add(
-                    element::Line::new()
-                        .set("x1", "0")
-                        .set("x2", width)
-                        .set("y1", opt.window.header.height.r2p(fp))
-                        .set("y2", opt.window.header.height.r2p(fp))
-                        .set("stroke", opt.window.border.color1.to_hex_string())
-                        .set("stroke-width", opt.window.border.width.r2p(fp)),
-                );
-
-            let hh2 = (opt.window.header.height / 2.0).r2p(fp);
-            let r = opt.window.buttons.radius.r2p(fp);
-            let sp = opt.window.buttons.spacing.r2p(fp);
-
-            // buttons
-            window = window
-                .add(
-                    element::Circle::new()
-                        .set("cx", (hh2).r2p(fp))
-                        .set("cy", hh2)
-                        .set("r", r)
-                        .set("fill", opt.window.buttons.close.color.to_hex_string()),
-                )
-                .add(
-                    element::Circle::new()
-                        .set("cx", (hh2 + sp).r2p(fp))
-                        .set("cy", hh2)
-                        .set("r", r)
-                        .set("fill", opt.window.buttons.minimize.color.to_hex_string()),
-                )
-                .add(
-                    element::Circle::new()
-                        .set("cx", (hh2 + sp * 2.0).r2p(fp))
-                        .set("cy", hh2)
-                        .set("r", r)
-                        .set("fill", opt.window.buttons.maximize.color.to_hex_string()),
-                );
-
-            // screen
-            window = window.add(screen);
-
-            // frame border
-            window = window
-                .add(
-                    element::Rectangle::new()
-                        .set("width", (width + 0.0).r2p(fp))
-                        .set("height", (height + 0.0).r2p(fp))
-                        .set("fill", "none")
-                        .set("stroke", opt.window.border.color1.to_hex_string())
-                        .set("stroke-width", opt.window.border.width.r2p(fp))
-                        .set("rx", (opt.window.border.radius + 0.0).r2p(fp))
-                        .set("ry", (opt.window.border.radius + 0.0).r2p(fp)),
-                )
-                .add(
-                    element::Rectangle::new()
-                        .set("width", (width - 2.0).r2p(fp))
-                        .set("height", (height - 2.0).r2p(fp))
-                        .set("x", (1.0).r2p(fp))
-                        .set("y", (1.0).r2p(fp))
-                        .set("fill", "none")
-                        .set("stroke", opt.window.border.color2.to_hex_string())
-                        .set("stroke-width", opt.window.border.width.r2p(fp))
-                        .set("rx", (opt.window.border.radius - 1.0).r2p(fp))
-                        .set("ry", (opt.window.border.radius - 1.0).r2p(fp)),
-                );
-
-            Document::new()
-                .set("width", (width + margin.left + margin.right).r2p(fp))
-                .set("height", (height + margin.top + margin.bottom).r2p(fp))
-                .add(window)
+            make_window(opt, width, height, screen)
         } else {
             screen
         };
 
+        let faces = collect_font_faces(opt, used_font_faces)?;
+        if faces.len() != 0 {
+            let style = element::Style::new(faces.join("\n"));
+            doc = doc.add(style);
+        }
+
         Ok(svg::write(target, &doc)?)
     }
+}
+
+fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> element::SVG {
+    let fp = opt.precision; // floating point precision
+    let margin = opt.window.margin.r2p(fp); // margin in pixels
+    let height = (height + opt.window.header.height).r2p(fp);
+
+    let mut window = element::Group::new().set(
+        "transform",
+        format!("translate({mx},{my})", mx = margin.left, my = margin.top),
+    );
+
+    if opt.window.shadow.enabled {
+        window = window
+            .add(
+                element::Filter::new().set("id", "shadow").add(
+                    element::FilterEffectGaussianBlur::new()
+                        .set("stdDeviation", opt.window.shadow.blur.r2p(fp)),
+                ),
+            )
+            .add(
+                element::Rectangle::new()
+                    .set("width", width)
+                    .set("height", height)
+                    .set("x", (opt.window.shadow.x).r2p(fp))
+                    .set("y", (opt.window.shadow.y).r2p(fp))
+                    .set("fill", opt.window.shadow.color.to_hex_string())
+                    .set("rx", opt.window.border.radius.r2p(fp))
+                    .set("ry", opt.window.border.radius.r2p(fp))
+                    .set("filter", "url(#shadow)"),
+            )
+    }
+
+    // background
+    window = window.add(
+        element::Rectangle::new()
+            .set("fill", opt.theme.bg.to_hex_string())
+            .set("rx", opt.window.border.radius.r2p(fp))
+            .set("ry", opt.window.border.radius.r2p(fp))
+            .set("width", width)
+            .set("height", height),
+    );
+
+    // header
+    window = window
+        .add(
+            element::ClipPath::new().set("id", "header").add(
+                element::Rectangle::new()
+                    .set("width", width)
+                    .set("height", opt.window.header.height.r2p(fp)),
+            ),
+        )
+        .add(
+            element::Rectangle::new()
+                .set("fill", opt.window.header.color.to_hex_string())
+                .set("rx", opt.window.border.radius.r2p(fp))
+                .set("ry", opt.window.border.radius.r2p(fp))
+                .set("width", width)
+                .set("height", 2.0 * opt.window.header.height.r2p(fp))
+                .set("clip-path", "url(#header)"),
+        )
+        .add(
+            element::Line::new()
+                .set("x1", "0")
+                .set("x2", width)
+                .set("y1", opt.window.header.height.r2p(fp))
+                .set("y2", opt.window.header.height.r2p(fp))
+                .set("stroke", opt.window.border.color1.to_hex_string())
+                .set("stroke-width", opt.window.border.width.r2p(fp)),
+        );
+
+    let hh2 = (opt.window.header.height / 2.0).r2p(fp);
+    let r = opt.window.buttons.radius.r2p(fp);
+    let sp = opt.window.buttons.spacing.r2p(fp);
+
+    // buttons
+    window = window
+        .add(
+            element::Circle::new()
+                .set("cx", (hh2).r2p(fp))
+                .set("cy", hh2)
+                .set("r", r)
+                .set("fill", opt.window.buttons.close.color.to_hex_string()),
+        )
+        .add(
+            element::Circle::new()
+                .set("cx", (hh2 + sp).r2p(fp))
+                .set("cy", hh2)
+                .set("r", r)
+                .set("fill", opt.window.buttons.minimize.color.to_hex_string()),
+        )
+        .add(
+            element::Circle::new()
+                .set("cx", (hh2 + sp * 2.0).r2p(fp))
+                .set("cy", hh2)
+                .set("r", r)
+                .set("fill", opt.window.buttons.maximize.color.to_hex_string()),
+        );
+
+    // screen
+    window = window.add(screen);
+
+    // frame border
+    window = window
+        .add(
+            element::Rectangle::new()
+                .set("width", (width + 0.0).r2p(fp))
+                .set("height", (height + 0.0).r2p(fp))
+                .set("fill", "none")
+                .set("stroke", opt.window.border.color1.to_hex_string())
+                .set("stroke-width", opt.window.border.width.r2p(fp))
+                .set("rx", (opt.window.border.radius + 0.0).r2p(fp))
+                .set("ry", (opt.window.border.radius + 0.0).r2p(fp)),
+        )
+        .add(
+            element::Rectangle::new()
+                .set("width", (width - 2.0).r2p(fp))
+                .set("height", (height - 2.0).r2p(fp))
+                .set("x", (1.0).r2p(fp))
+                .set("y", (1.0).r2p(fp))
+                .set("fill", "none")
+                .set("stroke", opt.window.border.color2.to_hex_string())
+                .set("stroke-width", opt.window.border.width.r2p(fp))
+                .set("rx", (opt.window.border.radius - 1.0).r2p(fp))
+                .set("ry", (opt.window.border.radius - 1.0).r2p(fp)),
+        );
+
+    Document::new()
+        .set("width", (width + margin.left + margin.right).r2p(fp))
+        .set("height", (height + margin.top + margin.bottom).r2p(fp))
+        .add(window)
 }
 
 fn collect_font_faces(opt: &Options, used_font_faces: HashSet<usize>) -> Result<Vec<String>> {

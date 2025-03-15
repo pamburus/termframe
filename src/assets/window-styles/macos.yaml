@@ -10,10 +10,10 @@ window:
     colors:
       outer:
         dark: "#000000"
-        light: "#a0a0a080"
+        light: "#80808080"
       inner:
         dark: "#f0f0f080"
-        light: "#f0f0f000"
+        light: "#ffffff80"
   header:
     color:
       dark: "#383837"

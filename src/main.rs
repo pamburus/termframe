@@ -18,7 +18,7 @@ use rayon::prelude::*;
 use config::{Load, Patch, Settings, load::Origin, winstyle::WindowStyleConfig};
 use parse::parse;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
-use theme::Theme;
+use theme::{AdaptiveTheme, Theme};
 
 mod appdirs;
 mod cli;
@@ -88,15 +88,16 @@ fn run() -> Result<()> {
     let surface = parse(opt.width, opt.height, input);
 
     let content = surface.screen_chars_to_string();
+    let mode = settings.mode.into();
 
     let options = render::Options {
         settings: settings.clone(),
         font: make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
-        theme: Theme::default().into(),
+        theme: AdaptiveTheme::default().resolve(mode).into(),
         window: WindowStyleConfig::load(&settings.window.style)?
             .unwrap_or_default()
             .window,
-        mode: settings.mode.into(),
+        mode,
     };
 
     let mut output: Box<dyn io::Write> = if opt.output != "-" {

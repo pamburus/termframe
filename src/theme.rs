@@ -8,6 +8,74 @@ use std::{
 use csscolorparser::Color;
 use termwiz::color::ColorAttribute;
 
+// local imports
+use crate::config::mode::Mode;
+
+// ---
+
+#[derive(Debug, Clone)]
+pub struct AdaptiveTheme {
+    pub light: Theme,
+    pub dark: Theme,
+}
+
+impl AdaptiveTheme {
+    pub fn resolve(self, mode: Mode) -> Theme {
+        match mode {
+            Mode::Light => self.light,
+            Mode::Dark => self.dark,
+        }
+    }
+}
+
+impl Default for AdaptiveTheme {
+    fn default() -> Self {
+        let bg = Color::from_rgba8(0x28, 0x2c, 0x30, 0xff);
+        let fg = Color::from_rgba8(0xac, 0xb2, 0xbe, 0xff);
+        let mut palette = Palette::default();
+        palette[0] = Color::from_rgba8(0x28, 0x2c, 0x34, 0xff); // black
+        palette[1] = Color::from_rgba8(0xd1, 0x72, 0x77, 0xff); // red
+        palette[2] = Color::from_rgba8(0xa1, 0xc2, 0x81, 0xff); // green
+        palette[3] = Color::from_rgba8(0xde, 0x9b, 0x64, 0xff); // yellow
+        palette[4] = Color::from_rgba8(0x74, 0xad, 0xe9, 0xff); // blue
+        palette[5] = Color::from_rgba8(0xbb, 0x7c, 0xd7, 0xff); // magenta
+        palette[6] = Color::from_rgba8(0x29, 0xa9, 0xbc, 0xff); // cyan
+        palette[7] = Color::from_rgba8(0xac, 0xb2, 0xbe, 0xff); // white
+        palette[8] = Color::from_rgba8(0x67, 0x6f, 0x82, 0xff); // bright black
+        palette[9] = Color::from_rgba8(0xe6, 0x67, 0x6d, 0xff); // bright red
+        palette[10] = Color::from_rgba8(0xa9, 0xd4, 0x7f, 0xff); // bright green
+        palette[11] = Color::from_rgba8(0xde, 0x9b, 0x64, 0xff); // bright yellow
+        palette[12] = Color::from_rgba8(0x66, 0xac, 0xff, 0xff); // bright blue
+        palette[13] = Color::from_rgba8(0xc6, 0x71, 0xeb, 0xff); // bright magenta
+        palette[14] = Color::from_rgba8(0x69, 0xc6, 0xd1, 0xff); // bright cyan
+        palette[15] = Color::from_rgba8(0xcc, 0xcc, 0xcc, 0xff); // bright white
+        let dark = Theme { bg, fg, palette };
+
+        let bg = Color::from_rgba8(0xf9, 0xf9, 0xf9, 0xff);
+        let fg = Color::from_rgba8(0x2a, 0x2c, 0x33, 0xff);
+        let mut palette = Palette::default();
+        palette[0] = Color::from_rgba8(0x00, 0x00, 0x00, 0xff); // black
+        palette[1] = Color::from_rgba8(0xc9, 0x1b, 0x00, 0xff); // red
+        palette[2] = Color::from_rgba8(0x00, 0xc2, 0x00, 0xff); // green
+        palette[3] = Color::from_rgba8(0xc7, 0xc4, 0x00, 0xff); // yellow
+        palette[4] = Color::from_rgba8(0x02, 0x25, 0xc7, 0xff); // blue
+        palette[5] = Color::from_rgba8(0xc9, 0x30, 0xc7, 0xff); // magenta
+        palette[6] = Color::from_rgba8(0x00, 0xc5, 0xc7, 0xff); // cyan
+        palette[7] = Color::from_rgba8(0xc7, 0xc7, 0xc7, 0xff); // white
+        palette[8] = Color::from_rgba8(0x67, 0x67, 0x67, 0xff); // bright black
+        palette[9] = Color::from_rgba8(0xff, 0x6d, 0x67, 0xff); // bright red
+        palette[10] = Color::from_rgba8(0x5f, 0xf9, 0x67, 0xff); // bright green
+        palette[11] = Color::from_rgba8(0xfe, 0xfb, 0x67, 0xff); // bright yellow
+        palette[12] = Color::from_rgba8(0x68, 0x71, 0xff, 0xff); // bright blue
+        palette[13] = Color::from_rgba8(0xff, 0x76, 0xff, 0xff); // bright magenta
+        palette[14] = Color::from_rgba8(0x5f, 0xfd, 0xff, 0xff); // bright cyan
+        palette[15] = Color::from_rgba8(0xff, 0xfe, 0xff, 0xff); // bright white
+        let light = Theme { bg, fg, palette };
+
+        Self { dark, light }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Theme {
     pub bg: Color,
@@ -33,31 +101,6 @@ impl Theme {
 
     pub fn resolve_bg(&self, attr: ColorAttribute) -> Color {
         self.resolve(attr).unwrap_or_else(|| self.bg.clone())
-    }
-}
-
-impl Default for Theme {
-    fn default() -> Self {
-        let bg = Color::from_rgba8(0x28, 0x2c, 0x30, 0xff);
-        let fg = Color::from_rgba8(0xac, 0xb2, 0xbe, 0xff);
-        let mut palette = Palette::default();
-        palette[0] = Color::from_rgba8(0x28, 0x2c, 0x34, 0xff); // black
-        palette[1] = Color::from_rgba8(0xd1, 0x72, 0x77, 0xff); // red
-        palette[2] = Color::from_rgba8(0xa1, 0xc2, 0x81, 0xff); // green
-        palette[3] = Color::from_rgba8(0xde, 0x9b, 0x64, 0xff); // yellow
-        palette[4] = Color::from_rgba8(0x74, 0xad, 0xe9, 0xff); // blue
-        palette[5] = Color::from_rgba8(0xbb, 0x7c, 0xd7, 0xff); // magenta
-        palette[6] = Color::from_rgba8(0x29, 0xa9, 0xbc, 0xff); // cyan
-        palette[7] = Color::from_rgba8(0xac, 0xb2, 0xbe, 0xff); // white
-        palette[8] = Color::from_rgba8(0x67, 0x6f, 0x82, 0xff); // bright black
-        palette[9] = Color::from_rgba8(0xe6, 0x67, 0x6d, 0xff); // bright red
-        palette[10] = Color::from_rgba8(0xa9, 0xd4, 0x7f, 0xff); // bright green
-        palette[11] = Color::from_rgba8(0xde, 0x9b, 0x64, 0xff); // bright yellow
-        palette[12] = Color::from_rgba8(0x66, 0xac, 0xff, 0xff); // bright blue
-        palette[13] = Color::from_rgba8(0xc6, 0x71, 0xeb, 0xff); // bright magenta
-        palette[14] = Color::from_rgba8(0x69, 0xc6, 0xd1, 0xff); // bright cyan
-        palette[15] = Color::from_rgba8(0xcc, 0xcc, 0xcc, 0xff); // bright white
-        Self { bg, fg, palette }
     }
 }
 

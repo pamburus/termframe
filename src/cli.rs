@@ -41,17 +41,20 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().font.weights.normal.into(), overrides_with = "font_weight")]
     pub font_weight: FontWeight,
 
-    #[arg(long, default_value_t = config::global::get().font.weights.bold.into(), overrides_with = "font_weight_bold")]
-    pub font_weight_bold: FontWeight,
-
-    #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "font_weight_faint")]
-    pub font_weight_faint: FontWeight,
-
     #[arg(long, num_args = 1, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts")]
     pub embed_fonts: bool,
 
+    #[arg(long, num_args = 1, default_value_t = config::global::get().bold_is_bright, overrides_with = "bold_is_bright")]
+    pub bold_is_bright: bool,
+
+    #[arg(long, default_value_t = config::global::get().font.weights.bold.into(), overrides_with = "bold_font_weight")]
+    pub bold_font_weight: FontWeight,
+
     #[arg(long, default_value_t = config::global::get().faint_opacity, overrides_with = "faint_opacity")]
     pub faint_opacity: f32,
+
+    #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "faint_font_weight")]
+    pub faint_font_weight: FontWeight,
 
     /// Line height.
     #[arg(long, default_value_t = config::global::get().line_height, overrides_with = "line_height")]
@@ -65,9 +68,17 @@ pub struct Opt {
     #[arg(long, default_value = &config::global::get().theme, overrides_with = "theme")]
     pub theme: String,
 
-    /// Add window.
+    /// Enable window.
     #[arg(long, num_args = 1, default_value_t = config::global::get().window.enabled, overrides_with = "window")]
     pub window: bool,
+
+    /// Enable window shadow.
+    #[arg(long, num_args = 1, default_value_t = config::global::get().window.shadow.enabled, overrides_with = "window_shadow")]
+    pub window_shadow: bool,
+
+    /// Override window margin, in pixels.
+    #[arg(long, overrides_with = "window_margin")]
+    pub window_margin: Option<f32>,
 
     /// First line to capture, if not specified, captures from the beginning of the input.
     #[arg(long, overrides_with = "start")]
@@ -111,17 +122,22 @@ impl config::Patch for Opt {
         settings.font.family = self.font_family.clone();
         settings.font.size = self.font_size;
         settings.font.weights.normal = self.font_weight.into();
-        settings.font.weights.bold = self.font_weight_bold.into();
-        settings.font.weights.faint = self.font_weight_faint.into();
+        settings.font.weights.bold = self.bold_font_weight.into();
+        settings.font.weights.faint = self.faint_font_weight.into();
         settings.embed_fonts = self.embed_fonts;
         settings.faint_opacity = self.faint_opacity;
         settings.line_height = self.line_height;
         settings.precision = self.precision;
+        settings.bold_is_bright = self.bold_is_bright;
         settings.theme = self.theme.clone();
         if let Some(padding) = self.padding {
             settings.padding = PaddingOption::Uniform(padding);
         }
         settings.window.enabled = self.window;
+        settings.window.shadow.enabled = self.window_shadow;
+        if let Some(margin) = self.window_margin {
+            settings.window.margin = PaddingOption::Uniform(margin);
+        }
 
         settings
     }

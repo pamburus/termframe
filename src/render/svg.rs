@@ -132,10 +132,22 @@ impl SvgRenderer {
                         range.end = range.start + 1;
                     }
 
+                    let correct = |mut color: ColorAttribute| {
+                        if opt.bold_is_bright && cluster.attrs.intensity() == Intensity::Bold {
+                            match color {
+                                ColorAttribute::PaletteIndex(i) if i < 8 => {
+                                    color = ColorAttribute::PaletteIndex(i + 8)
+                                }
+                                _ => {}
+                            }
+                        }
+                        color
+                    };
+
                     let mut color = if cluster.attrs.reverse() {
                         opt.theme.resolve_bg(cluster.attrs.background())
                     } else {
-                        opt.theme.resolve_fg(cluster.attrs.foreground())
+                        opt.theme.resolve_fg(correct(cluster.attrs.foreground()))
                     };
 
                     if cluster.attrs.intensity() == Intensity::Half {

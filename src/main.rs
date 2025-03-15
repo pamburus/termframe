@@ -71,6 +71,7 @@ fn run() -> Result<()> {
         precision: settings.precision,
         padding: settings.padding.convert(),
         faint_opacity: settings.faint_opacity,
+        bold_is_bright: settings.bold_is_bright,
         theme: Theme::default().into(),
         stroke: settings.stroke,
         window: settings.window.convert(),

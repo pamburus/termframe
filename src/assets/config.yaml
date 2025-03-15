@@ -11,7 +11,6 @@ font:
     faint: normal
 
 embed-fonts: true
-faint-opacity: 0.5
 line-height: 1.2
 precision: 3
 padding:
@@ -19,6 +18,9 @@ padding:
   vertical: 0.6
 stroke: 0.01
 theme: "one-dark"
+
+bold-is-bright: false
+faint-opacity: 0.5
 
 window:
   enabled: true

@@ -27,6 +27,7 @@ pub struct Options {
     pub precision: u8,
     pub stroke: f32,
     pub faint_opacity: f32,
+    pub bold_is_bright: bool,
     pub window: Window,
 }
 

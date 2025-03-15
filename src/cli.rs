@@ -3,7 +3,7 @@ use clap::{ArgAction, Args, Parser, value_parser};
 use clap_complete::Shell;
 
 // local imports
-use crate::config;
+use crate::config::{self, PaddingOption, Settings};
 
 // ---
 
@@ -22,7 +22,7 @@ pub struct Opt {
     #[arg(long, short = 'H', default_value_t = config::global::get().terminal.height, overrides_with = "height")]
     pub height: usize,
 
-    /// Padding for the inner text.
+    /// Override padding for the inner text in font size units.
     #[arg(long, overrides_with = "padding")]
     pub padding: Option<f32>,
 
@@ -61,30 +61,27 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().precision, overrides_with = "precision")]
     pub precision: u8,
 
-    /// Stroke width for filled rectangles, fraction of font size.
-    #[arg(long, default_value_t = config::global::get().stroke, overrides_with = "stroke")]
-    pub stroke: f32,
-
     /// Theme.
     #[arg(long, default_value = &config::global::get().theme, overrides_with = "theme")]
     pub theme: String,
 
-    /// First line to capture.
-    /// If not specified, captures since the beginning of the input.
+    /// Add window.
+    #[arg(long, num_args = 1, default_value_t = config::global::get().window.enabled, overrides_with = "window")]
+    pub window: bool,
+
+    /// First line to capture, if not specified, captures from the beginning of the input.
     #[arg(long, overrides_with = "start")]
     pub start: Option<usize>,
 
-    /// Last line to capture.
-    /// If not specified, captures until the end of the input.
+    /// Last line to capture, if not specified, captures to the end of the input.
     #[arg(long, overrides_with = "end")]
     pub end: Option<usize>,
 
-    /// Output file.
-    /// If not specified, prints to stdout.
-    #[arg(long, short = 'o', overrides_with = "output")]
-    pub output: Option<String>,
+    /// Output file, by default prints to stdout.
+    #[arg(long, short = 'o', default_value = "-", overrides_with = "output")]
+    pub output: String,
 
-    /// Print help.
+    /// Print help and exit.
     #[arg(long, default_value_t = false, action = ArgAction::SetTrue)]
     pub help: bool,
 
@@ -105,12 +102,37 @@ pub struct Opt {
     pub file: std::path::PathBuf,
 }
 
+impl config::Patch for Opt {
+    fn patch(&self, settings: Settings) -> Settings {
+        let mut settings = settings;
+
+        settings.terminal.width = self.width;
+        settings.terminal.height = self.height;
+        settings.font.family = self.font_family.clone();
+        settings.font.size = self.font_size;
+        settings.font.weights.normal = self.font_weight.into();
+        settings.font.weights.bold = self.font_weight_bold.into();
+        settings.font.weights.faint = self.font_weight_faint.into();
+        settings.embed_fonts = self.embed_fonts;
+        settings.faint_opacity = self.faint_opacity;
+        settings.line_height = self.line_height;
+        settings.precision = self.precision;
+        settings.theme = self.theme.clone();
+        if let Some(padding) = self.padding {
+            settings.padding = PaddingOption::Uniform(padding);
+        }
+        settings.window.enabled = self.window;
+
+        settings
+    }
+}
+
 // ---
 
 #[derive(Args)]
 pub struct BootstrapArgs {
     /// Configuration file path.
-    #[arg(long, value_name = "FILE", env = "HL_CONFIG", num_args = 1)]
+    #[arg(long, value_name = "FILE", env = "TERMSHOT_CONFIG", num_args = 1)]
     pub config: Vec<String>,
 }
 
@@ -187,12 +209,12 @@ impl From<config::FontWeight> for FontWeight {
     }
 }
 
-impl Into<crate::render::FontWeight> for FontWeight {
-    fn into(self) -> crate::render::FontWeight {
-        match self {
-            Self::Normal => crate::render::FontWeight::Normal,
-            Self::Bold => crate::render::FontWeight::Bold,
-            Self::Fixed(weight) => crate::render::FontWeight::Fixed(weight),
+impl From<FontWeight> for config::FontWeight {
+    fn from(weight: FontWeight) -> Self {
+        match weight {
+            FontWeight::Normal => Self::Normal,
+            FontWeight::Bold => Self::Bold,
+            FontWeight::Fixed(weight) => Self::Fixed(weight),
         }
     }
 }

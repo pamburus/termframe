@@ -261,34 +261,40 @@ impl SvgRenderer {
 
         let style = element::Style::new(faces.join("\n"));
 
+        let mut content = element::SVG::new()
+            .set("x", format!("{}em", pad.left))
+            .set("y", format!("{}em", pad.top))
+            .set("fill", opt.theme.fg.to_hex_string())
+            .add(group);
+        content.unassign("xmlns");
+
+        let width = (size.0 + pad.left + pad.right).r2p(fp);
+        let height = (size.1 + pad.top + pad.bottom).r2p(fp);
+
         let mut screen = element::SVG::new()
-            .set("x", pad.left)
-            .set("y", pad.top)
-            .set("width", format!("{}em", size.0))
-            .set("height", format!("{}em", size.1))
+            .set("width", format!("{}em", width))
+            .set("height", format!("{}em", height))
             .set("font-size", opt.font.size.r2p(fp))
             .set("font-family", opt.font.family.clone())
-            .set("fill", opt.theme.fg.to_hex_string())
-            .add(style)
-            .add(group);
-        screen.unassign("xmlns");
-
-        let width = (opt.font.size * size.0 + pad.left + pad.right).r2p(fp);
-        let height = (opt.font.size * size.1 + pad.top * pad.bottom).r2p(fp);
+            .add(style);
+        if !opt.window.enabled {
+            screen = screen.add(background)
+        }
+        screen = screen.add(content);
 
         let doc = if opt.window.enabled {
-            let mut screen = screen.set("y", (pad.top + opt.window.header.height).r2p(fp));
+            let width = (opt.font.size * width).r2p(fp);
+            let height = (opt.font.size * height).r2p(fp);
+
+            let mut screen = screen.set("y", opt.window.header.height.r2p(fp));
             screen.unassign("xmlns");
 
             let height = (height + opt.window.header.height).r2p(fp);
 
-            let mut window = element::Group::new()
-                .set(
-                    "transform",
-                    format!("translate({mx},{my})", mx = margin.left, my = margin.top),
-                )
-                .set("width", width)
-                .set("height", height);
+            let mut window = element::Group::new().set(
+                "transform",
+                format!("translate({mx},{my})", mx = margin.left, my = margin.top),
+            );
 
             if opt.window.shadow.enabled {
                 window = window
@@ -410,11 +416,7 @@ impl SvgRenderer {
                 .set("height", (height + margin.top + margin.bottom).r2p(fp))
                 .add(window)
         } else {
-            Document::new()
-                .set("width", width)
-                .set("height", height)
-                .add(background)
-                .add(screen)
+            screen
         };
 
         Ok(svg::write(target, &doc)?)

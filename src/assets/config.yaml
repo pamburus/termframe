@@ -1,6 +1,6 @@
 terminal:
-  width: 160
-  height: 80
+  width: 96
+  height: 48
 
 font:
   family: "JetBrains Mono"
@@ -15,10 +15,8 @@ faint-opacity: 0.5
 line-height: 1.2
 precision: 3
 padding:
-  left: 8
-  right: 8
-  top: 4
-  bottom: 4
+  horizontal: 0.8
+  vertical: 0.6
 stroke: 0.01
 theme: "one-dark"
 
@@ -31,7 +29,7 @@ window:
     bottom: 48
   border:
     width: 0.5
-    radius: 12
+    radius: 10
     color1: "#000000"
     color2: "#f0f0f080"
   header:

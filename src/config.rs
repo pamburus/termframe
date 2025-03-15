@@ -12,22 +12,22 @@ use csscolorparser::Color;
 use serde::Deserialize;
 
 // local imports
-use crate::{appdirs::AppDirs, render::Padding};
+use crate::appdirs::AppDirs;
 
 // ---
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Settings {
-    pub terminal: TerminalSetting,
-    pub font: FontSetting,
+    pub terminal: Terminal,
+    pub font: Font,
     pub faint_opacity: f32,
     pub line_height: f32,
     pub precision: u8,
     pub theme: String,
     pub fonts: Fonts,
     pub embed_fonts: bool,
-    pub padding: Padding,
+    pub padding: PaddingOption,
     pub stroke: f32,
     pub window: Window,
 }
@@ -75,7 +75,7 @@ impl Default for &'static Settings {
 #[derive(Debug, Deserialize, Clone)]
 pub struct Window {
     pub enabled: bool,
-    pub margin: Padding,
+    pub margin: PaddingOption,
     pub border: WindowBorder,
     pub header: WindowHeader,
     pub buttons: WindowButtons,
@@ -131,28 +131,28 @@ pub struct FontFace {
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
-pub struct TerminalSetting {
+pub struct Terminal {
     pub width: usize,
     pub height: usize,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
-pub struct FontSetting {
+pub struct Font {
     pub family: String,
     pub size: f32,
-    pub weights: FontWeightsSetting,
+    pub weights: FontWeights,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
-pub struct FontWeightsSetting {
+pub struct FontWeights {
     pub normal: FontWeight,
     pub bold: FontWeight,
     pub faint: FontWeight,
 }
 
-impl Default for FontWeightsSetting {
+impl Default for FontWeights {
     fn default() -> Self {
         Self {
             normal: FontWeight::Normal,
@@ -185,6 +185,48 @@ impl ToString for FontWeight {
             Self::Fixed(weight) => weight.to_string(),
         }
     }
+}
+
+// ---
+
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+#[serde(untagged)]
+pub enum PaddingOption {
+    Uniform(f32),
+    Symmetric { vertical: f32, horizontal: f32 },
+    Asymmetric(Padding),
+}
+
+impl PaddingOption {
+    pub fn resolve(&self) -> Padding {
+        match self {
+            Self::Uniform(value) => Padding {
+                top: *value,
+                bottom: *value,
+                left: *value,
+                right: *value,
+            },
+            Self::Symmetric {
+                vertical,
+                horizontal,
+            } => Padding {
+                top: *vertical,
+                bottom: *vertical,
+                left: *horizontal,
+                right: *horizontal,
+            },
+            Self::Asymmetric(padding) => *padding,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
+pub struct Padding {
+    pub top: f32,
+    pub bottom: f32,
+    pub left: f32,
+    pub right: f32,
 }
 
 // ---
@@ -350,4 +392,10 @@ impl SourceFile {
     pub fn required(self, required: bool) -> Self {
         Self { required, ..self }
     }
+}
+
+// ---
+
+pub trait Patch {
+    fn patch(&self, settings: Settings) -> Settings;
 }

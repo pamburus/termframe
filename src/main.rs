@@ -14,7 +14,7 @@ use env_logger::{self as logger};
 use rayon::prelude::*;
 
 // local imports
-use config::Settings;
+use config::{Patch, Settings};
 use parse::parse;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use theme::Theme;
@@ -57,6 +57,8 @@ fn run() -> Result<()> {
         return Ok(());
     }
 
+    let settings = opt.patch(settings);
+
     let file = std::fs::File::open(&opt.file)?;
     let input = io::BufReader::new(file);
     let surface = parse(opt.width, opt.height, input);
@@ -64,61 +66,18 @@ fn run() -> Result<()> {
     let content = surface.screen_chars_to_string();
 
     let options = render::Options {
-        font: make_font_options(&settings, &opt, content.chars().filter(|c| *c != '\n'))?,
-        line_height: opt.line_height,
-        precision: opt.precision,
-        padding: render::Padding {
-            left: settings.padding.left,
-            right: settings.padding.right,
-            top: settings.padding.top,
-            bottom: settings.padding.bottom,
-        },
-        faint_opacity: opt.faint_opacity,
+        font: make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
+        line_height: settings.line_height,
+        precision: settings.precision,
+        padding: settings.padding.convert(),
+        faint_opacity: settings.faint_opacity,
         theme: Theme::default().into(),
-        stroke: opt.stroke,
-        window: render::Window {
-            enabled: settings.window.enabled,
-            margin: render::Padding {
-                left: settings.window.margin.left,
-                right: settings.window.margin.right,
-                top: settings.window.margin.top,
-                bottom: settings.window.margin.bottom,
-            },
-            border: render::WindowBorder {
-                color1: settings.window.border.color1,
-                color2: settings.window.border.color2,
-                width: settings.window.border.width,
-                radius: settings.window.border.radius,
-            },
-            header: render::WindowHeader {
-                height: settings.window.header.height,
-                color: settings.window.header.color,
-            },
-            buttons: render::WindowButtons {
-                radius: settings.window.buttons.radius,
-                spacing: settings.window.buttons.spacing,
-                close: render::WindowButton {
-                    color: settings.window.buttons.close.color,
-                },
-                minimize: render::WindowButton {
-                    color: settings.window.buttons.minimize.color,
-                },
-                maximize: render::WindowButton {
-                    color: settings.window.buttons.maximize.color,
-                },
-            },
-            shadow: render::WindowShadow {
-                enabled: settings.window.shadow.enabled,
-                color: settings.window.shadow.color,
-                x: settings.window.shadow.x,
-                y: settings.window.shadow.y,
-                blur: settings.window.shadow.blur,
-            },
-        },
+        stroke: settings.stroke,
+        window: settings.window.convert(),
     };
 
-    let mut output: Box<dyn io::Write> = if let Some(output) = opt.output {
-        Box::new(std::fs::File::create(output)?)
+    let mut output: Box<dyn io::Write> = if opt.output != "-" {
+        Box::new(std::fs::File::create(opt.output)?)
     } else {
         Box::new(stdout())
     };
@@ -162,11 +121,7 @@ fn bootstrap() -> Result<Settings> {
 
 // ---
 
-fn make_font_options<C>(
-    settings: &Settings,
-    opt: &cli::Opt,
-    chars: C,
-) -> Result<render::FontOptions>
+fn make_font_options<C>(settings: &Settings, chars: C) -> Result<render::FontOptions>
 where
     C: IntoIterator<Item = char>,
 {
@@ -179,7 +134,7 @@ where
     let files = settings
         .fonts
         .par_iter()
-        .filter(|font| font.family == opt.font_family)
+        .filter(|font| font.family == settings.font.family)
         .flat_map(|font| &font.files)
         .map(|file| {
             font::FontFile::load(file.as_str().into())
@@ -246,7 +201,7 @@ where
         DEFAULT_FONT_METRICS
     };
 
-    if opt.embed_fonts {
+    if settings.embed_fonts {
         for (i, file) in files.iter().enumerate() {
             let data = file.data();
             log::debug!(
@@ -258,15 +213,11 @@ where
     }
 
     Ok(render::FontOptions {
-        family: opt.font_family.clone(),
-        size: opt.font_size,
+        family: settings.font.family.clone(),
+        size: settings.font.size,
         metrics,
         faces,
-        weights: render::FontWeights {
-            normal: opt.font_weight.into(),
-            bold: opt.font_weight_bold.into(),
-            faint: opt.font_weight_faint.into(),
-        },
+        weights: settings.font.weights.convert(),
     })
 }
 
@@ -303,3 +254,106 @@ const DEFAULT_FONT_METRICS: render::FontMetrics = render::FontMetrics {
     ascender: 0.0,
     descender: 0.0,
 };
+
+// ---
+
+trait Convert<T> {
+    fn convert(&self) -> T;
+}
+
+impl Convert<render::FontWeight> for config::FontWeight {
+    fn convert(&self) -> render::FontWeight {
+        match self {
+            config::FontWeight::Normal => render::FontWeight::Normal,
+            config::FontWeight::Bold => render::FontWeight::Bold,
+            config::FontWeight::Fixed(weight) => render::FontWeight::Fixed(*weight),
+        }
+    }
+}
+
+impl Convert<render::FontWeights> for config::FontWeights {
+    fn convert(&self) -> render::FontWeights {
+        render::FontWeights {
+            normal: self.normal.convert(),
+            bold: self.bold.convert(),
+            faint: self.faint.convert(),
+        }
+    }
+}
+
+impl Convert<render::Padding> for config::PaddingOption {
+    fn convert(&self) -> render::Padding {
+        let padding = self.resolve();
+        render::Padding {
+            left: padding.left,
+            right: padding.right,
+            top: padding.top,
+            bottom: padding.bottom,
+        }
+    }
+}
+
+impl Convert<render::WindowBorder> for config::WindowBorder {
+    fn convert(&self) -> render::WindowBorder {
+        render::WindowBorder {
+            color1: self.color1.clone(),
+            color2: self.color2.clone(),
+            width: self.width,
+            radius: self.radius,
+        }
+    }
+}
+
+impl Convert<render::WindowHeader> for config::WindowHeader {
+    fn convert(&self) -> render::WindowHeader {
+        render::WindowHeader {
+            height: self.height,
+            color: self.color.clone(),
+        }
+    }
+}
+
+impl Convert<render::WindowButtons> for config::WindowButtons {
+    fn convert(&self) -> render::WindowButtons {
+        render::WindowButtons {
+            radius: self.radius,
+            spacing: self.spacing,
+            close: self.close.convert(),
+            minimize: self.minimize.convert(),
+            maximize: self.maximize.convert(),
+        }
+    }
+}
+
+impl Convert<render::WindowButton> for config::WindowButton {
+    fn convert(&self) -> render::WindowButton {
+        render::WindowButton {
+            color: self.color.clone(),
+        }
+    }
+}
+
+impl Convert<render::WindowShadow> for config::WindowShadow {
+    fn convert(&self) -> render::WindowShadow {
+        render::WindowShadow {
+            enabled: self.enabled,
+            color: self.color.clone(),
+            x: self.x,
+            y: self.y,
+            blur: self.blur,
+        }
+    }
+}
+
+impl Convert<render::Window> for config::Window {
+    fn convert(&self) -> render::Window {
+        render::Window {
+            enabled: self.enabled,
+            margin: self.margin.convert(),
+            border: self.border.convert(),
+            header: self.header.convert(),
+            buttons: self.buttons.convert(),
+            shadow: self.shadow.convert(),
+        }
+    }
+}

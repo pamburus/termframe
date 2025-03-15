@@ -3,7 +3,6 @@ use std::{collections::HashSet, rc::Rc};
 
 // third-party imports
 use csscolorparser::Color;
-use serde::Deserialize;
 use termwiz::surface::Surface;
 
 // local imports
@@ -100,7 +99,7 @@ impl FontWeight {
     }
 }
 
-#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Padding {
     pub top: f32,
     pub bottom: f32,

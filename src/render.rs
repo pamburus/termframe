@@ -33,7 +33,7 @@ pub struct Options {
 
 #[derive(Debug, Clone)]
 pub struct FontOptions {
-    pub family: String,
+    pub family: Vec<String>,
     pub size: f32,
     pub metrics: FontMetrics,
     pub faces: Vec<FontFace>,
@@ -66,6 +66,7 @@ impl Default for FontWeights {
 
 #[derive(Debug, Clone)]
 pub struct FontFace {
+    pub family: String,
     pub weight: FontWeight,
     pub style: Option<FontStyle>,
     pub url: String,

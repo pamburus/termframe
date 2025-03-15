@@ -3,11 +3,11 @@ use clap::{ArgAction, Args, Parser, value_parser};
 use clap_complete::Shell;
 
 // local imports
-use crate::config::{self, PaddingOption, Settings};
+use crate::config::{self, FontFamilyOption, PaddingOption, Settings};
 
 // ---
 
-/// JSON and logfmt log converter to human readable representation.
+/// Terminal output snapshot tool.
 #[derive(Parser)]
 #[clap(version, disable_help_flag = true)]
 pub struct Opt {
@@ -26,33 +26,35 @@ pub struct Opt {
     #[arg(long, overrides_with = "padding")]
     pub padding: Option<f32>,
 
-    /// Font family.
-    #[arg(long, default_value = &config::global::get().font.family, overrides_with = "font_family")]
-    pub font_family: String,
+    /// Font family, can be specified multiple times.
+    #[arg(long)]
+    pub font_family: Vec<String>,
 
     /// Font size.
     #[arg(long, default_value_t = config::global::get().font.size, overrides_with = "font_size")]
     pub font_size: f32,
 
-    /// Font file, can be specified multiple times.
-    #[arg(long, num_args = 1)]
-    pub font_file: Vec<String>,
-
+    /// Normal font weight.
     #[arg(long, default_value_t = config::global::get().font.weights.normal.into(), overrides_with = "font_weight")]
     pub font_weight: FontWeight,
 
+    /// Embed fonts.
     #[arg(long, num_args = 1, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts")]
     pub embed_fonts: bool,
 
+    /// Use bright colors for bold text.
     #[arg(long, num_args = 1, default_value_t = config::global::get().bold_is_bright, overrides_with = "bold_is_bright")]
     pub bold_is_bright: bool,
 
+    /// Bold text font weight.
     #[arg(long, default_value_t = config::global::get().font.weights.bold.into(), overrides_with = "bold_font_weight")]
     pub bold_font_weight: FontWeight,
 
+    /// Faint text opacity.
     #[arg(long, default_value_t = config::global::get().faint_opacity, overrides_with = "faint_opacity")]
     pub faint_opacity: f32,
 
+    // Faint text font weight.
     #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "faint_font_weight")]
     pub faint_font_weight: FontWeight,
 
@@ -119,7 +121,9 @@ impl config::Patch for Opt {
 
         settings.terminal.width = self.width;
         settings.terminal.height = self.height;
-        settings.font.family = self.font_family.clone();
+        if self.font_family.len() != 0 {
+            settings.font.family = FontFamilyOption::Multiple(self.font_family.clone());
+        }
         settings.font.size = self.font_size;
         settings.font.weights.normal = self.font_weight.into();
         settings.font.weights.bold = self.bold_font_weight.into();
@@ -152,7 +156,7 @@ pub struct BootstrapArgs {
     pub config: Vec<String>,
 }
 
-/// JSON and logfmt log converter to human readable representation.
+/// Terminal output snapshot tool.
 #[derive(Parser)]
 #[clap(version, disable_help_flag = true)]
 pub struct BootstrapOpt {

@@ -218,7 +218,7 @@ impl SvgRenderer {
                             if match_font_face(font, font_weight, font_style, ch) {
                                 if used_font_faces.insert(i) {
                                     log::debug!(
-                                        "using font face #{i} because it is required at least by character {ch:?} with weight={font_weight:?} style={font_style:?}",
+                                        "using font face #{i:02} because it is required at least by character {ch:?} with weight={font_weight:?} style={font_style:?}",
                                     );
                                 }
                                 break;
@@ -235,8 +235,6 @@ impl SvgRenderer {
             group = group.add(sl);
         }
 
-        let font_family_quoted = &format!("{:?}", opt.font.family.as_str());
-
         let faces = &opt
             .font
             .faces
@@ -244,7 +242,7 @@ impl SvgRenderer {
             .enumerate()
             .filter(|(i, _)| used_font_faces.contains(i))
             .map(|(_, face)| styles::FontFace {
-                font_family: font_family_quoted.clone(),
+                font_family: face.family.clone(),
                 font_weight: match face.weight {
                     FontWeight::Normal => "normal".into(),
                     FontWeight::Bold => "bold".into(),
@@ -284,11 +282,13 @@ impl SvgRenderer {
         let width = (size.0 + pad.left + pad.right).r2p(fp);
         let height = (size.1 + pad.top + pad.bottom).r2p(fp);
 
+        let font_family_list = opt.font.family.join(", ");
+
         let mut screen = element::SVG::new()
             .set("width", format!("{}em", width))
             .set("height", format!("{}em", height))
             .set("font-size", opt.font.size.r2p(fp))
-            .set("font-family", opt.font.family.clone())
+            .set("font-family", font_family_list)
             .add(style);
         if !opt.window.enabled {
             screen = screen.add(background)

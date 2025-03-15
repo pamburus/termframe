@@ -132,30 +132,40 @@ where
     let mut ascender: f32 = 0.0;
     let mut descender: f32 = 0.0;
 
-    let files = settings
+    let families = settings.font.family.resolve();
+
+    let mut files = settings
         .fonts
         .par_iter()
-        .filter(|font| font.family == settings.font.family)
-        .flat_map(|font| &font.files)
-        .map(|file| {
+        .filter(|font| families.contains(&font.family))
+        .flat_map(|font| font.files.par_iter().map(move |file| (&font.family, file)))
+        .map(|(family, file)| {
             font::FontFile::load(file.as_str().into())
                 .with_context(|| format!("failed to load font {file}"))
+                .map(|file| (family, file))
         })
         .collect::<Result<Vec<_>, _>>()?;
 
+    files.sort_by_key(|(family, _)| {
+        families
+            .iter()
+            .position(|f| f == *family)
+            .map(|i| -(i as i64))
+    });
+
     let mut fonts = Vec::new();
 
-    for file in &files {
+    for (family, file) in &files {
         let font = file.font().unwrap();
         let url = file.location().url().unwrap().to_string();
-        fonts.push((url, font));
+        fonts.push((url, family, font));
     }
 
     let mut used: HashMap<char, u64> = HashMap::new();
 
     for ch in chars {
         let mut bitmap: u64 = 0;
-        for (i, (_, font)) in fonts.iter_mut().enumerate() {
+        for (i, (_, _, font)) in fonts.iter_mut().enumerate() {
             if font.has_char(ch) {
                 bitmap |= 1 << i;
             }
@@ -165,7 +175,7 @@ where
 
     let used = Rc::new(used);
 
-    for (i, (url, font)) in fonts.iter_mut().enumerate() {
+    for (i, (url, family, font)) in fonts.iter_mut().enumerate() {
         if let Some(width) = &mut width {
             *width = width.max(font.width());
             ascender = ascender.max(font.ascender());
@@ -181,15 +191,24 @@ where
             (used.get(&ch).copied().unwrap_or(0) & (1 << i) as u64) != 0
         }));
 
-        let face = make_font_face(url, font, chars);
+        let face = make_font_face(family, url, font, chars);
 
         log::debug!(
-            "font face #{i}: weight={weight:?} style={style:?} url={url:?}",
+            "font face #{i:02}: weight={weight:?} style={style:?} url={url:?}",
             weight = face.weight,
             style = face.style
         );
 
         faces.push(face);
+    }
+
+    for (i, (_, family, font)) in fonts.iter_mut().enumerate() {
+        log::debug!(
+            "font face info #{i:02}: configured-family={cf:?} family={family:?} name={name:?}",
+            family = font.family(),
+            name = font.name(),
+            cf = family,
+        );
     }
 
     let metrics = if let Some(width) = width {
@@ -203,10 +222,10 @@ where
     };
 
     if settings.embed_fonts {
-        for (i, file) in files.iter().enumerate() {
+        for (i, (_, file)) in files.iter().enumerate() {
             let data = file.data();
             log::debug!(
-                "embedding font face #{i} with {len} bytes",
+                "embedding font face #{i:02} with {len} bytes",
                 len = data.len()
             );
             faces[i].url = format!(
@@ -218,7 +237,7 @@ where
     }
 
     Ok(render::FontOptions {
-        family: settings.font.family.clone(),
+        family: families,
         size: settings.font.size,
         metrics,
         faces,
@@ -227,11 +246,19 @@ where
 }
 
 fn make_font_face(
+    family: &str,
     url: &mut String,
     font: &mut font::Font,
     chars: Rc<dyn CharSet>,
 ) -> render::FontFace {
+    if let Some(ff) = font.family() {
+        if ff != family {
+            log::warn!("font family mismatch for {url}: expected {family:?}, got {ff:?}",);
+        }
+    }
+
     render::FontFace {
+        family: family.to_owned(),
         weight: if let Some((min, max)) = font.weight_axis() {
             render::FontWeight::Variable(f32::from(min) as u16, f32::from(max) as u16)
         } else if font.bold() {

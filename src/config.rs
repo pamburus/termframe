@@ -128,6 +128,13 @@ pub type Fonts = Vec<FontFace>;
 pub struct FontFace {
     pub family: String,
     pub files: Vec<String>,
+    pub fallback: Option<FontFaceFallback>,
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+pub struct FontFaceFallback {
+    pub family: String,
+    pub files: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
@@ -140,9 +147,40 @@ pub struct Terminal {
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Font {
-    pub family: String,
+    pub family: FontFamilyOption,
     pub size: f32,
     pub weights: FontWeights,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+#[serde(untagged)]
+pub enum FontFamilyOption {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+impl FontFamilyOption {
+    pub fn primary(&self) -> &str {
+        match self {
+            Self::Single(family) => family,
+            Self::Multiple(families) => &families[0],
+        }
+    }
+
+    pub fn resolve(&self) -> Vec<String> {
+        match self {
+            Self::Single(family) => vec![family.clone()],
+            Self::Multiple(families) => families.clone(),
+        }
+    }
+
+    pub fn contains(&self, family: &str) -> bool {
+        match self {
+            Self::Single(f) => f == family,
+            Self::Multiple(f) => f.contains(&family.to_string()),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Clone)]

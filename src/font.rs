@@ -7,7 +7,7 @@ use allsorts::{
     font::MatchingPresentation,
     font_data::{DynamicFontTableProvider, FontData},
     subset::subset,
-    tables::{HeadTable, os2::Os2},
+    tables::{FontTableProvider, HeadTable, NameTable, os2::Os2},
     tag,
 };
 use anyhow::anyhow;
@@ -77,6 +77,12 @@ impl FontFile {
 
     pub fn font(&self) -> Result<Font> {
         let provider = self.data.scope().read::<FontData>()?.table_provider(0)?;
+
+        let name_data = provider.read_table_data(tag::NAME)?;
+        let name_table = ReadScope::new(name_data.as_ref()).read::<NameTable>()?;
+        let name = name_table.string_for_id(1);
+        let family = name_table.string_for_id(16);
+
         let inner = allsorts::Font::new(provider)?;
         let Some(head) = inner.head_table()? else {
             return Err(anyhow!("No head table found in the font"));
@@ -89,6 +95,8 @@ impl FontFile {
             head,
             os2,
             format: self.format(),
+            name,
+            family,
         })
     }
 }
@@ -148,11 +156,21 @@ pub struct Font<'a> {
     head: HeadTable,
     os2: Os2,
     format: Option<&'static str>,
+    name: Option<String>,
+    family: Option<String>,
 }
 
 impl<'a> Font<'a> {
     pub fn format(&self) -> Option<&'static str> {
         self.format
+    }
+
+    pub fn family(&self) -> Option<&str> {
+        self.family.as_ref().map(String::as_str)
+    }
+
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_ref().map(String::as_str)
     }
 
     pub fn width(&mut self) -> f32 {

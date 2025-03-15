@@ -12,7 +12,7 @@ use csscolorparser::Color;
 use serde::Deserialize;
 
 // local imports
-use crate::appdirs::AppDirs;
+use crate::{appdirs::AppDirs, render::Padding};
 
 // ---
 
@@ -27,7 +27,7 @@ pub struct Settings {
     pub theme: String,
     pub fonts: Fonts,
     pub embed_fonts: bool,
-    pub padding: f32,
+    pub padding: Padding,
     pub stroke: f32,
     pub window: Window,
 }
@@ -75,7 +75,7 @@ impl Default for &'static Settings {
 #[derive(Debug, Deserialize, Clone)]
 pub struct Window {
     pub enabled: bool,
-    pub margin: f32,
+    pub margin: Padding,
     pub border: WindowBorder,
     pub header: WindowHeader,
     pub buttons: WindowButtons,

@@ -43,7 +43,7 @@ impl SvgRenderer {
             (dimensions.1 as f32 * lh).r2p(fp),
         );
         let pad = opt.padding.r2p(fp); // padding in pixels
-        let margin = opt.margin.r2p(fp); // margin in pixels
+        let margin = opt.window.margin.r2p(fp); // margin in pixels
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
 
         let background = element::Rectangle::new()
@@ -262,8 +262,8 @@ impl SvgRenderer {
         let style = element::Style::new(faces.join("\n"));
 
         let mut screen = element::SVG::new()
-            .set("x", pad.x)
-            .set("y", pad.y)
+            .set("x", pad.left)
+            .set("y", pad.top)
             .set("width", format!("{}em", size.0))
             .set("height", format!("{}em", size.1))
             .set("font-size", opt.font.size.r2p(fp))
@@ -273,11 +273,11 @@ impl SvgRenderer {
             .add(group);
         screen.unassign("xmlns");
 
-        let width = (opt.font.size * size.0 + pad.x * 2.0).r2p(fp);
-        let height = (opt.font.size * size.1 + pad.y * 2.0).r2p(fp);
+        let width = (opt.font.size * size.0 + pad.left + pad.right).r2p(fp);
+        let height = (opt.font.size * size.1 + pad.top * pad.bottom).r2p(fp);
 
         let doc = if opt.window.enabled {
-            let mut screen = screen.set("y", (pad.y + opt.window.header.height).r2p(fp));
+            let mut screen = screen.set("y", (pad.top + opt.window.header.height).r2p(fp));
             screen.unassign("xmlns");
 
             let height = (height + opt.window.header.height).r2p(fp);
@@ -285,7 +285,7 @@ impl SvgRenderer {
             let mut window = element::Group::new()
                 .set(
                     "transform",
-                    format!("translate({mx},{my})", mx = margin.x, my = margin.y),
+                    format!("translate({mx},{my})", mx = margin.left, my = margin.top),
                 )
                 .set("width", width)
                 .set("height", height);
@@ -406,8 +406,8 @@ impl SvgRenderer {
                 );
 
             Document::new()
-                .set("width", (width + margin.x * 2.0).r2p(fp))
-                .set("height", (height + margin.y * 2.0).r2p(fp))
+                .set("width", (width + margin.left + margin.right).r2p(fp))
+                .set("height", (height + margin.top + margin.bottom).r2p(fp))
                 .add(window)
         } else {
             Document::new()
@@ -466,8 +466,10 @@ impl RoundToPrecision for (f32, f32, f32, f32) {
 impl RoundToPrecision for Padding {
     fn r2p(&self, precision: u8) -> Self {
         Padding {
-            x: r2p(self.x, precision),
-            y: r2p(self.y, precision),
+            left: r2p(self.left, precision),
+            right: r2p(self.right, precision),
+            top: r2p(self.top, precision),
+            bottom: r2p(self.bottom, precision),
         }
     }
 }

@@ -23,8 +23,8 @@ pub struct Opt {
     pub height: usize,
 
     /// Padding for the inner text.
-    #[arg(long, default_value_t = config::global::get().padding, overrides_with = "padding")]
-    pub padding: f32,
+    #[arg(long, overrides_with = "padding")]
+    pub padding: Option<f32>,
 
     /// Font family.
     #[arg(long, default_value = &config::global::get().font.family, overrides_with = "font_family")]

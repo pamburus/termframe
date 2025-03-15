@@ -68,18 +68,22 @@ fn run() -> Result<()> {
         line_height: opt.line_height,
         precision: opt.precision,
         padding: render::Padding {
-            x: opt.padding,
-            y: opt.padding,
-        },
-        margin: render::Padding {
-            x: settings.window.margin,
-            y: settings.window.margin,
+            left: settings.padding.left,
+            right: settings.padding.right,
+            top: settings.padding.top,
+            bottom: settings.padding.bottom,
         },
         faint_opacity: opt.faint_opacity,
         theme: Theme::default().into(),
         stroke: opt.stroke,
         window: render::Window {
             enabled: settings.window.enabled,
+            margin: render::Padding {
+                left: settings.window.margin.left,
+                right: settings.window.margin.right,
+                top: settings.window.margin.top,
+                bottom: settings.window.margin.bottom,
+            },
             border: render::WindowBorder {
                 color1: settings.window.border.color1,
                 color2: settings.window.border.color2,

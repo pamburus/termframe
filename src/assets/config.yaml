@@ -14,13 +14,21 @@ embed-fonts: true
 faint-opacity: 0.5
 line-height: 1.2
 precision: 3
-padding: 8
+padding:
+  left: 8
+  right: 8
+  top: 4
+  bottom: 4
 stroke: 0.01
 theme: "one-dark"
 
 window:
   enabled: true
-  margin: 24
+  margin:
+    left: 32
+    right: 32
+    top: 16
+    bottom: 48
   border:
     width: 0.5
     radius: 12
@@ -41,9 +49,9 @@ window:
   shadow:
     enabled: true
     color: "#000000c0"
-    blur: 8
+    blur: 12
     x: 4
-    y: 4
+    y: 12
 
 fonts:
   - family: "JetBrains Mono"

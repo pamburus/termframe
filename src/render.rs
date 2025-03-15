@@ -3,6 +3,7 @@ use std::{collections::HashSet, rc::Rc};
 
 // third-party imports
 use csscolorparser::Color;
+use serde::Deserialize;
 use termwiz::surface::Surface;
 
 // local imports
@@ -23,7 +24,6 @@ pub struct Options {
     pub font: FontOptions,
     pub line_height: f32,
     pub padding: Padding,
-    pub margin: Padding,
     pub theme: Rc<Theme>,
     pub precision: u8,
     pub stroke: f32,
@@ -100,10 +100,12 @@ impl FontWeight {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
 pub struct Padding {
-    pub x: f32,
-    pub y: f32,
+    pub top: f32,
+    pub bottom: f32,
+    pub left: f32,
+    pub right: f32,
 }
 
 // ---
@@ -111,6 +113,7 @@ pub struct Padding {
 #[derive(Debug, Clone)]
 pub struct Window {
     pub enabled: bool,
+    pub margin: Padding,
     pub border: WindowBorder,
     pub header: WindowHeader,
     pub buttons: WindowButtons,

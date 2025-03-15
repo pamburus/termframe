@@ -235,43 +235,6 @@ impl SvgRenderer {
             group = group.add(sl);
         }
 
-        let faces = &opt
-            .font
-            .faces
-            .iter()
-            .enumerate()
-            .filter(|(i, _)| used_font_faces.contains(i))
-            .map(|(_, face)| styles::FontFace {
-                font_family: face.family.clone(),
-                font_weight: match face.weight {
-                    FontWeight::Normal => "normal".into(),
-                    FontWeight::Bold => "bold".into(),
-                    FontWeight::Fixed(w) => w.to_string(),
-                    FontWeight::Variable(min, max) => {
-                        format!("{min} {max}", min = f32::from(min), max = f32::from(max))
-                    }
-                },
-                font_style: face.style.map(|style| match style {
-                    FontStyle::Normal => "normal".into(),
-                    FontStyle::Italic => "italic".into(),
-                    FontStyle::Oblique => "oblique".into(),
-                }),
-                src_url: face.url.to_string(),
-                format: face.format,
-            })
-            .collect::<Vec<_>>();
-
-        let faces = faces
-            .iter()
-            .map(|face| {
-                face.render()
-                    .map_err(Into::into)
-                    .map(|x| x.trim().to_owned())
-            })
-            .collect::<Result<Vec<_>>>()?;
-
-        let style = element::Style::new(faces.join("\n"));
-
         let mut content = element::SVG::new()
             .set("x", format!("{}em", pad.left))
             .set("y", format!("{}em", pad.top))
@@ -283,16 +246,23 @@ impl SvgRenderer {
         let height = (size.1 + pad.top + pad.bottom).r2p(fp);
 
         let font_family_list = opt.font.family.join(", ");
+        let faces = collect_font_faces(opt, used_font_faces)?;
 
         let mut screen = element::SVG::new()
             .set("width", format!("{}em", width))
             .set("height", format!("{}em", height))
             .set("font-size", opt.font.size.r2p(fp))
-            .set("font-family", font_family_list)
-            .add(style);
+            .set("font-family", font_family_list);
+
+        if faces.len() != 0 {
+            let style = element::Style::new(faces.join("\n"));
+            screen = screen.add(style);
+        }
+
         if !opt.window.enabled {
             screen = screen.add(background)
         }
+
         screen = screen.add(content);
 
         let doc = if opt.window.enabled {
@@ -434,6 +404,45 @@ impl SvgRenderer {
 
         Ok(svg::write(target, &doc)?)
     }
+}
+
+fn collect_font_faces(opt: &Options, used_font_faces: HashSet<usize>) -> Result<Vec<String>> {
+    let faces = &opt
+        .font
+        .faces
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| used_font_faces.contains(i))
+        .map(|(_, face)| styles::FontFace {
+            font_family: face.family.clone(),
+            font_weight: match face.weight {
+                FontWeight::Normal => "normal".into(),
+                FontWeight::Bold => "bold".into(),
+                FontWeight::Fixed(w) => w.to_string(),
+                FontWeight::Variable(min, max) => {
+                    format!("{min} {max}", min = f32::from(min), max = f32::from(max))
+                }
+            },
+            font_style: face.style.map(|style| match style {
+                FontStyle::Normal => "normal".into(),
+                FontStyle::Italic => "italic".into(),
+                FontStyle::Oblique => "oblique".into(),
+            }),
+            src_url: face.url.to_string(),
+            format: face.format,
+        })
+        .collect::<Vec<_>>();
+
+    let faces = faces
+        .iter()
+        .map(|face| {
+            face.render()
+                .map_err(Into::into)
+                .map(|x| x.trim().to_owned())
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(faces)
 }
 
 impl Render for SvgRenderer {

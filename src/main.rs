@@ -221,6 +221,13 @@ where
         DEFAULT_FONT_METRICS
     };
 
+    log::debug!(
+        "font metrics: width={width} ascender={ascender} descender={descender}",
+        width = metrics.width,
+        ascender = metrics.ascender,
+        descender = metrics.descender
+    );
+
     if settings.embed_fonts {
         for (i, (_, file)) in files.iter().enumerate() {
             let data = file.data();
@@ -284,8 +291,8 @@ fn make_font_face(
 const TERMSHOT_DEBUG_LOG: &str = "TERMSHOT_DEBUG_LOG";
 const DEFAULT_FONT_METRICS: render::FontMetrics = render::FontMetrics {
     width: 0.6,
-    ascender: 0.0,
-    descender: 0.0,
+    ascender: 1.02,
+    descender: -0.3,
 };
 
 // ---

@@ -38,7 +38,7 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().font.weights.normal.into(), overrides_with = "font_weight")]
     pub font_weight: FontWeight,
 
-    /// Embed fonts.
+    /// Embed fonts, if possible (NOTE: Make sure the font license allows this type of redistribution).
     #[arg(long, num_args = 1, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts")]
     pub embed_fonts: bool,
 

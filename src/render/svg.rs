@@ -271,40 +271,29 @@ impl SvgRenderer {
             .set("font-family", opt.font.family.clone())
             .set("fill", opt.theme.fg.to_hex_string())
             .add(style)
-            .add(background)
+            // .add(background)
             .add(group);
         screen.unassign("xmlns");
 
         let width = (opt.font.size * size.0 + pad.x * 2.0).r2p(fp);
         let height = (opt.font.size * size.1 + pad.y * 2.0).r2p(fp);
 
-        let mut doc = Document::new()
-            .set("width", width)
-            .set("height", height)
-            .add(
-                element::Rectangle::new()
-                    .set("fill", opt.theme.bg.to_hex_string())
-                    .set("rx", opt.window.border.radius.r2p(fp))
-                    .set("ry", opt.window.border.radius.r2p(fp))
-                    .set("width", "100%")
-                    .set("height", "100%"),
-            )
-            .add(screen);
-
-        if opt.window.enabled {
-            let mut screen = doc
-                .set("x", margin.x)
-                .set("y", (opt.window.header.height + margin.y).r2p(fp));
+        let doc = if opt.window.enabled {
+            let mut screen = screen.set("y", (opt.window.header.height).r2p(fp));
             screen.unassign("xmlns");
 
             let height = (height + opt.window.header.height).r2p(fp);
 
-            doc = Document::new()
-                .set("width", (width + margin.x * 2.0).r2p(fp))
-                .set("height", (height + margin.y * 2.0).r2p(fp));
+            let mut window = element::Group::new()
+                .set(
+                    "transform",
+                    format!("translate({mx},{my})", mx = margin.x, my = margin.y),
+                )
+                .set("width", width)
+                .set("height", height);
 
             if opt.window.shadow.enabled {
-                doc = doc
+                window = window
                     .add(
                         element::Filter::new().set("id", "shadow").add(
                             element::FilterEffectGaussianBlur::new()
@@ -315,8 +304,8 @@ impl SvgRenderer {
                         element::Rectangle::new()
                             .set("width", width)
                             .set("height", height)
-                            .set("x", (margin.x + opt.window.shadow.x).r2p(fp))
-                            .set("y", (margin.y + opt.window.shadow.y).r2p(fp))
+                            .set("x", (opt.window.shadow.x).r2p(fp))
+                            .set("y", (opt.window.shadow.y).r2p(fp))
                             .set("fill", opt.window.shadow.color.to_hex_string())
                             .set("rx", opt.window.border.radius.r2p(fp))
                             .set("ry", opt.window.border.radius.r2p(fp))
@@ -324,26 +313,52 @@ impl SvgRenderer {
                     )
             }
 
-            doc = doc.add(
+            // background
+            window = window.add(
                 element::Rectangle::new()
                     .set("fill", opt.theme.bg.to_hex_string())
-                    .set("x", margin.x.r2p(fp))
-                    .set("y", margin.y.r2p(fp))
                     .set("rx", opt.window.border.radius.r2p(fp))
                     .set("ry", opt.window.border.radius.r2p(fp))
                     .set("width", width)
                     .set("height", height),
             );
 
-            doc = doc.add(screen);
+            // header
+            window = window
+                .add(
+                    element::ClipPath::new().set("id", "header").add(
+                        element::Rectangle::new()
+                            .set("width", width)
+                            .set("height", opt.window.header.height.r2p(fp)),
+                    ),
+                )
+                .add(
+                    element::Rectangle::new()
+                        .set("fill", opt.window.header.color.to_hex_string())
+                        .set("rx", opt.window.border.radius.r2p(fp))
+                        .set("ry", opt.window.border.radius.r2p(fp))
+                        .set("width", width)
+                        .set("height", 2.0 * opt.window.header.height.r2p(fp))
+                        .set("clip-path", "url(#header)"),
+                )
+                .add(
+                    element::Line::new()
+                        .set("x1", "0")
+                        .set("x2", width)
+                        .set("y1", opt.window.header.height.r2p(fp))
+                        .set("y2", opt.window.header.height.r2p(fp))
+                        .set("stroke", opt.window.border.color1.to_hex_string())
+                        .set("stroke-width", opt.window.border.width.r2p(fp)),
+                );
 
-            doc = doc
+            window = window.add(screen);
+
+            // frame border
+            window = window
                 .add(
                     element::Rectangle::new()
                         .set("width", (width + 0.0).r2p(fp))
                         .set("height", (height + 0.0).r2p(fp))
-                        .set("x", (margin.x - 0.0).r2p(fp))
-                        .set("y", (margin.y - 0.0).r2p(fp))
                         .set("fill", "none")
                         .set("stroke", opt.window.border.color1.to_hex_string())
                         .set("stroke-width", opt.window.border.width.r2p(fp))
@@ -354,15 +369,33 @@ impl SvgRenderer {
                     element::Rectangle::new()
                         .set("width", (width - 2.0).r2p(fp))
                         .set("height", (height - 2.0).r2p(fp))
-                        .set("x", (margin.x + 1.0).r2p(fp))
-                        .set("y", (margin.y + 1.0).r2p(fp))
+                        .set("x", (1.0).r2p(fp))
+                        .set("y", (1.0).r2p(fp))
                         .set("fill", "none")
                         .set("stroke", opt.window.border.color2.to_hex_string())
                         .set("stroke-width", opt.window.border.width.r2p(fp))
                         .set("rx", (opt.window.border.radius - 1.0).r2p(fp))
                         .set("ry", (opt.window.border.radius - 1.0).r2p(fp)),
                 );
-        }
+
+            Document::new()
+                .set("width", (width + margin.x * 2.0).r2p(fp))
+                .set("height", (height + margin.y * 2.0).r2p(fp))
+                .add(window)
+        } else {
+            Document::new()
+                .set("width", width)
+                .set("height", height)
+                .add(
+                    element::Rectangle::new()
+                        .set("fill", opt.theme.bg.to_hex_string())
+                        .set("rx", opt.window.border.radius.r2p(fp))
+                        .set("ry", opt.window.border.radius.r2p(fp))
+                        .set("width", "100%")
+                        .set("height", "100%"),
+                )
+                .add(screen)
+        };
 
         Ok(svg::write(target, &doc)?)
     }

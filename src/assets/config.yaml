@@ -28,9 +28,10 @@ window:
     color2: "#f0f0f080"
   header:
     color: "#383837"
-    height: 32
+    height: 28
   buttons:
-    radius: 16
+    radius: 6
+    spacing: 20
     close:
       color: "#ff5f56"
     minimize:

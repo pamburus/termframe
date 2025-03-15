@@ -99,6 +99,7 @@ pub struct WindowHeader {
 #[derive(Debug, Deserialize, Clone)]
 pub struct WindowButtons {
     pub radius: f32,
+    pub spacing: f32,
     pub close: WindowButton,
     pub minimize: WindowButton,
     pub maximize: WindowButton,

@@ -351,6 +351,35 @@ impl SvgRenderer {
                         .set("stroke-width", opt.window.border.width.r2p(fp)),
                 );
 
+            let hh2 = (opt.window.header.height / 2.0).r2p(fp);
+            let r = opt.window.buttons.radius.r2p(fp);
+            let sp = opt.window.buttons.spacing.r2p(fp);
+
+            // buttons
+            window = window
+                .add(
+                    element::Circle::new()
+                        .set("cx", (hh2).r2p(fp))
+                        .set("cy", hh2)
+                        .set("r", r)
+                        .set("fill", opt.window.buttons.close.color.to_hex_string()),
+                )
+                .add(
+                    element::Circle::new()
+                        .set("cx", (hh2 + sp).r2p(fp))
+                        .set("cy", hh2)
+                        .set("r", r)
+                        .set("fill", opt.window.buttons.minimize.color.to_hex_string()),
+                )
+                .add(
+                    element::Circle::new()
+                        .set("cx", (hh2 + sp * 2.0).r2p(fp))
+                        .set("cy", hh2)
+                        .set("r", r)
+                        .set("fill", opt.window.buttons.maximize.color.to_hex_string()),
+                );
+
+            // screen
             window = window.add(screen);
 
             // frame border

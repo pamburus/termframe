@@ -92,6 +92,7 @@ fn run() -> Result<()> {
             },
             buttons: render::WindowButtons {
                 radius: settings.window.buttons.radius,
+                spacing: settings.window.buttons.spacing,
                 close: render::WindowButton {
                     color: settings.window.buttons.close.color,
                 },

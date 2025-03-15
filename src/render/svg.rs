@@ -261,8 +261,8 @@ impl SvgRenderer {
         let style = element::Style::new(faces.join("\n"));
 
         let mut screen = element::SVG::new()
-            .set("x", format!("{}em", pad.x))
-            .set("y", format!("{}em", pad.y))
+            .set("x", pad.x)
+            .set("y", pad.y)
             .set("width", format!("{}em", size.0))
             .set("height", format!("{}em", size.1))
             .set("font-size", opt.font.size.r2p(fp))
@@ -274,8 +274,8 @@ impl SvgRenderer {
         screen.unassign("xmlns");
 
         let doc = Document::new()
-            .set("width", (opt.font.size * (size.0 + pad.x * 2.0)).r2p(fp))
-            .set("height", (opt.font.size * (size.1 + pad.y * 2.0)).r2p(fp))
+            .set("width", (opt.font.size * size.0 + pad.x * 2.0).r2p(fp))
+            .set("height", (opt.font.size * size.1 + pad.y * 2.0).r2p(fp))
             .add(
                 element::Rectangle::new()
                     .set("fill", opt.theme.bg.to_hex_string())

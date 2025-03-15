@@ -292,30 +292,52 @@ impl SvgRenderer {
             .add(screen);
 
         if opt.window.enabled {
-            doc = doc.set("x", margin.x).set("y", margin.y);
-            doc.unassign("xmlns");
+            let mut screen = doc
+                .set("x", margin.x)
+                .set("y", (opt.window.header.height + margin.y).r2p(fp));
+            screen.unassign("xmlns");
+
+            let height = (height + opt.window.header.height).r2p(fp);
 
             doc = Document::new()
                 .set("width", (width + margin.x * 2.0).r2p(fp))
-                .set("height", (height + margin.y * 2.0).r2p(fp))
-                .add(
-                    element::Filter::new().set("id", "shadow").add(
-                        element::FilterEffectGaussianBlur::new()
-                            .set("stdDeviation", opt.window.shadow.blur.r2p(fp)),
-                    ),
-                )
-                .add(
-                    element::Rectangle::new()
-                        .set("width", width)
-                        .set("height", height)
-                        .set("x", (margin.x + opt.window.shadow.x).r2p(fp))
-                        .set("y", (margin.y + opt.window.shadow.y).r2p(fp))
-                        .set("fill", opt.window.shadow.color.to_hex_string())
-                        .set("rx", opt.window.border.radius.r2p(fp))
-                        .set("ry", opt.window.border.radius.r2p(fp))
-                        .set("filter", "url(#shadow)"),
-                )
-                .add(doc)
+                .set("height", (height + margin.y * 2.0).r2p(fp));
+
+            if opt.window.shadow.enabled {
+                doc = doc
+                    .add(
+                        element::Filter::new().set("id", "shadow").add(
+                            element::FilterEffectGaussianBlur::new()
+                                .set("stdDeviation", opt.window.shadow.blur.r2p(fp)),
+                        ),
+                    )
+                    .add(
+                        element::Rectangle::new()
+                            .set("width", width)
+                            .set("height", height)
+                            .set("x", (margin.x + opt.window.shadow.x).r2p(fp))
+                            .set("y", (margin.y + opt.window.shadow.y).r2p(fp))
+                            .set("fill", opt.window.shadow.color.to_hex_string())
+                            .set("rx", opt.window.border.radius.r2p(fp))
+                            .set("ry", opt.window.border.radius.r2p(fp))
+                            .set("filter", "url(#shadow)"),
+                    )
+            }
+
+            doc = doc.add(
+                element::Rectangle::new()
+                    .set("fill", opt.theme.bg.to_hex_string())
+                    .set("x", margin.x.r2p(fp))
+                    .set("y", margin.y.r2p(fp))
+                    .set("rx", opt.window.border.radius.r2p(fp))
+                    .set("ry", opt.window.border.radius.r2p(fp))
+                    .set("width", width)
+                    .set("height", height),
+            );
+
+            doc = doc.add(screen);
+
+            doc = doc
                 .add(
                     element::Rectangle::new()
                         .set("width", (width + 0.0).r2p(fp))

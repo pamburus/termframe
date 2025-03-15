@@ -20,7 +20,7 @@ theme: "one-dark"
 
 window:
   enabled: true
-  margin: 32
+  margin: 24
   border:
     width: 0.5
     radius: 12
@@ -38,7 +38,8 @@ window:
     maximize:
       color: "#28c941"
   shadow:
-    color: "#000000"
+    enabled: true
+    color: "#000000c0"
     blur: 8
     x: 4
     y: 4

@@ -141,6 +141,7 @@ pub struct WindowButtons {
 
 #[derive(Debug, Clone)]
 pub struct WindowShadow {
+    pub enabled: bool,
     pub color: Color,
     pub blur: f32,
     pub x: f32,

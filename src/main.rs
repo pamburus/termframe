@@ -103,6 +103,7 @@ fn run() -> Result<()> {
                 },
             },
             shadow: render::WindowShadow {
+                enabled: settings.window.shadow.enabled,
                 color: settings.window.shadow.color,
                 x: settings.window.shadow.x,
                 y: settings.window.shadow.y,

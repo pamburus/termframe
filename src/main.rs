@@ -209,7 +209,11 @@ where
                 "embedding font face #{i} with {len} bytes",
                 len = data.len()
             );
-            faces[i].url = format!("data:font/otf;base64,{}", BASE64_STANDARD.encode(data));
+            faces[i].url = format!(
+                "data:font/{};base64,{}",
+                file.format().unwrap_or("ttf"),
+                BASE64_STANDARD.encode(data)
+            );
         }
     }
 
@@ -244,6 +248,7 @@ fn make_font_face(
         } else {
             Some(render::FontStyle::Normal)
         },
+        format: font.format(),
         url: url.clone(),
         chars,
     }

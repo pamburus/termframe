@@ -69,6 +69,7 @@ pub struct FontFace {
     pub weight: FontWeight,
     pub style: Option<FontStyle>,
     pub url: String,
+    pub format: Option<&'static str>,
     pub chars: Rc<dyn CharSet>,
 }
 

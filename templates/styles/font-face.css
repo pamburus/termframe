@@ -6,5 +6,5 @@
 	font-style: {{ font_style }};
 	{% when None -%}
 	{% endmatch -%}
-	src: url({{ src_url }});
+	src: url({{ src_url }}) {% match format -%}{% when Some with (format) -%}format('{{ format }}'){% when None -%}{% endmatch -%};
 }

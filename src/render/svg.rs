@@ -259,6 +259,7 @@ impl SvgRenderer {
                     FontStyle::Oblique => "oblique".into(),
                 }),
                 src_url: face.url.to_string(),
+                format: face.format,
             })
             .collect::<Vec<_>>();
 
@@ -646,5 +647,6 @@ mod styles {
         pub font_weight: String,
         pub font_style: Option<String>,
         pub src_url: String,
+        pub format: Option<&'static str>,
     }
 }

@@ -56,6 +56,20 @@ impl FontFile {
         self.data.scope().data()
     }
 
+    pub fn format(&self) -> Option<&'static str> {
+        if self.data().len() < 4 {
+            return None;
+        }
+        match &self.data()[0..4] {
+            b"\x00\x01\x00\x00" => Some("ttf"),
+            b"OTTO" => Some("otf"),
+            b"ttcf" => Some("ttf"),
+            b"wOFF" => Some("woff"),
+            b"wOF2" => Some("woff2"),
+            _ => None,
+        }
+    }
+
     #[allow(dead_code)]
     pub fn location(&self) -> &Location {
         &self.location
@@ -70,7 +84,12 @@ impl FontFile {
         let Some(os2) = inner.os2_table()? else {
             return Err(anyhow!("No os/2 table found in the font"));
         };
-        Ok(Font { inner, head, os2 })
+        Ok(Font {
+            inner,
+            head,
+            os2,
+            format: self.format(),
+        })
     }
 }
 
@@ -128,9 +147,14 @@ pub struct Font<'a> {
     inner: allsorts::Font<DynamicFontTableProvider<'a>>,
     head: HeadTable,
     os2: Os2,
+    format: Option<&'static str>,
 }
 
 impl<'a> Font<'a> {
+    pub fn format(&self) -> Option<&'static str> {
+        self.format
+    }
+
     pub fn width(&mut self) -> f32 {
         let (glyph, _) = self
             .inner

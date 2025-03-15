@@ -27,7 +27,7 @@ pub struct Opt {
     pub padding: Option<f32>,
 
     /// Font family, can be specified multiple times.
-    #[arg(long)]
+    #[arg(long, value_parser = trim, num_args = 1.., value_delimiter = ',')]
     pub font_family: Vec<String>,
 
     /// Font size.
@@ -262,4 +262,8 @@ impl ToString for FontWeight {
             Self::Fixed(weight) => weight.to_string(),
         }
     }
+}
+
+fn trim(s: &str) -> Result<String, String> {
+    Ok(s.trim().to_string())
 }

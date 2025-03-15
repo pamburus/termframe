@@ -7,7 +7,6 @@ use std::{
 
 // third-party imports
 use askama::Template;
-use csscolorparser::Color;
 use svg::{Document, Node, node::element};
 use termwiz::{
     cell::{Intensity, Underline},
@@ -271,7 +270,6 @@ impl SvgRenderer {
             .set("font-family", opt.font.family.clone())
             .set("fill", opt.theme.fg.to_hex_string())
             .add(style)
-            // .add(background)
             .add(group);
         screen.unassign("xmlns");
 
@@ -279,7 +277,7 @@ impl SvgRenderer {
         let height = (opt.font.size * size.1 + pad.y * 2.0).r2p(fp);
 
         let doc = if opt.window.enabled {
-            let mut screen = screen.set("y", (opt.window.header.height).r2p(fp));
+            let mut screen = screen.set("y", (pad.y + opt.window.header.height).r2p(fp));
             screen.unassign("xmlns");
 
             let height = (height + opt.window.header.height).r2p(fp);
@@ -415,14 +413,7 @@ impl SvgRenderer {
             Document::new()
                 .set("width", width)
                 .set("height", height)
-                .add(
-                    element::Rectangle::new()
-                        .set("fill", opt.theme.bg.to_hex_string())
-                        .set("rx", opt.window.border.radius.r2p(fp))
-                        .set("ry", opt.window.border.radius.r2p(fp))
-                        .set("width", "100%")
-                        .set("height", "100%"),
-                )
+                .add(background)
                 .add(screen)
         };
 
@@ -616,11 +607,6 @@ fn svg_weight(weight: FontWeight) -> String {
         FontWeight::Fixed(w) => w.to_string(),
         FontWeight::Variable(_, max) => max.to_string(),
     }
-}
-
-fn opaque(mut color: Color) -> Color {
-    color.a = 1.0;
-    color
 }
 
 // ---

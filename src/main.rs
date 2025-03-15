@@ -71,9 +71,44 @@ fn run() -> Result<()> {
             x: opt.padding,
             y: opt.padding,
         },
+        margin: render::Padding {
+            x: settings.window.margin,
+            y: settings.window.margin,
+        },
         faint_opacity: opt.faint_opacity,
         theme: Theme::default().into(),
         stroke: opt.stroke,
+        window: render::Window {
+            enabled: settings.window.enabled,
+            border: render::WindowBorder {
+                color1: settings.window.border.color1,
+                color2: settings.window.border.color2,
+                width: settings.window.border.width,
+                radius: settings.window.border.radius,
+            },
+            header: render::WindowHeader {
+                height: settings.window.header.height,
+                color: settings.window.header.color,
+            },
+            buttons: render::WindowButtons {
+                radius: settings.window.buttons.radius,
+                close: render::WindowButton {
+                    color: settings.window.buttons.close.color,
+                },
+                minimize: render::WindowButton {
+                    color: settings.window.buttons.minimize.color,
+                },
+                maximize: render::WindowButton {
+                    color: settings.window.buttons.maximize.color,
+                },
+            },
+            shadow: render::WindowShadow {
+                color: settings.window.shadow.color,
+                x: settings.window.shadow.x,
+                y: settings.window.shadow.y,
+                blur: settings.window.shadow.blur,
+            },
+        },
     };
 
     let mut output: Box<dyn io::Write> = if let Some(output) = opt.output {

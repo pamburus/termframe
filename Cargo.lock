@@ -510,6 +510,7 @@ checksum = "eb2a7d3066da2de787b7f032c736763eb7ae5d355f81a68bab2675a96008b0bf"
 dependencies = [
  "lab",
  "phf",
+ "serde",
 ]
 
 [[package]]

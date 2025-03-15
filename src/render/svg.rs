@@ -7,6 +7,7 @@ use std::{
 
 // third-party imports
 use askama::Template;
+use csscolorparser::Color;
 use svg::{Document, Node, node::element};
 use termwiz::{
     cell::{Intensity, Underline},
@@ -43,6 +44,7 @@ impl SvgRenderer {
             (dimensions.1 as f32 * lh).r2p(fp),
         );
         let pad = opt.padding.r2p(fp); // padding in pixels
+        let margin = opt.margin.r2p(fp); // margin in pixels
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
 
         let background = element::Rectangle::new()
@@ -273,16 +275,72 @@ impl SvgRenderer {
             .add(group);
         screen.unassign("xmlns");
 
-        let doc = Document::new()
-            .set("width", (opt.font.size * size.0 + pad.x * 2.0).r2p(fp))
-            .set("height", (opt.font.size * size.1 + pad.y * 2.0).r2p(fp))
+        let width = (opt.font.size * size.0 + pad.x * 2.0).r2p(fp);
+        let height = (opt.font.size * size.1 + pad.y * 2.0).r2p(fp);
+
+        let mut doc = Document::new()
+            .set("width", width)
+            .set("height", height)
             .add(
                 element::Rectangle::new()
                     .set("fill", opt.theme.bg.to_hex_string())
+                    .set("rx", opt.window.border.radius.r2p(fp))
+                    .set("ry", opt.window.border.radius.r2p(fp))
                     .set("width", "100%")
                     .set("height", "100%"),
             )
             .add(screen);
+
+        if opt.window.enabled {
+            doc = doc.set("x", margin.x).set("y", margin.y);
+            doc.unassign("xmlns");
+
+            doc = Document::new()
+                .set("width", (width + margin.x * 2.0).r2p(fp))
+                .set("height", (height + margin.y * 2.0).r2p(fp))
+                .add(
+                    element::Filter::new().set("id", "shadow").add(
+                        element::FilterEffectGaussianBlur::new()
+                            .set("stdDeviation", opt.window.shadow.blur.r2p(fp)),
+                    ),
+                )
+                .add(
+                    element::Rectangle::new()
+                        .set("width", width)
+                        .set("height", height)
+                        .set("x", (margin.x + opt.window.shadow.x).r2p(fp))
+                        .set("y", (margin.y + opt.window.shadow.y).r2p(fp))
+                        .set("fill", opt.window.shadow.color.to_hex_string())
+                        .set("rx", opt.window.border.radius.r2p(fp))
+                        .set("ry", opt.window.border.radius.r2p(fp))
+                        .set("filter", "url(#shadow)"),
+                )
+                .add(doc)
+                .add(
+                    element::Rectangle::new()
+                        .set("width", (width + 0.0).r2p(fp))
+                        .set("height", (height + 0.0).r2p(fp))
+                        .set("x", (margin.x - 0.0).r2p(fp))
+                        .set("y", (margin.y - 0.0).r2p(fp))
+                        .set("fill", "none")
+                        .set("stroke", opt.window.border.color1.to_hex_string())
+                        .set("stroke-width", opt.window.border.width.r2p(fp))
+                        .set("rx", (opt.window.border.radius + 0.0).r2p(fp))
+                        .set("ry", (opt.window.border.radius + 0.0).r2p(fp)),
+                )
+                .add(
+                    element::Rectangle::new()
+                        .set("width", (width - 2.0).r2p(fp))
+                        .set("height", (height - 2.0).r2p(fp))
+                        .set("x", (margin.x + 1.0).r2p(fp))
+                        .set("y", (margin.y + 1.0).r2p(fp))
+                        .set("fill", "none")
+                        .set("stroke", opt.window.border.color2.to_hex_string())
+                        .set("stroke-width", opt.window.border.width.r2p(fp))
+                        .set("rx", (opt.window.border.radius - 1.0).r2p(fp))
+                        .set("ry", (opt.window.border.radius - 1.0).r2p(fp)),
+                );
+        }
 
         Ok(svg::write(target, &doc)?)
     }
@@ -474,6 +532,11 @@ fn svg_weight(weight: FontWeight) -> String {
         FontWeight::Fixed(w) => w.to_string(),
         FontWeight::Variable(_, max) => max.to_string(),
     }
+}
+
+fn opaque(mut color: Color) -> Color {
+    color.a = 1.0;
+    color
 }
 
 // ---

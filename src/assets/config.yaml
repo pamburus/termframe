@@ -18,6 +18,31 @@ padding: 8
 stroke: 0.01
 theme: "one-dark"
 
+window:
+  enabled: true
+  margin: 32
+  border:
+    width: 0.5
+    radius: 12
+    color1: "#000000"
+    color2: "#f0f0f080"
+  header:
+    color: "#383837"
+    height: 32
+  buttons:
+    radius: 16
+    close:
+      color: "#ff5f56"
+    minimize:
+      color: "#ffbd2e"
+    maximize:
+      color: "#28c941"
+  shadow:
+    color: "#000000"
+    blur: 8
+    x: 4
+    y: 4
+
 fonts:
   - family: "JetBrains Mono"
     files:

@@ -2,6 +2,7 @@
 use std::{collections::HashSet, rc::Rc};
 
 // third-party imports
+use csscolorparser::Color;
 use termwiz::surface::Surface;
 
 // local imports
@@ -22,10 +23,12 @@ pub struct Options {
     pub font: FontOptions,
     pub line_height: f32,
     pub padding: Padding,
+    pub margin: Padding,
     pub theme: Rc<Theme>,
     pub precision: u8,
     pub stroke: f32,
     pub faint_opacity: f32,
+    pub window: Window,
 }
 
 #[derive(Debug, Clone)]
@@ -101,6 +104,52 @@ impl FontWeight {
 pub struct Padding {
     pub x: f32,
     pub y: f32,
+}
+
+// ---
+
+#[derive(Debug, Clone)]
+pub struct Window {
+    pub enabled: bool,
+    pub border: WindowBorder,
+    pub header: WindowHeader,
+    pub buttons: WindowButtons,
+    pub shadow: WindowShadow,
+}
+
+#[derive(Debug, Clone)]
+pub struct WindowBorder {
+    pub color1: Color,
+    pub color2: Color,
+    pub width: f32,
+    pub radius: f32,
+}
+
+#[derive(Debug, Clone)]
+pub struct WindowHeader {
+    pub color: Color,
+    pub height: f32,
+}
+
+#[derive(Debug, Clone)]
+pub struct WindowButtons {
+    pub radius: f32,
+    pub close: WindowButton,
+    pub minimize: WindowButton,
+    pub maximize: WindowButton,
+}
+
+#[derive(Debug, Clone)]
+pub struct WindowShadow {
+    pub color: Color,
+    pub blur: f32,
+    pub x: f32,
+    pub y: f32,
+}
+
+#[derive(Debug, Clone)]
+pub struct WindowButton {
+    pub color: Color,
 }
 
 // ---

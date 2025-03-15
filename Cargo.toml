@@ -14,7 +14,7 @@ clap_complete = "4"
 clap_mangen = "0"
 closure = "0"
 config = { version = "0", features = ["yaml", "json", "toml"] }
-csscolorparser = "0"
+csscolorparser = { version = "0", features = ["serde"] }
 dirs = "6"
 dirs-sys = "0"
 env_logger = "0"

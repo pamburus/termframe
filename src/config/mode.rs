@@ -14,17 +14,21 @@ impl From<ModeSetting> for Mode {
         match mode_setting {
             ModeSetting::Dark => Mode::Dark,
             ModeSetting::Light => Mode::Light,
-            ModeSetting::Auto => match dark_light::detect().ok() {
-                Some(dark_light::Mode::Dark) => {
+            ModeSetting::Auto => match dark_light::detect() {
+                Ok(dark_light::Mode::Dark) => {
                     log::info!("detected dark mode");
                     Mode::Dark
                 }
-                Some(dark_light::Mode::Light) => {
+                Ok(dark_light::Mode::Light) => {
                     log::info!("detected light mode");
                     Mode::Light
                 }
-                _ => {
-                    log::info!("could not detect dark or light mode, fallback to dark");
+                Ok(dark_light::Mode::Unspecified) => {
+                    log::info!("dark or light mode is unspecified");
+                    Mode::Dark
+                }
+                Err(e) => {
+                    log::warn!("could not detect dark or light mode: {e}");
                     Mode::Dark
                 }
             },

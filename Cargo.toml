@@ -9,6 +9,7 @@ askama_escape = "0"
 allsorts = "0"
 anyhow = "1"
 base64 = "0"
+cached = { version = "0", features = ["disk_store"] }
 clap = { version = "4", features = ["wrap_help", "derive", "env", "string"] }
 clap_complete = "4"
 clap_mangen = "0"

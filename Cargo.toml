@@ -2,6 +2,11 @@
 name = "termshot"
 version = "0.1.0"
 edition = "2024"
+build = "build/build.rs"
+
+[build-dependencies]
+voca_rs = "1"
+serde_json = { version = "1" }
 
 [dependencies]
 askama = "0"
@@ -34,4 +39,5 @@ termwiz = "0"
 toml = "0"
 ureq = "3"
 url = "2"
+voca_rs = "1"
 wild = "2"

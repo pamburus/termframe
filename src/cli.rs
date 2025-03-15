@@ -3,7 +3,7 @@ use clap::{ArgAction, Args, Parser, value_parser};
 use clap_complete::Shell;
 
 // local imports
-use crate::config::{self, FontFamilyOption, PaddingOption, Settings};
+use crate::config::{self, FontFamilyOption, PaddingOption, Settings, ThemeSetting};
 
 // ---
 
@@ -66,12 +66,13 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().precision, overrides_with = "precision")]
     pub precision: u8,
 
+    /// Override dark or light mode.
     #[arg(long, value_enum, default_value_t = config::global::get().mode, overrides_with = "mode")]
     pub mode: config::mode::ModeSetting,
 
-    /// Theme.
-    #[arg(long, default_value = &config::global::get().theme, overrides_with = "theme")]
-    pub theme: String,
+    /// Color theme.
+    #[arg(long, overrides_with = "theme")]
+    pub theme: Option<String>,
 
     /// Enable window.
     #[arg(long, num_args = 1, default_value_t = config::global::get().window.enabled, overrides_with = "window")]
@@ -96,6 +97,10 @@ pub struct Opt {
     /// Output file, by default prints to stdout.
     #[arg(long, short = 'o', default_value = "-", overrides_with = "output")]
     pub output: String,
+
+    /// Print available color themes and exit.
+    #[arg(long)]
+    pub list_themes: bool,
 
     /// Print available window styles and exit.
     #[arg(long)]
@@ -140,7 +145,9 @@ impl config::Patch for Opt {
         settings.line_height = self.line_height;
         settings.precision = self.precision;
         settings.bold_is_bright = self.bold_is_bright;
-        settings.theme = self.theme.clone();
+        if let Some(theme) = &self.theme {
+            settings.theme = ThemeSetting::Fixed(theme.clone());
+        }
         if let Some(padding) = self.padding {
             settings.padding = PaddingOption::Uniform(padding);
         }

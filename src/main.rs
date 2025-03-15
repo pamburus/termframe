@@ -19,7 +19,9 @@ use itertools::Itertools;
 use rayon::prelude::*;
 
 // local imports
-use config::{Load, Patch, Settings, load::Origin, winstyle::WindowStyleConfig};
+use config::{
+    Load, Patch, Settings, load::Origin, theme::ThemeConfig, winstyle::WindowStyleConfig,
+};
 use parse::parse;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use theme::{AdaptiveTheme, Theme};
@@ -39,12 +41,12 @@ fn main() {
     }
 }
 
-struct App {
-    cache: DiskCache<String, Vec<u8>>,
-}
-
 fn run() -> Result<()> {
     App::new()?.run()
+}
+
+struct App {
+    cache: DiskCache<String, Vec<u8>>,
 }
 
 impl App {
@@ -79,6 +81,10 @@ impl App {
             return Ok(print_man_page()?);
         }
 
+        if opt.list_themes {
+            return Ok(list_themes()?);
+        }
+
         if opt.list_window_styles {
             return Ok(list_window_styles()?);
         }
@@ -92,10 +98,20 @@ impl App {
         let content = surface.screen_chars_to_string();
         let mode = settings.mode.into();
 
+        let theme = settings.theme.resolve(mode);
+        let theme = if theme == "-" {
+            AdaptiveTheme::default().resolve(mode)
+        } else {
+            let Some(theme) = ThemeConfig::load(theme)? else {
+                return Err(anyhow!("theme {theme:?} not found"));
+            };
+            Rc::new(Theme::from_config(theme.resolve(mode)))
+        };
+
         let options = render::Options {
             settings: settings.clone(),
             font: self.make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
-            theme: AdaptiveTheme::default().resolve(mode).into(),
+            theme,
             window: WindowStyleConfig::load(&settings.window.style)?
                 .unwrap_or_default()
                 .window,
@@ -259,7 +275,7 @@ impl App {
     }
 }
 
-fn print_man_page() -> Result<(), anyhow::Error> {
+fn print_man_page() -> Result<()> {
     let man = clap_mangen::Man::new(cli::Opt::command());
     man.render(&mut stdout())?;
     Ok(())
@@ -271,12 +287,36 @@ fn print_shell_completions(shell: clap_complete::Shell) {
     clap_complete::generate(shell, &mut cmd, name, &mut stdout());
 }
 
-fn list_window_styles() -> Result<(), anyhow::Error> {
-    let themes = WindowStyleConfig::list()?
+fn list_themes() -> Result<()> {
+    let themes = ThemeConfig::list()?
         .into_iter()
         .sorted_by_key(|(name, info)| (info.origin, name.clone()));
     Ok(
         for (origin, group) in themes.chunk_by(|(_, info)| info.origin).into_iter() {
+            let origin = match origin {
+                Origin::Stock => "stock",
+                Origin::Custom => "custom",
+            };
+            if stdout().is_terminal() {
+                println!("{}:", origin);
+            }
+            for (name, _) in group {
+                if stdout().is_terminal() {
+                    println!("  - {}", name);
+                } else {
+                    println!("{}", name);
+                }
+            }
+        },
+    )
+}
+
+fn list_window_styles() -> Result<()> {
+    let styles = WindowStyleConfig::list()?
+        .into_iter()
+        .sorted_by_key(|(name, info)| (info.origin, name.clone()));
+    Ok(
+        for (origin, group) in styles.chunk_by(|(_, info)| info.origin).into_iter() {
             let origin = match origin {
                 Origin::Stock => "stock",
                 Origin::Custom => "custom",

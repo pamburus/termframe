@@ -35,6 +35,7 @@ pub trait Load {
     where
         Self: DeserializeOwned,
     {
+        let name = Self::resolve_embedded_name_alias(name);
         for format in Format::iter() {
             let filename = Self::filename(name, format);
             if let Some(file) = Self::Assets::get(&filename) {
@@ -118,8 +119,22 @@ pub trait Load {
 
     fn dir_name() -> &'static str;
 
+    fn resolve_embedded_name_alias(name_or_alias: &str) -> &str {
+        name_or_alias
+    }
+
+    fn preferred_embedded_name_alias(name: &str) -> &str {
+        name
+    }
+
     fn embedded_names() -> impl IntoIterator<Item = String> {
-        Self::Assets::iter().filter_map(|a| Self::strip_known_extension(&a).map(|n| n.to_string()))
+        Self::Assets::iter().filter_map(|a| {
+            if a.starts_with('.') {
+                return None;
+            }
+            Self::strip_known_extension(&a)
+                .map(|n| Self::preferred_embedded_name_alias(n).to_string())
+        })
     }
 
     fn custom_names() -> Result<impl IntoIterator<Item = Result<String>>> {

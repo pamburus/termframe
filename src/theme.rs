@@ -1,6 +1,7 @@
 // std imports
 use std::{
     ops::{Deref, DerefMut},
+    rc::Rc,
     sync::LazyLock,
 };
 
@@ -9,18 +10,41 @@ use csscolorparser::Color;
 use termwiz::color::ColorAttribute;
 
 // local imports
-use crate::config::mode::Mode;
+use crate::config::{
+    self,
+    {mode::Mode, theme::ThemeConfig},
+};
 
 // ---
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct AdaptiveTheme {
-    pub light: Theme,
-    pub dark: Theme,
+    pub light: Rc<Theme>,
+    pub dark: Rc<Theme>,
 }
 
 impl AdaptiveTheme {
-    pub fn resolve(self, mode: Mode) -> Theme {
+    #[allow(dead_code)]
+    pub fn from_config(cfg: &ThemeConfig) -> Self {
+        match cfg {
+            ThemeConfig::Fixed(cfg) => {
+                let theme = Rc::new(Theme::from_config(&cfg.colors));
+                Self {
+                    light: theme.clone(),
+                    dark: theme,
+                }
+            }
+            ThemeConfig::Adaptive(cfg) => {
+                let light = Rc::new(Theme::from_config(&cfg.modes.light));
+                let dark = Rc::new(Theme::from_config(&cfg.modes.dark));
+                Self { light, dark }
+            }
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn resolve(self, mode: Mode) -> Rc<Theme> {
         match mode {
             Mode::Light => self.light,
             Mode::Dark => self.dark,
@@ -49,7 +73,7 @@ impl Default for AdaptiveTheme {
         palette[13] = Color::from_rgba8(0xc6, 0x71, 0xeb, 0xff); // bright magenta
         palette[14] = Color::from_rgba8(0x69, 0xc6, 0xd1, 0xff); // bright cyan
         palette[15] = Color::from_rgba8(0xcc, 0xcc, 0xcc, 0xff); // bright white
-        let dark = Theme { bg, fg, palette };
+        let dark = Theme { bg, fg, palette }.into();
 
         let bg = Color::from_rgba8(0xf9, 0xf9, 0xf9, 0xff);
         let fg = Color::from_rgba8(0x2a, 0x2c, 0x33, 0xff);
@@ -70,7 +94,7 @@ impl Default for AdaptiveTheme {
         palette[13] = Color::from_rgba8(0xff, 0x76, 0xff, 0xff); // bright magenta
         palette[14] = Color::from_rgba8(0x5f, 0xfd, 0xff, 0xff); // bright cyan
         palette[15] = Color::from_rgba8(0xff, 0xfe, 0xff, 0xff); // bright white
-        let light = Theme { bg, fg, palette };
+        let light = Theme { bg, fg, palette }.into();
 
         Self { dark, light }
     }
@@ -84,6 +108,13 @@ pub struct Theme {
 }
 
 impl Theme {
+    pub fn from_config(cfg: &config::theme::Colors) -> Self {
+        let bg = cfg.background.clone();
+        let fg = cfg.foreground.clone();
+        let palette = Palette::from_config(&cfg.palette);
+        Self { bg, fg, palette }
+    }
+
     pub fn resolve(&self, attr: ColorAttribute) -> Option<Color> {
         match attr {
             ColorAttribute::Default => None,
@@ -128,6 +159,14 @@ impl DerefMut for Palette {
 impl Palette {
     pub fn new(colors: [Color; 256]) -> Self {
         Self(colors)
+    }
+
+    pub fn from_config(cfg: &config::theme::Palette) -> Self {
+        let mut colors = Self::make_default().0;
+        for (i, c) in cfg.iter() {
+            colors[*i as usize] = c.clone();
+        }
+        Self::new(colors)
     }
 
     fn make_default() -> Self {

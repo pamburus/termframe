@@ -17,6 +17,7 @@ use crate::appdirs::AppDirs;
 
 pub mod load;
 pub mod mode;
+pub mod theme;
 pub mod winstyle;
 
 // ---
@@ -33,7 +34,7 @@ pub struct Settings {
     pub font: Font,
     pub line_height: f32,
     pub precision: u8,
-    pub theme: String,
+    pub theme: ThemeSetting,
     pub fonts: Fonts,
     pub embed_fonts: bool,
     pub faint_opacity: f32,
@@ -85,6 +86,7 @@ impl Default for &'static Settings {
 // ---
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct Window {
     pub enabled: bool,
     pub shadow: bool,
@@ -94,9 +96,32 @@ pub struct Window {
 
 // ---
 
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+#[serde(untagged)]
+pub enum ThemeSetting {
+    Fixed(String),
+    Adaptive { light: String, dark: String },
+}
+
+impl ThemeSetting {
+    pub fn resolve(&self, mode: mode::Mode) -> &str {
+        match self {
+            Self::Fixed(theme) => theme,
+            Self::Adaptive { light, dark } => match mode {
+                mode::Mode::Light => light,
+                mode::Mode::Dark => dark,
+            },
+        }
+    }
+}
+
+// ---
+
 pub type Fonts = Vec<FontFace>;
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
 pub struct FontFace {
     pub family: String,
     pub files: Vec<String>,
@@ -104,6 +129,7 @@ pub struct FontFace {
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
 pub struct FontFaceFallback {
     pub family: String,
     pub files: Vec<String>,
@@ -233,6 +259,7 @@ impl PaddingOption {
 }
 
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
+#[serde(rename_all = "kebab-case")]
 pub struct Padding {
     pub top: f32,
     pub bottom: f32,

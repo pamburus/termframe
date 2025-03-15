@@ -2,11 +2,13 @@
 use std::{collections::HashSet, rc::Rc};
 
 // third-party imports
-use csscolorparser::Color;
 use termwiz::surface::Surface;
 
 // local imports
-use crate::Theme;
+use crate::{
+    Theme,
+    config::{Padding, Settings, mode::Mode, winstyle::Window},
+};
 
 pub mod svg;
 
@@ -20,15 +22,11 @@ pub trait Render {
 
 #[derive(Debug, Clone)]
 pub struct Options {
+    pub settings: Rc<Settings>,
     pub font: FontOptions,
-    pub line_height: f32,
-    pub padding: Padding,
     pub theme: Rc<Theme>,
-    pub precision: u8,
-    pub stroke: f32,
-    pub faint_opacity: f32,
-    pub bold_is_bright: bool,
     pub window: Window,
+    pub mode: Mode,
 }
 
 #[derive(Debug, Clone)]
@@ -100,63 +98,6 @@ impl FontWeight {
             Self::Variable(min, max) => (*min, *max),
         }
     }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Padding {
-    pub top: f32,
-    pub bottom: f32,
-    pub left: f32,
-    pub right: f32,
-}
-
-// ---
-
-#[derive(Debug, Clone)]
-pub struct Window {
-    pub enabled: bool,
-    pub margin: Padding,
-    pub border: WindowBorder,
-    pub header: WindowHeader,
-    pub buttons: WindowButtons,
-    pub shadow: WindowShadow,
-}
-
-#[derive(Debug, Clone)]
-pub struct WindowBorder {
-    pub color1: Color,
-    pub color2: Color,
-    pub width: f32,
-    pub radius: f32,
-}
-
-#[derive(Debug, Clone)]
-pub struct WindowHeader {
-    pub color: Color,
-    pub height: f32,
-}
-
-#[derive(Debug, Clone)]
-pub struct WindowButtons {
-    pub radius: f32,
-    pub spacing: f32,
-    pub close: WindowButton,
-    pub minimize: WindowButton,
-    pub maximize: WindowButton,
-}
-
-#[derive(Debug, Clone)]
-pub struct WindowShadow {
-    pub enabled: bool,
-    pub color: Color,
-    pub blur: f32,
-    pub x: f32,
-    pub y: f32,
-}
-
-#[derive(Debug, Clone)]
-pub struct WindowButton {
-    pub color: Color,
 }
 
 // ---

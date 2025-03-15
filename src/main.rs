@@ -1,7 +1,7 @@
 // std imports
 use std::{
     collections::HashMap,
-    io::{self, stdout},
+    io::{self, IsTerminal, stdout},
     process,
     rc::Rc,
 };
@@ -11,10 +11,11 @@ use anyhow::{Context, Result};
 use base64::prelude::*;
 use clap::{CommandFactory, Parser};
 use env_logger::{self as logger};
+use itertools::Itertools;
 use rayon::prelude::*;
 
 // local imports
-use config::{Patch, Settings};
+use config::{Load, Patch, Settings, load::Origin, winstyle::WindowStyleConfig};
 use parse::parse;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use theme::Theme;
@@ -57,7 +58,30 @@ fn run() -> Result<()> {
         return Ok(());
     }
 
-    let settings = opt.patch(settings);
+    if opt.list_window_styles {
+        let themes = WindowStyleConfig::list()?
+            .into_iter()
+            .sorted_by_key(|(name, info)| (info.origin, name.clone()));
+        for (origin, group) in themes.chunk_by(|(_, info)| info.origin).into_iter() {
+            let origin = match origin {
+                Origin::Stock => "stock",
+                Origin::Custom => "custom",
+            };
+            if stdout().is_terminal() {
+                println!("{}:", origin);
+            }
+            for (name, _) in group {
+                if stdout().is_terminal() {
+                    println!("  - {}", name);
+                } else {
+                    println!("{}", name);
+                }
+            }
+        }
+        return Ok(());
+    }
+
+    let settings = Rc::new(opt.patch(settings));
 
     let file = std::fs::File::open(&opt.file)?;
     let input = io::BufReader::new(file);
@@ -66,15 +90,13 @@ fn run() -> Result<()> {
     let content = surface.screen_chars_to_string();
 
     let options = render::Options {
+        settings: settings.clone(),
         font: make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
-        line_height: settings.line_height,
-        precision: settings.precision,
-        padding: settings.padding.convert(),
-        faint_opacity: settings.faint_opacity,
-        bold_is_bright: settings.bold_is_bright,
         theme: Theme::default().into(),
-        stroke: settings.stroke,
-        window: settings.window.convert(),
+        window: WindowStyleConfig::load(&settings.window.style)?
+            .unwrap_or_default()
+            .window,
+        mode: settings.mode.into(),
     };
 
     let mut output: Box<dyn io::Write> = if opt.output != "-" {
@@ -317,83 +339,6 @@ impl Convert<render::FontWeights> for config::FontWeights {
             normal: self.normal.convert(),
             bold: self.bold.convert(),
             faint: self.faint.convert(),
-        }
-    }
-}
-
-impl Convert<render::Padding> for config::PaddingOption {
-    fn convert(&self) -> render::Padding {
-        let padding = self.resolve();
-        render::Padding {
-            left: padding.left,
-            right: padding.right,
-            top: padding.top,
-            bottom: padding.bottom,
-        }
-    }
-}
-
-impl Convert<render::WindowBorder> for config::WindowBorder {
-    fn convert(&self) -> render::WindowBorder {
-        render::WindowBorder {
-            color1: self.color1.clone(),
-            color2: self.color2.clone(),
-            width: self.width,
-            radius: self.radius,
-        }
-    }
-}
-
-impl Convert<render::WindowHeader> for config::WindowHeader {
-    fn convert(&self) -> render::WindowHeader {
-        render::WindowHeader {
-            height: self.height,
-            color: self.color.clone(),
-        }
-    }
-}
-
-impl Convert<render::WindowButtons> for config::WindowButtons {
-    fn convert(&self) -> render::WindowButtons {
-        render::WindowButtons {
-            radius: self.radius,
-            spacing: self.spacing,
-            close: self.close.convert(),
-            minimize: self.minimize.convert(),
-            maximize: self.maximize.convert(),
-        }
-    }
-}
-
-impl Convert<render::WindowButton> for config::WindowButton {
-    fn convert(&self) -> render::WindowButton {
-        render::WindowButton {
-            color: self.color.clone(),
-        }
-    }
-}
-
-impl Convert<render::WindowShadow> for config::WindowShadow {
-    fn convert(&self) -> render::WindowShadow {
-        render::WindowShadow {
-            enabled: self.enabled,
-            color: self.color.clone(),
-            x: self.x,
-            y: self.y,
-            blur: self.blur,
-        }
-    }
-}
-
-impl Convert<render::Window> for config::Window {
-    fn convert(&self) -> render::Window {
-        render::Window {
-            enabled: self.enabled,
-            margin: self.margin.convert(),
-            border: self.border.convert(),
-            header: self.header.convert(),
-            buttons: self.buttons.convert(),
-            shadow: self.shadow.convert(),
         }
     }
 }

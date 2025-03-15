@@ -32,9 +32,10 @@ impl SvgRenderer {
 
     pub fn render(&self, surface: &Surface, target: &mut dyn std::io::Write) -> Result<()> {
         let opt = &self.options;
+        let cfg = &opt.settings;
 
-        let fp = opt.precision; // floating point precision
-        let lh = opt.line_height.r2p(fp); // line height in em
+        let fp = cfg.precision; // floating point precision
+        let lh = cfg.line_height.r2p(fp); // line height in em
         let fw = opt.font.metrics.width.r2p(fp); // font width in em
         let dimensions = surface.dimensions(); // surface dimensions in cells
         let size = (
@@ -42,7 +43,7 @@ impl SvgRenderer {
             (dimensions.0 as f32 * fw).r2p(fp),
             (dimensions.1 as f32 * lh).r2p(fp),
         );
-        let pad = opt.padding.r2p(fp); // padding in pixels
+        let pad = cfg.padding.resolve().r2p(fp); // padding in pixels
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
 
         let background = element::Rectangle::new()
@@ -70,10 +71,10 @@ impl SvgRenderer {
                 if let Some(mut color) = color {
                     color.a = 1.0;
 
-                    let x = (cluster.first_cell_idx as f32 * fw - opt.stroke).r2p(fp);
-                    let y = (row as f32 * lh - opt.stroke).r2p(fp);
-                    let width = (cluster.width as f32 * fw + opt.stroke * 2.0).r2p(fp);
-                    let height = (lh + opt.stroke * 2.0).r2p(fp);
+                    let x = (cluster.first_cell_idx as f32 * fw - cfg.stroke).r2p(fp);
+                    let y = (row as f32 * lh - cfg.stroke).r2p(fp);
+                    let width = (cluster.width as f32 * fw + cfg.stroke * 2.0).r2p(fp);
+                    let height = (lh + cfg.stroke * 2.0).r2p(fp);
 
                     let rect = element::Rectangle::new()
                         .set("x", format!("{}em", x))
@@ -132,7 +133,7 @@ impl SvgRenderer {
                     }
 
                     let correct = |mut color: ColorAttribute| {
-                        if opt.bold_is_bright && cluster.attrs.intensity() == Intensity::Bold {
+                        if cfg.bold_is_bright && cluster.attrs.intensity() == Intensity::Bold {
                             match color {
                                 ColorAttribute::PaletteIndex(i) if i < 8 => {
                                     color = ColorAttribute::PaletteIndex(i + 8)
@@ -153,7 +154,7 @@ impl SvgRenderer {
                         color = opt
                             .theme
                             .bg
-                            .interpolate_lab(&color, opt.faint_opacity as f64);
+                            .interpolate_lab(&color, cfg.faint_opacity as f64);
                     }
                     color.a = 1.0;
 
@@ -251,12 +252,12 @@ impl SvgRenderer {
             .set("height", format!("{}em", height))
             .set("font-size", opt.font.size.r2p(fp))
             .set("font-family", font_family_list);
-        if !opt.window.enabled {
+        if !cfg.window.enabled {
             screen = screen.add(background)
         }
         screen = screen.add(content);
 
-        let mut doc = if opt.window.enabled {
+        let mut doc = if cfg.window.enabled {
             let width = (opt.font.size * width).r2p(fp);
             let height = (opt.font.size * height).r2p(fp);
 
@@ -279,32 +280,37 @@ impl SvgRenderer {
 }
 
 fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> element::SVG {
-    let fp = opt.precision; // floating point precision
-    let margin = opt.window.margin.r2p(fp); // margin in pixels
+    let cfg = &opt.settings;
+    let fp = cfg.precision; // floating point precision
+    let margin = cfg
+        .window
+        .margin
+        .unwrap_or(opt.window.margin)
+        .resolve()
+        .r2p(fp); // margin in pixels
     let height = (height + opt.window.header.height).r2p(fp);
+    let border = &opt.window.border;
 
     let mut window = element::Group::new().set(
         "transform",
         format!("translate({mx},{my})", mx = margin.left, my = margin.top),
     );
 
-    if opt.window.shadow.enabled {
+    if cfg.window.shadow && opt.window.shadow.enabled {
+        let shadow = &opt.window.shadow;
         window = window
-            .add(
-                element::Filter::new().set("id", "shadow").add(
-                    element::FilterEffectGaussianBlur::new()
-                        .set("stdDeviation", opt.window.shadow.blur.r2p(fp)),
-                ),
-            )
+            .add(element::Filter::new().set("id", "shadow").add(
+                element::FilterEffectGaussianBlur::new().set("stdDeviation", shadow.blur.r2p(fp)),
+            ))
             .add(
                 element::Rectangle::new()
                     .set("width", width)
                     .set("height", height)
-                    .set("x", (opt.window.shadow.x).r2p(fp))
-                    .set("y", (opt.window.shadow.y).r2p(fp))
-                    .set("fill", opt.window.shadow.color.to_hex_string())
-                    .set("rx", opt.window.border.radius.r2p(fp))
-                    .set("ry", opt.window.border.radius.r2p(fp))
+                    .set("x", (shadow.x).r2p(fp))
+                    .set("y", (shadow.y).r2p(fp))
+                    .set("fill", shadow.color.resolve(opt.mode).to_hex_string())
+                    .set("rx", border.radius.r2p(fp))
+                    .set("ry", border.radius.r2p(fp))
                     .set("filter", "url(#shadow)"),
             )
     }
@@ -313,43 +319,53 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
     window = window.add(
         element::Rectangle::new()
             .set("fill", opt.theme.bg.to_hex_string())
-            .set("rx", opt.window.border.radius.r2p(fp))
-            .set("ry", opt.window.border.radius.r2p(fp))
+            .set("rx", border.radius.r2p(fp))
+            .set("ry", border.radius.r2p(fp))
             .set("width", width)
             .set("height", height),
     );
 
     // header
+    let header = &opt.window.header;
     window = window
         .add(
             element::ClipPath::new().set("id", "header").add(
                 element::Rectangle::new()
                     .set("width", width)
-                    .set("height", opt.window.header.height.r2p(fp)),
+                    .set("height", header.height.r2p(fp)),
             ),
         )
         .add(
             element::Rectangle::new()
-                .set("fill", opt.window.header.color.to_hex_string())
-                .set("rx", opt.window.border.radius.r2p(fp))
-                .set("ry", opt.window.border.radius.r2p(fp))
+                .set("fill", header.color.resolve(opt.mode).to_hex_string())
+                .set("rx", border.radius.r2p(fp))
+                .set("ry", border.radius.r2p(fp))
                 .set("width", width)
-                .set("height", 2.0 * opt.window.header.height.r2p(fp))
+                .set("height", 2.0 * header.height.r2p(fp))
                 .set("clip-path", "url(#header)"),
         )
         .add(
             element::Line::new()
                 .set("x1", "0")
                 .set("x2", width)
-                .set("y1", opt.window.header.height.r2p(fp))
-                .set("y2", opt.window.header.height.r2p(fp))
-                .set("stroke", opt.window.border.color1.to_hex_string())
-                .set("stroke-width", opt.window.border.width.r2p(fp)),
+                .set("y1", header.height.r2p(fp))
+                .set("y2", header.height.r2p(fp))
+                .set(
+                    "stroke",
+                    opt.window
+                        .border
+                        .colors
+                        .outer
+                        .resolve(opt.mode)
+                        .to_hex_string(),
+                )
+                .set("stroke-width", border.width.r2p(fp)),
         );
 
     let hh2 = (opt.window.header.height / 2.0).r2p(fp);
     let r = opt.window.buttons.radius.r2p(fp);
     let sp = opt.window.buttons.spacing.r2p(fp);
+    let buttons = &opt.window.buttons;
 
     // buttons
     window = window
@@ -358,21 +374,30 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("cx", (hh2).r2p(fp))
                 .set("cy", hh2)
                 .set("r", r)
-                .set("fill", opt.window.buttons.close.color.to_hex_string()),
+                .set(
+                    "fill",
+                    buttons.close.color.resolve(opt.mode).to_hex_string(),
+                ),
         )
         .add(
             element::Circle::new()
                 .set("cx", (hh2 + sp).r2p(fp))
                 .set("cy", hh2)
                 .set("r", r)
-                .set("fill", opt.window.buttons.minimize.color.to_hex_string()),
+                .set(
+                    "fill",
+                    buttons.minimize.color.resolve(opt.mode).to_hex_string(),
+                ),
         )
         .add(
             element::Circle::new()
                 .set("cx", (hh2 + sp * 2.0).r2p(fp))
                 .set("cy", hh2)
                 .set("r", r)
-                .set("fill", opt.window.buttons.maximize.color.to_hex_string()),
+                .set(
+                    "fill",
+                    buttons.maximize.color.resolve(opt.mode).to_hex_string(),
+                ),
         );
 
     // screen
@@ -385,10 +410,13 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("width", (width + 0.0).r2p(fp))
                 .set("height", (height + 0.0).r2p(fp))
                 .set("fill", "none")
-                .set("stroke", opt.window.border.color1.to_hex_string())
-                .set("stroke-width", opt.window.border.width.r2p(fp))
-                .set("rx", (opt.window.border.radius + 0.0).r2p(fp))
-                .set("ry", (opt.window.border.radius + 0.0).r2p(fp)),
+                .set(
+                    "stroke",
+                    border.colors.outer.resolve(opt.mode).to_hex_string(),
+                )
+                .set("stroke-width", border.width.r2p(fp))
+                .set("rx", (border.radius + 0.0).r2p(fp))
+                .set("ry", (border.radius + 0.0).r2p(fp)),
         )
         .add(
             element::Rectangle::new()
@@ -397,10 +425,13 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("x", (1.0).r2p(fp))
                 .set("y", (1.0).r2p(fp))
                 .set("fill", "none")
-                .set("stroke", opt.window.border.color2.to_hex_string())
-                .set("stroke-width", opt.window.border.width.r2p(fp))
-                .set("rx", (opt.window.border.radius - 1.0).r2p(fp))
-                .set("ry", (opt.window.border.radius - 1.0).r2p(fp)),
+                .set(
+                    "stroke",
+                    border.colors.inner.resolve(opt.mode).to_hex_string(),
+                )
+                .set("stroke-width", border.width.r2p(fp))
+                .set("rx", (border.radius - 1.0).r2p(fp))
+                .set("ry", (border.radius - 1.0).r2p(fp)),
         );
 
     Document::new()

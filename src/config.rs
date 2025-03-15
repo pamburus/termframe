@@ -8,11 +8,21 @@ use std::{
 // third-party imports
 use anyhow::Result;
 use config::{Config, File, FileFormat};
-use csscolorparser::Color;
 use serde::Deserialize;
 
 // local imports
 use crate::appdirs::AppDirs;
+
+// ---
+
+pub mod load;
+pub mod mode;
+pub mod winstyle;
+
+// ---
+
+// re-exports
+pub use load::Load;
 
 // ---
 
@@ -30,6 +40,7 @@ pub struct Settings {
     pub bold_is_bright: bool,
     pub padding: PaddingOption,
     pub stroke: f32,
+    pub mode: mode::ModeSetting,
     pub window: Window,
 }
 
@@ -76,48 +87,9 @@ impl Default for &'static Settings {
 #[derive(Debug, Deserialize, Clone)]
 pub struct Window {
     pub enabled: bool,
-    pub margin: PaddingOption,
-    pub border: WindowBorder,
-    pub header: WindowHeader,
-    pub buttons: WindowButtons,
-    pub shadow: WindowShadow,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct WindowBorder {
-    pub color1: Color,
-    pub color2: Color,
-    pub width: f32,
-    pub radius: f32,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct WindowHeader {
-    pub color: Color,
-    pub height: f32,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct WindowButtons {
-    pub radius: f32,
-    pub spacing: f32,
-    pub close: WindowButton,
-    pub minimize: WindowButton,
-    pub maximize: WindowButton,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct WindowButton {
-    pub color: Color,
-}
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct WindowShadow {
-    pub enabled: bool,
-    pub color: Color,
-    pub x: f32,
-    pub y: f32,
-    pub blur: f32,
+    pub shadow: bool,
+    pub style: String,
+    pub margin: Option<PaddingOption>,
 }
 
 // ---

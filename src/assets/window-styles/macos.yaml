@@ -1,0 +1,36 @@
+window:
+  margin:
+    left: 32
+    right: 32
+    top: 16
+    bottom: 48
+  border:
+    width: 0.5
+    radius: 10
+    colors:
+      outer:
+        dark: "#000000"
+        light: "#a0a0a080"
+      inner:
+        dark: "#f0f0f080"
+        light: "#f0f0f000"
+  header:
+    color:
+      dark: "#383837"
+      light: "#dcdcdd"
+    height: 28
+  buttons:
+    radius: 6
+    spacing: 20
+    close:
+      color: "#ff5f56"
+    minimize:
+      color: "#ffbd2e"
+    maximize:
+      color: "#28c941"
+  shadow:
+    enabled: true
+    color: "#000000c0"
+    blur: 12
+    x: 4
+    y: 12

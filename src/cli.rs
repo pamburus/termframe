@@ -66,6 +66,9 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().precision, overrides_with = "precision")]
     pub precision: u8,
 
+    #[arg(long, value_enum, default_value_t = config::global::get().mode, overrides_with = "mode")]
+    pub mode: config::mode::ModeSetting,
+
     /// Theme.
     #[arg(long, default_value = &config::global::get().theme, overrides_with = "theme")]
     pub theme: String,
@@ -75,7 +78,7 @@ pub struct Opt {
     pub window: bool,
 
     /// Enable window shadow.
-    #[arg(long, num_args = 1, default_value_t = config::global::get().window.shadow.enabled, overrides_with = "window_shadow")]
+    #[arg(long, num_args = 1, default_value_t = config::global::get().window.shadow, overrides_with = "window_shadow")]
     pub window_shadow: bool,
 
     /// Override window margin, in pixels.
@@ -93,6 +96,10 @@ pub struct Opt {
     /// Output file, by default prints to stdout.
     #[arg(long, short = 'o', default_value = "-", overrides_with = "output")]
     pub output: String,
+
+    /// Print available window styles and exit.
+    #[arg(long)]
+    pub list_window_styles: bool,
 
     /// Print help and exit.
     #[arg(long, default_value_t = false, action = ArgAction::SetTrue)]
@@ -138,10 +145,11 @@ impl config::Patch for Opt {
             settings.padding = PaddingOption::Uniform(padding);
         }
         settings.window.enabled = self.window;
-        settings.window.shadow.enabled = self.window_shadow;
+        settings.window.shadow = self.window_shadow;
         if let Some(margin) = self.window_margin {
-            settings.window.margin = PaddingOption::Uniform(margin);
+            settings.window.margin = Some(PaddingOption::Uniform(margin));
         }
+        settings.mode = self.mode;
 
         settings
     }

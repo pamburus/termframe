@@ -22,36 +22,12 @@ theme: "one-dark"
 bold-is-bright: false
 faint-opacity: 0.5
 
+mode: auto
+
 window:
   enabled: true
-  margin:
-    left: 32
-    right: 32
-    top: 16
-    bottom: 48
-  border:
-    width: 0.5
-    radius: 10
-    color1: "#000000"
-    color2: "#f0f0f080"
-  header:
-    color: "#383837"
-    height: 28
-  buttons:
-    radius: 6
-    spacing: 20
-    close:
-      color: "#ff5f56"
-    minimize:
-      color: "#ffbd2e"
-    maximize:
-      color: "#28c941"
-  shadow:
-    enabled: true
-    color: "#000000c0"
-    blur: 12
-    x: 4
-    y: 12
+  shadow: true
+  style: "macos"
 
 fonts:
   - family: "JetBrains Mono"

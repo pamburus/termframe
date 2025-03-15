@@ -15,15 +15,22 @@ clap_mangen = "0"
 closure = "0"
 config = { version = "0", features = ["yaml", "json", "toml"] }
 csscolorparser = { version = "0", features = ["serde"] }
+dark-light = "2"
 dirs = "6"
 dirs-sys = "0"
 env_logger = "0"
+itertools = "0.14"
 known-folders = "1"
 log = "0"
 rayon = "1"
+rust-embed = "8"
 serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
+serde_yml = "0"
+strum = { version = "0", features = ["derive"] }
 svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }
 termwiz = "0"
+toml = "0"
 ureq = "3"
 url = "2"
 wild = "2"

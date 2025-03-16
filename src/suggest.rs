@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 const MIN_RELEVANCE: f64 = 0.75;
 
+#[derive(Debug, Clone)]
 pub struct Suggestions {
     wanted: String,
     candidates: Vec<(f64, String)>,

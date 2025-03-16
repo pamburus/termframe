@@ -7,7 +7,7 @@ use std::{
 };
 
 // third-party imports
-use anyhow::{Context, Result, anyhow};
+use anyhow::Context;
 use base64::prelude::*;
 use cached::{
     IOCached,
@@ -22,6 +22,7 @@ use rayon::prelude::*;
 use config::{
     Load, Patch, Settings, load::Origin, theme::ThemeConfig, winstyle::WindowStyleConfig,
 };
+use error::{Error, Result};
 use parse::parse;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use theme::{AdaptiveTheme, Theme};
@@ -29,6 +30,7 @@ use theme::{AdaptiveTheme, Theme};
 mod appdirs;
 mod cli;
 mod config;
+mod error;
 mod font;
 mod parse;
 mod render;
@@ -37,7 +39,7 @@ mod theme;
 
 fn main() {
     if let Err(err) = run() {
-        eprintln!("error: {:?}", err);
+        err.log();
         process::exit(1);
     }
 }
@@ -53,7 +55,7 @@ struct App {
 impl App {
     fn new() -> Result<Self> {
         let Some(dirs) = config::app_dirs() else {
-            return Err(anyhow!("failed to determine app directories"));
+            return Err(Error::FailedToDetectAppDirs);
         };
 
         let cache = DiskCacheBuilder::new("main")
@@ -65,7 +67,6 @@ impl App {
     }
 
     fn run(&self) -> Result<()> {
-        #[allow(unused_variables)]
         let settings = bootstrap()?;
 
         let opt = cli::Opt::parse_from(wild::args());
@@ -92,7 +93,10 @@ impl App {
 
         let settings = Rc::new(opt.patch(settings));
 
-        let file = std::fs::File::open(&opt.file)?;
+        let file = std::fs::File::open(&opt.file).map_err(|e| Error::FailedToOpenFile {
+            name: opt.file,
+            source: e,
+        })?;
         let input = io::BufReader::new(file);
         let surface = parse(opt.width, opt.height, input);
 
@@ -106,10 +110,10 @@ impl App {
             match ThemeConfig::load(theme)? {
                 Ok(theme) => Rc::new(Theme::from_config(theme.resolve(mode))),
                 Err(suggestions) => {
-                    return Err(anyhow!(
-                        "theme {theme:?} not found\ndid you mean {suggestions:?}",
-                        suggestions = suggestions.iter().collect_vec(),
-                    ));
+                    return Err(Error::UnknownTheme {
+                        name: theme.to_owned(),
+                        suggestions,
+                    });
                 }
             }
         };

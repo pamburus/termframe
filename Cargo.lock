@@ -1777,6 +1777,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "nu-ansi-term"
+version = "0.50.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4a28e057d01f97e61255210fcff094d74ed0466038633e95017f5beb68e4399"
+dependencies = [
+ "windows-sys 0.52.0",
+]
+
+[[package]]
 name = "num-derive"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2780,6 +2789,7 @@ dependencies = [
  "itertools 0.14.0",
  "known-folders",
  "log",
+ "nu-ansi-term",
  "rayon",
  "rust-embed",
  "serde",
@@ -2789,6 +2799,7 @@ dependencies = [
  "strum",
  "svg",
  "termwiz",
+ "thiserror 2.0.12",
  "toml",
  "ureq",
  "url",

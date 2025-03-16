@@ -12,7 +12,7 @@ use termwiz::{
 pub struct Terminal {
     surface: Surface,
     parser: Parser,
-    pair: PtyPair,
+    pty: PtyPair,
 }
 
 impl Terminal {
@@ -32,7 +32,7 @@ impl Terminal {
         Ok(Self {
             surface: Surface::new(cols.into(), rows.into()),
             parser: Parser::new(),
-            pair,
+            pty: pair,
         })
     }
 
@@ -64,10 +64,10 @@ impl Terminal {
             cmd.cwd(".");
         }
 
-        let mut child = self.pair.slave.spawn_command(cmd)?;
+        let mut child = self.pty.slave.spawn_command(cmd)?;
 
-        let reader = BufReader::new(self.pair.master.try_clone_reader()?);
-        let mut _writer = self.pair.master.take_writer()?;
+        let reader = BufReader::new(self.pty.master.try_clone_reader()?);
+        let mut _writer = self.pty.master.take_writer()?;
 
         thread::scope(|s| {
             let thread = s.spawn(move || self.feed(reader));

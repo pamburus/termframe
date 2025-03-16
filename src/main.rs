@@ -112,15 +112,6 @@ impl App {
             return Ok(cli::Opt::command().print_help()?);
         };
 
-        let file = std::fs::File::open(&file).map_err(|e| Error::FailedToOpenFile {
-            name: file,
-            source: e,
-        })?;
-
-        let input = io::BufReader::new(file);
-        let surface = parse(opt.width, opt.height, input);
-
-        let content = surface.screen_chars_to_string();
         let mode = settings.mode.into();
 
         let theme = settings.theme.resolve(mode);
@@ -129,12 +120,22 @@ impl App {
         } else {
             Rc::new(Theme::from_config(ThemeConfig::load(theme)?.resolve(mode)))
         };
+        let window = WindowStyleConfig::load(&settings.window.style)?.window;
+
+        let file = std::fs::File::open(&file).map_err(|e| Error::FailedToOpenFile {
+            name: file,
+            source: e,
+        })?;
+
+        let input = io::BufReader::new(file);
+        let surface = parse(opt.width, opt.height, input);
+        let content = surface.screen_chars_to_string();
 
         let options = render::Options {
             settings: settings.clone(),
             font: self.make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
             theme,
-            window: WindowStyleConfig::load(&settings.window.style)?.window,
+            window,
             mode,
         };
 

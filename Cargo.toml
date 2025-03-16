@@ -33,6 +33,7 @@ rust-embed = "8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
 serde_yml = "0"
+strsim = "0"
 strum = { version = "0", features = ["derive"] }
 svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }
 termwiz = "0"

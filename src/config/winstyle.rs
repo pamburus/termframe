@@ -126,4 +126,4 @@ impl SelectiveColor {
 pub struct Assets;
 
 static DEFAULT: LazyLock<Arc<WindowStyleConfig>> =
-    LazyLock::new(|| Arc::new(WindowStyleConfig::load("macos").unwrap().unwrap()));
+    LazyLock::new(|| Arc::new(WindowStyleConfig::load("macos").unwrap().ok().unwrap()));

@@ -14,24 +14,25 @@ use strum::{EnumIter, IntoEnumIterator};
 
 // local imports
 use super::Result;
+use crate::suggest::Suggestions;
 
 // ---
 
 pub trait Load {
     type Assets: RustEmbed;
 
-    fn load(name: &str) -> Result<Option<Self>>
+    fn load(name: &str) -> Result<Result<Self, Suggestions>>
     where
         Self: DeserializeOwned + Sized,
     {
         if let Some(r) = Self::load_from(&Self::dir(), name)? {
-            return Ok(Some(r));
+            return Ok(Ok(r));
         }
 
         Self::embedded(name)
     }
 
-    fn embedded(name: &str) -> Result<Option<Self>>
+    fn embedded(name: &str) -> Result<Result<Self, Suggestions>>
     where
         Self: DeserializeOwned,
     {
@@ -39,11 +40,11 @@ pub trait Load {
         for format in Format::iter() {
             let filename = Self::filename(name, format);
             if let Some(file) = Self::Assets::get(&filename) {
-                return Ok(Some(Self::from_buf(file.data.as_ref(), format)?));
+                return Ok(Ok(Self::from_buf(file.data.as_ref(), format)?));
             }
         }
 
-        Ok(None)
+        Ok(Err(Suggestions::new(name, Self::embedded_names())))
     }
 
     fn list() -> Result<HashMap<String, ItemInfo>> {

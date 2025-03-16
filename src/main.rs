@@ -32,11 +32,12 @@ mod config;
 mod font;
 mod parse;
 mod render;
+mod suggest;
 mod theme;
 
 fn main() {
     if let Err(err) = run() {
-        eprintln!("ERROR: {:?}", err);
+        eprintln!("error: {:?}", err);
         process::exit(1);
     }
 }
@@ -102,10 +103,15 @@ impl App {
         let theme = if theme == "-" {
             AdaptiveTheme::default().resolve(mode)
         } else {
-            let Some(theme) = ThemeConfig::load(theme)? else {
-                return Err(anyhow!("theme {theme:?} not found"));
-            };
-            Rc::new(Theme::from_config(theme.resolve(mode)))
+            match ThemeConfig::load(theme)? {
+                Ok(theme) => Rc::new(Theme::from_config(theme.resolve(mode))),
+                Err(suggestions) => {
+                    return Err(anyhow!(
+                        "theme {theme:?} not found\ndid you mean {suggestions:?}",
+                        suggestions = suggestions.iter().collect_vec(),
+                    ));
+                }
+            }
         };
 
         let options = render::Options {

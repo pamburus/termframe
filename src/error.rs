@@ -3,7 +3,6 @@ use std::{
     borrow::Cow,
     io,
     num::{ParseFloatError, ParseIntError, TryFromIntError},
-    path::PathBuf,
 };
 
 // third-party imports
@@ -30,8 +29,6 @@ pub enum Error {
     Config(#[from] ConfigError),
     #[error(transparent)]
     Infallible(#[from] std::convert::Infallible),
-    #[error("failed to open file {}: {source}", .name.hl())]
-    FailedToOpenFile { name: PathBuf, source: io::Error },
     #[error(transparent)]
     Theme(#[from] theme::Error),
     #[error(transparent)]

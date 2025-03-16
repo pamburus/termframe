@@ -138,8 +138,8 @@ pub struct FontFaceFallback {
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Terminal {
-    pub width: usize,
-    pub height: usize,
+    pub width: u16,
+    pub height: u16,
 }
 
 #[derive(Debug, Deserialize, Clone)]

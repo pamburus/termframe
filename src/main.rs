@@ -17,6 +17,7 @@ use clap::{CommandFactory, Parser};
 use env_logger::{self as logger};
 use itertools::Itertools;
 use nu_ansi_term::Color;
+use portable_pty::CommandBuilder;
 use rayon::prelude::*;
 
 // local imports
@@ -27,8 +28,8 @@ use config::{
     winstyle::WindowStyleConfig,
 };
 use error::{AppInfoProvider, Error, Result, UsageRequest, UsageResponse};
-use parse::parse;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
+use term::Terminal;
 use theme::{AdaptiveTheme, Theme};
 
 mod appdirs;
@@ -36,8 +37,8 @@ mod cli;
 mod config;
 mod error;
 mod font;
-mod parse;
 mod render;
+mod term;
 mod theme;
 mod xerr;
 
@@ -108,10 +109,6 @@ impl App {
 
         let settings = Rc::new(opt.patch(settings));
 
-        let Some(file) = opt.file else {
-            return Ok(cli::Opt::command().print_help()?);
-        };
-
         let mode = settings.mode.into();
 
         let theme = settings.theme.resolve(mode);
@@ -122,14 +119,21 @@ impl App {
         };
         let window = WindowStyleConfig::load(&settings.window.style)?.window;
 
-        let file = std::fs::File::open(&file).map_err(|e| Error::FailedToOpenFile {
-            name: file,
-            source: e,
-        })?;
+        let mut terminal = Terminal::new(opt.width, opt.height)?;
 
-        let input = io::BufReader::new(file);
-        let surface = parse(opt.width, opt.height, input);
-        let content = surface.screen_chars_to_string();
+        if let Some(command) = opt.command {
+            let mut command = CommandBuilder::new(command);
+            command.args(&opt.args);
+            terminal.run(command)?;
+        } else {
+            if io::stdin().is_terminal() {
+                return Ok(cli::Opt::command().print_help()?);
+            }
+
+            terminal.feed(io::BufReader::new(io::stdin()))?;
+        }
+
+        let content = terminal.surface().screen_chars_to_string();
 
         let options = render::Options {
             settings: settings.clone(),
@@ -146,7 +150,7 @@ impl App {
         };
 
         let renderer = SvgRenderer::new(options);
-        renderer.render(&surface, &mut output)?;
+        renderer.render(&terminal.surface(), &mut output)?;
 
         Ok(())
     }

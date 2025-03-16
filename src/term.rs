@@ -1,35 +1,88 @@
-// std imports
-use std::io::{self};
+use std::io::{BufRead, BufReader};
+use std::thread;
 
-// third-party imports
+use anyhow::{Context, Result};
+use portable_pty::{CommandBuilder, PtyPair, PtySize, native_pty_system};
 use termwiz::{
     cell::AttributeChange,
     escape::{Action, CSI, ControlCode, csi::Sgr, parser::Parser},
-    surface::{Change, SEQ_ZERO, Surface},
+    surface::{Change, SEQ_ZERO, SequenceNo, Surface},
 };
 
-pub fn parse(wifth: usize, height: usize, mut reader: impl io::BufRead) -> Surface {
-    let mut surface = Surface::new(wifth, height);
-
-    let mut parser = Parser::new();
-
-    while let Ok(buffer) = reader.fill_buf() {
-        if buffer.is_empty() {
-            break;
-        }
-
-        parser.parse(buffer, |action| {
-            apply_action_to_surface(&mut surface, action);
-        });
-
-        let len = buffer.len();
-        reader.consume(len);
-    }
-
-    surface
+pub struct Terminal {
+    surface: Surface,
+    parser: Parser,
+    pair: PtyPair,
 }
 
-fn apply_action_to_surface(surface: &mut Surface, action: Action) {
+impl Terminal {
+    pub fn new(cols: u16, rows: u16) -> Result<Self> {
+        // Define terminal size.
+        let size = PtySize {
+            cols,
+            rows,
+            pixel_width: 0,
+            pixel_height: 0,
+        };
+
+        // Create a PTY pair using portable-pty.
+        let pty = native_pty_system();
+        let pair = pty.openpty(size)?;
+
+        Ok(Self {
+            surface: Surface::new(cols.into(), rows.into()),
+            parser: Parser::new(),
+            pair,
+        })
+    }
+
+    pub fn surface(&self) -> &Surface {
+        &self.surface
+    }
+
+    pub fn feed(&mut self, mut reader: impl BufRead) -> Result<()> {
+        loop {
+            let buffer = reader.fill_buf().context("error reading PTY")?;
+            if buffer.is_empty() {
+                return Ok(());
+            }
+
+            self.parser.parse(buffer, |action| {
+                apply_action_to_surface(&mut self.surface, action);
+                self.surface
+                    .flush_changes_older_than(self.surface.current_seqno());
+            });
+
+            let len = buffer.len();
+            reader.consume(len);
+        }
+    }
+
+    pub fn run(&mut self, mut cmd: CommandBuilder) -> Result<()> {
+        cmd.env("TERM", "xterm-256color");
+        cmd.env("COLORTERM", "truecolor");
+        if cmd.get_cwd().is_none() {
+            cmd.cwd(".");
+        }
+
+        let mut child = self.pair.slave.spawn_command(cmd)?;
+
+        // Clone the master side for reading output and writing input.
+        let reader = BufReader::new(self.pair.master.try_clone_reader()?);
+        let mut _writer = self.pair.master.take_writer()?;
+
+        // Spawn a thread that reads data from the PTY master.
+        thread::scope(|s| {
+            let thread = s.spawn(move || self.feed(reader));
+            child.wait()?;
+            thread.join().unwrap()
+        })?;
+
+        Ok(())
+    }
+}
+
+pub(crate) fn apply_action_to_surface(surface: &mut Surface, action: Action) -> SequenceNo {
     match action {
         Action::Print(ch) => surface.add_change(ch),
         Action::PrintString(s) => surface.add_change(s),
@@ -75,5 +128,5 @@ fn apply_action_to_surface(surface: &mut Surface, action: Action) {
             }
         }
         _ => SEQ_ZERO,
-    };
+    }
 }

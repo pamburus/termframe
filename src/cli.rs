@@ -1,6 +1,3 @@
-// std imports
-use std::path::PathBuf;
-
 // third-party imports
 use clap::{ArgAction, Args, Parser, value_parser};
 use clap_complete::Shell;
@@ -19,11 +16,11 @@ pub struct Opt {
 
     /// Width of the virtual terminal window.
     #[arg(long, short = 'W', default_value_t = config::global::get().terminal.width, overrides_with = "width", value_name = "COLUMNS")]
-    pub width: usize,
+    pub width: u16,
 
     /// Height of the virtual terminal window.
     #[arg(long, short = 'H', default_value_t = config::global::get().terminal.height, overrides_with = "height", value_name = "LINES")]
-    pub height: usize,
+    pub height: u16,
 
     /// Override padding for the inner text in font size units.
     #[arg(long, overrides_with = "padding", value_name = "EM")]
@@ -139,9 +136,12 @@ pub struct Opt {
     #[arg(long)]
     pub man_page: bool,
 
-    /// File to process
-    #[arg(name = "FILE")]
-    pub file: Option<PathBuf>,
+    /// Command to run.
+    pub command: Option<String>,
+
+    /// Arguments provided to the command.
+    #[arg(trailing_var_arg(true))]
+    pub args: Vec<String>,
 }
 
 impl config::Patch for Opt {

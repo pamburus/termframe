@@ -1,3 +1,5 @@
 /.vscode
 /target
 /output.svg
+/*.ansi
+/*.svg

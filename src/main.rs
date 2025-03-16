@@ -27,7 +27,7 @@ use config::{
     theme::ThemeConfig,
     winstyle::WindowStyleConfig,
 };
-use error::{AppInfoProvider, Error, Result, UsageRequest, UsageResponse};
+use error::{AppInfoProvider, Result, UsageRequest, UsageResponse};
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use term::Terminal;
 use theme::{AdaptiveTheme, Theme};
@@ -43,14 +43,12 @@ mod theme;
 mod xerr;
 
 fn main() {
-    if let Err(err) = run() {
+    let app = App::new();
+
+    if let Err(err) = app.run() {
         err.log(&AppInfo);
         process::exit(1);
     }
-}
-
-fn run() -> Result<()> {
-    App::new()?.run()
 }
 
 struct AppInfo;
@@ -65,21 +63,23 @@ impl AppInfoProvider for AppInfo {
 }
 
 struct App {
-    cache: DiskCache<String, Vec<u8>>,
+    cache: Option<DiskCache<String, Vec<u8>>>,
 }
 
 impl App {
-    fn new() -> Result<Self> {
-        let Some(dirs) = config::app_dirs() else {
-            return Err(Error::FailedToDetectAppDirs);
-        };
+    fn new() -> Self {
+        let mut cache = None;
 
-        let cache = DiskCacheBuilder::new("main")
-            .set_disk_directory(dirs.cache_dir.join(config::APP_NAME))
-            .set_lifespan(3600)
-            .build()?;
+        if let Some(dirs) = config::app_dirs() {
+            cache = DiskCacheBuilder::new("main")
+                .set_disk_directory(dirs.cache_dir.join(config::APP_NAME))
+                .set_lifespan(3600)
+                .build()
+                .map_err(|e| log::warn!("Failed to create disk cache: {e}"))
+                .ok();
+        }
 
-        Ok(Self { cache })
+        Self { cache }
     }
 
     fn run(&self) -> Result<()> {
@@ -285,15 +285,21 @@ impl App {
         })
     }
 
-    fn load_font(&self, file: &String) -> Result<font::FontFile> {
+    fn load_font<S: AsRef<str>>(&self, file: S) -> Result<font::FontFile> {
+        let file = file.as_ref();
+        let location = file.into();
+
+        let Some(cache) = &self.cache else {
+            return Ok(font::FontFile::load(location)?);
+        };
+
         let key = format!("font:{file}");
-        let location = file.as_str().into();
-        let file = if let Some(data) = self.cache.cache_get(&key)? {
+        let file = if let Some(data) = cache.cache_get(&key)? {
             log::debug!("loading font from cache: {file}");
             font::FontFile::load_bytes(&data, location)?
         } else {
             let file = font::FontFile::load(location)?;
-            self.cache.cache_set(key, file.data().to_owned())?;
+            cache.cache_set(key, file.data().to_owned())?;
             file
         };
         Ok(file)

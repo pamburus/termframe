@@ -53,8 +53,6 @@ pub enum Error {
     DiskCacheError(#[from] DiskCacheError),
     #[error(transparent)]
     DiskCacheBuildError(#[from] DiskCacheBuildError),
-    #[error("failed to detect application directories")]
-    FailedToDetectAppDirs,
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

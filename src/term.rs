@@ -48,9 +48,8 @@ impl Terminal {
             }
 
             self.parser.parse(buffer, |action| {
-                apply_action_to_surface(&mut self.surface, action);
-                self.surface
-                    .flush_changes_older_than(self.surface.current_seqno());
+                let seq = apply_action_to_surface(&mut self.surface, action);
+                self.surface.flush_changes_older_than(seq);
             });
 
             let len = buffer.len();
@@ -67,11 +66,9 @@ impl Terminal {
 
         let mut child = self.pair.slave.spawn_command(cmd)?;
 
-        // Clone the master side for reading output and writing input.
         let reader = BufReader::new(self.pair.master.try_clone_reader()?);
         let mut _writer = self.pair.master.take_writer()?;
 
-        // Spawn a thread that reads data from the PTY master.
         thread::scope(|s| {
             let thread = s.spawn(move || self.feed(reader));
             child.wait()?;

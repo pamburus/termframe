@@ -1,6 +1,7 @@
 // std imports
 use std::{
     collections::HashMap,
+    io,
     io::ErrorKind,
     path::{Component, Path, PathBuf},
 };
@@ -11,28 +12,70 @@ use serde::de::DeserializeOwned;
 use serde_json as json;
 use serde_yml as yaml;
 use strum::{EnumIter, IntoEnumIterator};
+use thiserror::Error;
 
 // local imports
-use super::Result;
-use crate::suggest::Suggestions;
+use crate::xerr::Suggestions;
+
+// ---
+
+pub type Result<T, E = Error> = std::result::Result<T, E>;
+
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("unknown item {name:?} in {category:?}")]
+    ItemNotFound {
+        name: String,
+        category: &'static str,
+        suggestions: Suggestions,
+    },
+    #[error(transparent)]
+    Io(#[from] io::Error),
+    #[error(transparent)]
+    Parse(#[from] ParseError),
+}
+
+#[derive(Error, Debug)]
+pub enum ParseError {
+    #[error(transparent)]
+    Utf8(#[from] std::str::Utf8Error),
+    #[error(transparent)]
+    Yaml(#[from] yaml::Error),
+    #[error(transparent)]
+    Toml(#[from] toml::de::Error),
+    #[error(transparent)]
+    Json(#[from] json::Error),
+}
+
+pub trait Categorize {
+    fn category(&self) -> ErrorCategory;
+}
+
+pub enum ErrorCategory {
+    ItemNotFound,
+    Other,
+}
 
 // ---
 
 pub trait Load {
     type Assets: RustEmbed;
+    type Error: From<Error> + Categorize;
 
-    fn load(name: &str) -> Result<Result<Self, Suggestions>>
+    fn load(name: &str) -> Result<Self, Self::Error>
     where
         Self: DeserializeOwned + Sized,
     {
-        if let Some(r) = Self::load_from(&Self::dir(), name)? {
-            return Ok(Ok(r));
+        match Self::load_from(&Self::dir(), name) {
+            Ok(r) => return Ok(r),
+            Err(e) => match e.category() {
+                ErrorCategory::ItemNotFound => Self::embedded(name),
+                _ => return Err(e),
+            },
         }
-
-        Self::embedded(name)
     }
 
-    fn embedded(name: &str) -> Result<Result<Self, Suggestions>>
+    fn embedded(name: &str) -> Result<Self, Self::Error>
     where
         Self: DeserializeOwned,
     {
@@ -40,14 +83,20 @@ pub trait Load {
         for format in Format::iter() {
             let filename = Self::filename(name, format);
             if let Some(file) = Self::Assets::get(&filename) {
-                return Ok(Ok(Self::from_buf(file.data.as_ref(), format)?));
+                return Ok(Self::from_buf(file.data.as_ref(), format).map_err(Error::from)?);
             }
         }
 
-        Ok(Err(Suggestions::new(name, Self::embedded_names())))
+        let suggestions = Suggestions::new(name, Self::embedded_names());
+
+        Err(Self::Error::from(Error::ItemNotFound {
+            name: name.to_owned(),
+            category: Self::category(),
+            suggestions,
+        }))
     }
 
-    fn list() -> Result<HashMap<String, ItemInfo>> {
+    fn list() -> Result<HashMap<String, ItemInfo>, Self::Error> {
         let mut result = HashMap::new();
 
         for name in Self::embedded_names() {
@@ -63,7 +112,7 @@ pub trait Load {
         Ok(result)
     }
 
-    fn from_buf(data: &[u8], format: Format) -> Result<Self>
+    fn from_buf(data: &[u8], format: Format) -> Result<Self, ParseError>
     where
         Self: DeserializeOwned + Sized,
     {
@@ -75,7 +124,7 @@ pub trait Load {
         }
     }
 
-    fn load_from(dir: &PathBuf, name: &str) -> Result<Option<Self>>
+    fn load_from(dir: &PathBuf, name: &str) -> Result<Self, Self::Error>
     where
         Self: DeserializeOwned + Sized,
     {
@@ -92,16 +141,21 @@ pub trait Load {
             };
             match std::fs::read(&path) {
                 Ok(data) => {
-                    return Ok(Some(Self::from_buf(&data, format)?));
+                    return Ok(Self::from_buf(&data, format).map_err(Error::from)?);
                 }
                 Err(e) => match e.kind() {
                     ErrorKind::NotFound => continue,
-                    _ => return Err(e.into()),
+                    _ => return Err(Error::from(e).into()),
                 },
             }
         }
 
-        Ok(None)
+        Err(Error::ItemNotFound {
+            name: name.to_owned(),
+            category: Self::category(),
+            suggestions: Suggestions::none(),
+        }
+        .into())
     }
 
     fn filename(name: &str, format: Format) -> String {
@@ -118,6 +172,7 @@ pub trait Load {
             .unwrap_or_else(|| PathBuf::from("."))
     }
 
+    fn category() -> &'static str;
     fn dir_name() -> &'static str;
 
     fn resolve_embedded_name_alias(name_or_alias: &str) -> &str {

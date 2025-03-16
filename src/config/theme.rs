@@ -1,13 +1,55 @@
 // std imports
-use std::{collections::HashMap, sync::LazyLock};
+use std::{collections::HashMap, io, sync::LazyLock};
 
 // third-party imports
 use csscolorparser::Color;
 use rust_embed::RustEmbed;
 use serde::Deserialize;
+use thiserror::Error;
 
 // local imports
-use super::{load::Load, mode::Mode};
+use super::{
+    load::{self, Categorize, ErrorCategory, Load},
+    mode::Mode,
+};
+use crate::xerr::{Highlight, Suggestions};
+
+// ---
+
+/// Error is an error which may occur in the application.
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("unknown theme {}", .name.hl())]
+    ThemeNotFound {
+        name: String,
+        suggestions: Suggestions,
+    },
+    #[error(transparent)]
+    Io(#[from] io::Error),
+    #[error(transparent)]
+    Parse(#[from] load::ParseError),
+}
+
+impl From<load::Error> for Error {
+    fn from(err: load::Error) -> Self {
+        match err {
+            load::Error::ItemNotFound {
+                name, suggestions, ..
+            } => Error::ThemeNotFound { name, suggestions },
+            load::Error::Io(err) => Error::Io(err),
+            load::Error::Parse(err) => Error::Parse(err),
+        }
+    }
+}
+
+impl Categorize for Error {
+    fn category(&self) -> ErrorCategory {
+        match self {
+            Error::ThemeNotFound { .. } => ErrorCategory::ItemNotFound,
+            _ => ErrorCategory::Other,
+        }
+    }
+}
 
 // ---
 
@@ -33,9 +75,14 @@ impl ThemeConfig {
 
 impl Load for ThemeConfig {
     type Assets = Assets;
+    type Error = Error;
+
+    fn category() -> &'static str {
+        "themes"
+    }
 
     fn dir_name() -> &'static str {
-        "themes"
+        Self::category()
     }
 
     fn resolve_embedded_name_alias(alias: &str) -> &str {

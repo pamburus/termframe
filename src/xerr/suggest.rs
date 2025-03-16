@@ -1,10 +1,10 @@
+// std imports
 use std::cmp::Ordering;
 
 const MIN_RELEVANCE: f64 = 0.75;
 
 #[derive(Debug, Clone)]
 pub struct Suggestions {
-    wanted: String,
     candidates: Vec<(f64, String)>,
 }
 
@@ -34,10 +34,17 @@ impl Suggestions {
             }
         }
 
+        Self { candidates }
+    }
+
+    pub fn none() -> Self {
         Self {
-            wanted: wanted.to_owned(),
-            candidates,
+            candidates: Vec::new(),
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.candidates.is_empty()
     }
 
     pub fn iter(&self) -> SuggestionsIter {
@@ -46,11 +53,7 @@ impl Suggestions {
         }
     }
 
-    pub fn merge(self, other: Self) -> Result<Self, (Self, Self)> {
-        if self.wanted != other.wanted {
-            return Err((self, other));
-        }
-
+    pub fn merge(self, other: Self) -> Self {
         let mut candidates = self.candidates;
 
         for (relevance, candidate) in other.candidates {
@@ -66,10 +69,7 @@ impl Suggestions {
             candidates.insert(pos, (relevance, candidate));
         }
 
-        Ok(Self {
-            wanted: self.wanted,
-            candidates,
-        })
+        Self { candidates }
     }
 }
 

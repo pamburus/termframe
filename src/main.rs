@@ -16,13 +16,17 @@ use cached::{
 use clap::{CommandFactory, Parser};
 use env_logger::{self as logger};
 use itertools::Itertools;
+use nu_ansi_term::Color;
 use rayon::prelude::*;
 
 // local imports
 use config::{
-    Load, Patch, Settings, load::Origin, theme::ThemeConfig, winstyle::WindowStyleConfig,
+    Load, Patch, Settings,
+    load::{ItemInfo, Origin},
+    theme::ThemeConfig,
+    winstyle::WindowStyleConfig,
 };
-use error::{Error, Result};
+use error::{AppInfoProvider, Error, Result, UsageRequest, UsageResponse};
 use parse::parse;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use theme::{AdaptiveTheme, Theme};
@@ -34,18 +38,29 @@ mod error;
 mod font;
 mod parse;
 mod render;
-mod suggest;
 mod theme;
+mod xerr;
 
 fn main() {
     if let Err(err) = run() {
-        err.log();
+        err.log(&AppInfo);
         process::exit(1);
     }
 }
 
 fn run() -> Result<()> {
     App::new()?.run()
+}
+
+struct AppInfo;
+
+impl AppInfoProvider for AppInfo {
+    fn usage_suggestion(&self, request: UsageRequest) -> Option<UsageResponse> {
+        match request {
+            UsageRequest::ListThemes => Some(("--list-themes".into(), "".into())),
+            UsageRequest::ListWindowStyles => Some(("--list-window-styles".into(), "".into())),
+        }
+    }
 }
 
 struct App {
@@ -93,10 +108,15 @@ impl App {
 
         let settings = Rc::new(opt.patch(settings));
 
-        let file = std::fs::File::open(&opt.file).map_err(|e| Error::FailedToOpenFile {
-            name: opt.file,
+        let Some(file) = opt.file else {
+            return Ok(cli::Opt::command().print_help()?);
+        };
+
+        let file = std::fs::File::open(&file).map_err(|e| Error::FailedToOpenFile {
+            name: file,
             source: e,
         })?;
+
         let input = io::BufReader::new(file);
         let surface = parse(opt.width, opt.height, input);
 
@@ -107,24 +127,14 @@ impl App {
         let theme = if theme == "-" {
             AdaptiveTheme::default().resolve(mode)
         } else {
-            match ThemeConfig::load(theme)? {
-                Ok(theme) => Rc::new(Theme::from_config(theme.resolve(mode))),
-                Err(suggestions) => {
-                    return Err(Error::UnknownTheme {
-                        name: theme.to_owned(),
-                        suggestions,
-                    });
-                }
-            }
+            Rc::new(Theme::from_config(ThemeConfig::load(theme)?.resolve(mode)))
         };
 
         let options = render::Options {
             settings: settings.clone(),
             font: self.make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
             theme,
-            window: WindowStyleConfig::load(&settings.window.style)?
-                .unwrap_or_default()
-                .window,
+            window: WindowStyleConfig::load(&settings.window.style)?.window,
             mode,
         };
 
@@ -298,51 +308,71 @@ fn print_shell_completions(shell: clap_complete::Shell) {
 }
 
 fn list_themes() -> Result<()> {
-    let themes = ThemeConfig::list()?
-        .into_iter()
-        .sorted_by_key(|(name, info)| (info.origin, name.clone()));
-    Ok(
-        for (origin, group) in themes.chunk_by(|(_, info)| info.origin).into_iter() {
-            let origin = match origin {
-                Origin::Stock => "stock",
-                Origin::Custom => "custom",
-            };
-            if stdout().is_terminal() {
-                println!("{}:", origin);
-            }
-            for (name, _) in group {
-                if stdout().is_terminal() {
-                    println!("  - {}", name);
-                } else {
-                    println!("{}", name);
-                }
-            }
-        },
-    )
+    list_assets(ThemeConfig::list()?)
 }
 
 fn list_window_styles() -> Result<()> {
-    let styles = WindowStyleConfig::list()?
+    list_assets(WindowStyleConfig::list()?)
+}
+
+fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
+    let mut items: Vec<_> = items.into_iter().collect();
+    items.sort_by_key(|(name, info)| (info.origin.clone(), name.clone()));
+
+    let term = if stdout().is_terminal() {
+        term_size::dimensions()
+    } else {
+        None
+    };
+
+    let max_len = if term.is_some() {
+        items
+            .iter()
+            .map(|(name, _)| name.len())
+            .max()
+            .unwrap_or_default()
+    } else {
+        0
+    };
+
+    let columns = match term {
+        Some((w, _)) => w / (max_len + 4),
+        None => 1,
+    };
+
+    for (origin, group) in items
         .into_iter()
-        .sorted_by_key(|(name, info)| (info.origin, name.clone()));
-    Ok(
-        for (origin, group) in styles.chunk_by(|(_, info)| info.origin).into_iter() {
-            let origin = match origin {
-                Origin::Stock => "stock",
-                Origin::Custom => "custom",
-            };
-            if stdout().is_terminal() {
-                println!("{}:", origin);
-            }
-            for (name, _) in group {
-                if stdout().is_terminal() {
-                    println!("  - {}", name);
-                } else {
-                    println!("{}", name);
+        .chunk_by(|(_, info)| info.origin.clone())
+        .into_iter()
+    {
+        let origin_str = match origin {
+            Origin::Stock => "stock",
+            Origin::Custom => "custom",
+        };
+
+        if term.is_some() {
+            println!("{}:", Color::Default.bold().paint(origin_str));
+        }
+
+        let group: Vec<_> = group.collect();
+        let rows = (group.len() + columns - 1) / columns;
+
+        for row in 0..rows {
+            for col in 0..columns {
+                if let Some((name, _)) = group.get(row + col * rows) {
+                    if term.is_some() {
+                        print!("• {:width$}", name, width = max_len + 2);
+                    } else {
+                        println!("{}", name);
+                    }
                 }
             }
-        },
-    )
+            if term.is_some() {
+                println!();
+            }
+        }
+    }
+    Ok(())
 }
 
 fn bootstrap() -> Result<Settings> {

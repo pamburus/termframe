@@ -1,18 +1,63 @@
 // std imports
-use std::sync::{Arc, LazyLock};
+use std::{
+    io,
+    sync::{Arc, LazyLock},
+};
 
 // third-party imports
 use csscolorparser::Color;
 use rust_embed::RustEmbed;
 use serde::Deserialize;
+use thiserror::Error;
 
 // local imports
-use super::{load::Load, mode::Mode};
+use super::{
+    load::{self, Categorize, ErrorCategory, Load},
+    mode::Mode,
+};
+use crate::xerr::{Highlight, Suggestions};
 
 // ---
 
 // re-exports
 pub use super::PaddingOption;
+
+// ---
+
+/// Error is an error which may occur in the application.
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("unknown window style {}", .name.hl())]
+    WindowStyleNotFound {
+        name: String,
+        suggestions: Suggestions,
+    },
+    #[error(transparent)]
+    Io(#[from] io::Error),
+    #[error(transparent)]
+    Parse(#[from] load::ParseError),
+}
+
+impl From<load::Error> for Error {
+    fn from(err: load::Error) -> Self {
+        match err {
+            load::Error::ItemNotFound {
+                name, suggestions, ..
+            } => Error::WindowStyleNotFound { name, suggestions },
+            load::Error::Io(err) => Error::Io(err),
+            load::Error::Parse(err) => Error::Parse(err),
+        }
+    }
+}
+
+impl Categorize for Error {
+    fn category(&self) -> ErrorCategory {
+        match self {
+            Self::WindowStyleNotFound { .. } => ErrorCategory::ItemNotFound,
+            _ => ErrorCategory::Other,
+        }
+    }
+}
 
 // ---
 
@@ -30,6 +75,11 @@ impl WindowStyleConfig {
 
 impl Load for WindowStyleConfig {
     type Assets = Assets;
+    type Error = Error;
+
+    fn category() -> &'static str {
+        "window styles"
+    }
 
     fn dir_name() -> &'static str {
         "window-styles"
@@ -126,4 +176,4 @@ impl SelectiveColor {
 pub struct Assets;
 
 static DEFAULT: LazyLock<Arc<WindowStyleConfig>> =
-    LazyLock::new(|| Arc::new(WindowStyleConfig::load("macos").unwrap().ok().unwrap()));
+    LazyLock::new(|| Arc::new(WindowStyleConfig::load("macos").unwrap()));

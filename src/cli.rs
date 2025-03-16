@@ -1,3 +1,6 @@
+// std imports
+use std::path::PathBuf;
+
 // third-party imports
 use clap::{ArgAction, Args, Parser, value_parser};
 use clap_complete::Shell;
@@ -15,56 +18,56 @@ pub struct Opt {
     pub bootstrap: BootstrapArgs,
 
     /// Width of the virtual terminal window.
-    #[arg(long, short = 'W', default_value_t = config::global::get().terminal.width, overrides_with = "width")]
+    #[arg(long, short = 'W', default_value_t = config::global::get().terminal.width, overrides_with = "width", value_name = "COLUMNS")]
     pub width: usize,
 
     /// Height of the virtual terminal window.
-    #[arg(long, short = 'H', default_value_t = config::global::get().terminal.height, overrides_with = "height")]
+    #[arg(long, short = 'H', default_value_t = config::global::get().terminal.height, overrides_with = "height", value_name = "LINES")]
     pub height: usize,
 
     /// Override padding for the inner text in font size units.
-    #[arg(long, overrides_with = "padding")]
+    #[arg(long, overrides_with = "padding", value_name = "EM")]
     pub padding: Option<f32>,
 
     /// Font family, can be specified multiple times.
-    #[arg(long, value_parser = trim, num_args = 1.., value_delimiter = ',')]
+    #[arg(long, value_parser = trim, num_args = 1.., value_delimiter = ',', value_name = "NAME")]
     pub font_family: Vec<String>,
 
     /// Font size.
-    #[arg(long, default_value_t = config::global::get().font.size, overrides_with = "font_size")]
+    #[arg(long, default_value_t = config::global::get().font.size, overrides_with = "font_size", value_name = "SIZE")]
     pub font_size: f32,
 
     /// Normal font weight.
-    #[arg(long, default_value_t = config::global::get().font.weights.normal.into(), overrides_with = "font_weight")]
+    #[arg(long, default_value_t = config::global::get().font.weights.normal.into(), overrides_with = "font_weight", value_name = "WEIGHT")]
     pub font_weight: FontWeight,
 
-    /// Embed fonts, if possible (NOTE: Make sure the font license allows this type of redistribution).
-    #[arg(long, num_args = 1, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts")]
+    /// Embed fonts, if possible (NOTE: make sure the font license allows this type of redistribution).
+    #[arg(long, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts")]
     pub embed_fonts: bool,
 
+    /// Do not embed fonts, overrides --embed-fonts option.
+    #[arg(long, overrides_with = "no_embed_fonts")]
+    _no_embed_fonts: bool,
+
     /// Use bright colors for bold text.
-    #[arg(long, num_args = 1, default_value_t = config::global::get().bold_is_bright, overrides_with = "bold_is_bright")]
+    #[arg(long, num_args = 1, default_value_t = config::global::get().bold_is_bright, overrides_with = "bold_is_bright", value_name = "ENABLED")]
     pub bold_is_bright: bool,
 
     /// Bold text font weight.
-    #[arg(long, default_value_t = config::global::get().font.weights.bold.into(), overrides_with = "bold_font_weight")]
+    #[arg(long, default_value_t = config::global::get().font.weights.bold.into(), overrides_with = "bold_font_weight", value_name = "WEIGHT")]
     pub bold_font_weight: FontWeight,
 
     /// Faint text opacity.
-    #[arg(long, default_value_t = config::global::get().faint_opacity, overrides_with = "faint_opacity")]
+    #[arg(long, default_value_t = config::global::get().faint_opacity, overrides_with = "faint_opacity", value_name = "0..1")]
     pub faint_opacity: f32,
 
     // Faint text font weight.
-    #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "faint_font_weight")]
+    #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "faint_font_weight", value_name = "WEIGHT")]
     pub faint_font_weight: FontWeight,
 
-    /// Line height.
-    #[arg(long, default_value_t = config::global::get().line_height, overrides_with = "line_height")]
+    /// Line height, factor of the font size.
+    #[arg(long, default_value_t = config::global::get().line_height, overrides_with = "line_height", value_name = "FACTOR")]
     pub line_height: f32,
-
-    /// Precision for floating point numbers.
-    #[arg(long, default_value_t = config::global::get().precision, overrides_with = "precision")]
-    pub precision: u8,
 
     /// Override dark or light mode.
     #[arg(long, value_enum, default_value_t = config::global::get().mode, overrides_with = "mode")]
@@ -75,27 +78,45 @@ pub struct Opt {
     pub theme: Option<String>,
 
     /// Enable window.
-    #[arg(long, num_args = 1, default_value_t = config::global::get().window.enabled, overrides_with = "window")]
+    #[arg(long, default_value_t = config::global::get().window.enabled, overrides_with = "window")]
     pub window: bool,
 
+    /// Disable window, overrides --window option.
+    #[arg(long, overrides_with = "window")]
+    _no_window: bool,
+
     /// Enable window shadow.
-    #[arg(long, num_args = 1, default_value_t = config::global::get().window.shadow, overrides_with = "window_shadow")]
+    #[arg(long, default_value_t = config::global::get().window.shadow, overrides_with = "window_shadow")]
     pub window_shadow: bool,
 
+    /// Disable window shadow, overrides --window-shadow option.
+    #[arg(long, overrides_with = "window_shadow")]
+    _no_window_shadow: bool,
+
     /// Override window margin, in pixels.
-    #[arg(long, overrides_with = "window_margin")]
+    #[arg(long, overrides_with = "window_margin", value_name = "PIXELS")]
     pub window_margin: Option<f32>,
 
+    /// Window style.
+    #[arg(long, overrides_with = "window_style", value_name = "NAME")]
+    pub window_style: Option<String>,
+
     /// First line to capture, if not specified, captures from the beginning of the input.
-    #[arg(long, overrides_with = "start")]
+    #[arg(long, overrides_with = "start", value_name = "LINE")]
     pub start: Option<usize>,
 
     /// Last line to capture, if not specified, captures to the end of the input.
-    #[arg(long, overrides_with = "end")]
+    #[arg(long, overrides_with = "end", value_name = "LINE")]
     pub end: Option<usize>,
 
     /// Output file, by default prints to stdout.
-    #[arg(long, short = 'o', default_value = "-", overrides_with = "output")]
+    #[arg(
+        long,
+        short = 'o',
+        default_value = "-",
+        overrides_with = "output",
+        value_name = "FILE"
+    )]
     pub output: String,
 
     /// Print available color themes and exit.
@@ -111,11 +132,7 @@ pub struct Opt {
     pub help: bool,
 
     /// Print shell auto-completion script and exit.
-    #[arg(
-        long,
-        value_parser = value_parser!(Shell),
-        value_name = "SHELL",
-    )]
+    #[arg(long, value_parser = value_parser!(Shell), value_name = "SHELL")]
     pub shell_completions: Option<Shell>,
 
     /// Print man page and exit.
@@ -124,7 +141,7 @@ pub struct Opt {
 
     /// File to process
     #[arg(name = "FILE")]
-    pub file: std::path::PathBuf,
+    pub file: Option<PathBuf>,
 }
 
 impl config::Patch for Opt {
@@ -143,13 +160,15 @@ impl config::Patch for Opt {
         settings.embed_fonts = self.embed_fonts;
         settings.faint_opacity = self.faint_opacity;
         settings.line_height = self.line_height;
-        settings.precision = self.precision;
         settings.bold_is_bright = self.bold_is_bright;
         if let Some(theme) = &self.theme {
             settings.theme = ThemeSetting::Fixed(theme.clone());
         }
         if let Some(padding) = self.padding {
             settings.padding = PaddingOption::Uniform(padding);
+        }
+        if let Some(style) = &self.window_style {
+            settings.window.style = style.clone();
         }
         settings.window.enabled = self.window;
         settings.window.shadow = self.window_shadow;

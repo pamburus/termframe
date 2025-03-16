@@ -64,13 +64,13 @@ impl Terminal {
             cmd.cwd(".");
         }
 
-        let mut child = self.pty.slave.spawn_command(cmd)?;
-
         let reader = BufReader::new(self.pty.master.try_clone_reader()?);
-        let mut _writer = self.pty.master.take_writer()?;
+        let writer = self.pty.master.take_writer()?;
+        let mut child = self.pty.slave.spawn_command(cmd)?;
 
         thread::scope(|s| {
             let thread = s.spawn(move || self.feed(reader));
+            drop(writer);
             child.wait()?;
             thread.join().unwrap()
         })?;

@@ -6,13 +6,23 @@ use anyhow::{Context, Result};
 use portable_pty::{ChildKiller, CommandBuilder, PtyPair, PtySize, native_pty_system};
 use termwiz::{
     cell::AttributeChange,
+    color::SrgbaTuple,
     escape::{
-        Action, CSI, ControlCode,
+        Action, CSI, ControlCode, OperatingSystemCommand,
         csi::{Cursor, Sgr},
+        osc::{ColorOrQuery, DynamicColorNumber},
         parser::Parser,
     },
     surface::{Change, Position, SEQ_ZERO, SequenceNo, Surface},
 };
+
+#[derive(Debug, Default)]
+pub struct Options {
+    pub cols: Option<u16>,
+    pub rows: Option<u16>,
+    pub background: Option<SrgbaTuple>,
+    pub foreground: Option<SrgbaTuple>,
+}
 
 pub struct Terminal {
     surface: Surface,
@@ -22,7 +32,16 @@ pub struct Terminal {
 }
 
 impl Terminal {
-    pub fn new(cols: u16, rows: u16) -> Result<Self> {
+    pub fn new(options: Options) -> Result<Self> {
+        let cols = options.cols.unwrap_or(80);
+        let rows = options.rows.unwrap_or(24);
+        let background = options
+            .background
+            .unwrap_or(SrgbaTuple::from_hsla(0.0, 0.0, 0.9, 1.0));
+        let foreground = options
+            .foreground
+            .unwrap_or(SrgbaTuple::from_hsla(0.0, 0.0, 0.75, 1.0));
+
         // Define terminal size.
         let size = PtySize {
             cols,
@@ -38,7 +57,7 @@ impl Terminal {
         Ok(Self {
             surface: Surface::new(cols.into(), rows.into()),
             parser: Parser::new(),
-            state: State::default(),
+            state: State::new(background, foreground),
             pty: pair,
         })
     }
@@ -47,7 +66,19 @@ impl Terminal {
         &self.surface
     }
 
-    pub fn feed(&mut self, mut reader: impl BufRead) -> Result<()> {
+    pub fn background(&self) -> SrgbaTuple {
+        self.state.background
+    }
+
+    pub fn foreground(&self) -> SrgbaTuple {
+        self.state.foreground
+    }
+
+    pub fn feed(
+        &mut self,
+        mut reader: impl BufRead,
+        feedback: &mut dyn std::io::Write,
+    ) -> Result<()> {
         loop {
             let buffer = reader.fill_buf().context("error reading PTY")?;
             if buffer.is_empty() {
@@ -55,7 +86,7 @@ impl Terminal {
             }
 
             self.parser.parse(buffer, |action| {
-                let seq = Self::apply_action(&mut self.surface, &mut self.state, action);
+                let seq = Self::apply_action(&mut self.surface, &mut self.state, feedback, action);
                 self.surface.flush_changes_older_than(seq);
             });
 
@@ -72,12 +103,12 @@ impl Terminal {
         }
 
         let reader = BufReader::new(self.pty.master.try_clone_reader()?);
-        let _writer = self.pty.master.take_writer()?;
+        let mut writer = self.pty.master.take_writer()?;
         let mut child = self.pty.slave.spawn_command(cmd)?;
         let killer = child.clone_killer();
 
         thread::scope(|s| {
-            let thread = s.spawn(move || self.feed(reader));
+            let thread = s.spawn(move || self.feed(reader, &mut writer));
 
             with_timeout(timeout, killer, s, || child.wait())?;
             thread.join().unwrap()
@@ -86,7 +117,12 @@ impl Terminal {
         Ok(())
     }
 
-    fn apply_action(surface: &mut Surface, st: &mut State, action: Action) -> SequenceNo {
+    fn apply_action(
+        surface: &mut Surface,
+        st: &mut State,
+        feedback: &mut dyn std::io::Write,
+        action: Action,
+    ) -> SequenceNo {
         match action {
             Action::Print(ch) => surface.add_change(ch),
             Action::PrintString(s) => surface.add_change(s),
@@ -95,7 +131,7 @@ impl Terminal {
                 ControlCode::CarriageReturn | ControlCode::HorizontalTab => {
                     surface.add_change(code as u8 as char)
                 }
-                _ => SEQ_ZERO,
+                _ => unimplemented!(),
             },
             Action::CSI(csi) => match csi {
                 CSI::Sgr(sgr) => match sgr {
@@ -230,16 +266,79 @@ impl Terminal {
                     Cursor::ActivePositionReport { .. } => SEQ_ZERO,
                     Cursor::RequestActivePositionReport => SEQ_ZERO,
                 },
-                _ => SEQ_ZERO,
+                _ => unimplemented!(),
             },
-            _ => SEQ_ZERO,
+            Action::DeviceControl(_) => unimplemented!(),
+            Action::OperatingSystemCommand(cmd) => match *cmd {
+                OperatingSystemCommand::ChangeDynamicColors(num, q) => {
+                    for q in q.iter() {
+                        match q {
+                            ColorOrQuery::Color(color) => match num {
+                                DynamicColorNumber::TextBackgroundColor => {
+                                    st.background = *color;
+                                }
+                                DynamicColorNumber::TextForegroundColor => {
+                                    st.foreground = *color;
+                                }
+                                _ => unimplemented!("num={num:?} color={color:?}, q={q:?}"),
+                            },
+                            ColorOrQuery::Query => match num {
+                                DynamicColorNumber::TextBackgroundColor => {
+                                    let c = st.background.as_rgba_u8();
+                                    feedback
+                                        .write(
+                                            format!(
+                                                "\x1b]{};rgb:{:02x}/{:02x}/{:02x}\x07",
+                                                num as u8, c.0, c.1, c.2
+                                            )
+                                            .as_bytes(),
+                                        )
+                                        .map_err(|e| log::warn!("failed to write response: {e}"))
+                                        .ok();
+                                }
+                                DynamicColorNumber::TextForegroundColor => {
+                                    let c = st.foreground.as_rgba_u8();
+                                    feedback
+                                        .write(
+                                            format!(
+                                                "\x1b]{};rgb:{:02x}/{:02x}/{:02x}\x07",
+                                                num as u8, c.0, c.1, c.2
+                                            )
+                                            .as_bytes(),
+                                        )
+                                        .map_err(|e| log::warn!("failed to write response: {e}"))
+                                        .ok();
+                                }
+                                _ => unimplemented!("num={num:?}"),
+                            },
+                        }
+                    }
+                    SEQ_ZERO
+                }
+                _ => unimplemented!("command: {cmd:?}"),
+            },
+            Action::Esc(esc) => SEQ_ZERO, //unimplemented!("esc: {esc:?}"),
+            Action::XtGetTcap(_) => unimplemented!(),
+            _ => unimplemented!(),
         }
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 struct State {
     positions: Vec<(usize, usize)>,
+    background: SrgbaTuple,
+    foreground: SrgbaTuple,
+}
+
+impl State {
+    fn new(background: SrgbaTuple, foreground: SrgbaTuple) -> Self {
+        Self {
+            background,
+            foreground,
+            positions: Vec::new(),
+        }
+    }
 }
 
 fn with_timeout<'scope, 'env, R, F>(

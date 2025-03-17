@@ -15,9 +15,10 @@ use cached::{
     stores::{DiskCache, DiskCacheBuilder},
 };
 use clap::{CommandFactory, Parser};
+use csscolorparser::Color;
 use env_logger::{self as logger};
 use itertools::Itertools;
-use nu_ansi_term::Color;
+use nu_ansi_term::Color as NuColor;
 use portable_pty::CommandBuilder;
 use rayon::prelude::*;
 
@@ -31,6 +32,7 @@ use config::{
 use error::{AppInfoProvider, Result, UsageRequest, UsageResponse};
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use term::Terminal;
+use termwiz::color::SrgbaTuple;
 use theme::{AdaptiveTheme, Theme};
 
 mod appdirs;
@@ -120,7 +122,12 @@ impl App {
         };
         let window = WindowStyleConfig::load(&settings.window.style)?.window;
 
-        let mut terminal = Terminal::new(opt.width, opt.height)?;
+        let mut terminal = Terminal::new(term::Options {
+            cols: Some(opt.width.into()),
+            rows: Some(opt.height.into()),
+            background: Some(theme.bg.convert()),
+            foreground: Some(theme.fg.convert()),
+        })?;
 
         if let Some(command) = opt.command {
             let mut command = CommandBuilder::new(command);
@@ -131,7 +138,7 @@ impl App {
                 return Ok(cli::Opt::command().print_help()?);
             }
 
-            terminal.feed(io::BufReader::new(io::stdin()))?;
+            terminal.feed(io::BufReader::new(io::stdin()), &mut io::sink())?;
         }
 
         let content = terminal.surface().screen_chars_to_string();
@@ -363,7 +370,7 @@ fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
         };
 
         if term.is_some() {
-            println!("{}:", Color::Default.bold().paint(origin_str));
+            println!("{}:", NuColor::Default.bold().paint(origin_str));
         }
 
         let group: Vec<_> = group.collect();
@@ -482,5 +489,18 @@ impl Convert<render::FontWeights> for config::FontWeights {
             bold: self.bold.convert(),
             faint: self.faint.convert(),
         }
+    }
+}
+
+impl Convert<SrgbaTuple> for Color {
+    fn convert(&self) -> SrgbaTuple {
+        let x = self.to_rgba8();
+        (x[0], x[1], x[2], x[3]).into()
+    }
+}
+
+impl Convert<Color> for SrgbaTuple {
+    fn convert(&self) -> Color {
+        self.as_rgba_u8().into()
     }
 }

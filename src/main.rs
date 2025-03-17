@@ -5,6 +5,7 @@ use std::{
     io::{self, IsTerminal, stdout},
     process,
     rc::Rc,
+    sync::LazyLock,
     time::Duration,
 };
 
@@ -68,24 +69,26 @@ impl AppInfoProvider for AppInfo {
     }
 }
 
-struct App {
-    cache: Option<DiskCache<String, Vec<u8>>>,
-}
+static CACHE: LazyLock<Option<DiskCache<String, Vec<u8>>>> = LazyLock::new(|| {
+    let mut cache = None;
+
+    if let Some(dirs) = config::app_dirs() {
+        cache = DiskCacheBuilder::new("main")
+            .set_disk_directory(dirs.cache_dir.join(config::APP_NAME))
+            .set_lifespan(3600)
+            .build()
+            .map_err(|e| log::warn!("Failed to create disk cache: {e}"))
+            .ok();
+    }
+
+    cache
+});
+
+struct App {}
 
 impl App {
     fn new() -> Self {
-        let mut cache = None;
-
-        if let Some(dirs) = config::app_dirs() {
-            cache = DiskCacheBuilder::new("main")
-                .set_disk_directory(dirs.cache_dir.join(config::APP_NAME))
-                .set_lifespan(3600)
-                .build()
-                .map_err(|e| log::warn!("Failed to create disk cache: {e}"))
-                .ok();
-        }
-
-        Self { cache }
+        Self {}
     }
 
     fn run(&self) -> Result<()> {
@@ -314,7 +317,8 @@ impl App {
         let file = file.as_ref();
         let location = file.into();
 
-        let Some(cache) = &self.cache else {
+        let cache = CACHE.as_ref();
+        let Some(cache) = cache else {
             return Ok(font::FontFile::load(location)?);
         };
 

@@ -9,6 +9,7 @@ use termwiz::surface::Surface;
 use crate::{
     Theme,
     config::{Padding, Settings, mode::Mode, winstyle::Window},
+    fontformat::FontFormat,
 };
 
 // modules
@@ -82,7 +83,7 @@ pub struct FontFace {
     pub weight: FontWeight,
     pub style: Option<FontStyle>,
     pub url: String,
-    pub format: Option<&'static str>,
+    pub format: Option<FontFormat>,
     pub chars: Rc<dyn CharSet>,
 }
 

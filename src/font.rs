@@ -13,6 +13,9 @@ use allsorts::{
 use anyhow::anyhow;
 use url::Url;
 
+// local imports
+use crate::fontformat::FontFormat;
+
 // ---
 
 #[allow(dead_code)]
@@ -56,16 +59,16 @@ impl FontFile {
         self.data.scope().data()
     }
 
-    pub fn format(&self) -> Option<&'static str> {
+    pub fn format(&self) -> Option<FontFormat> {
         if self.data().len() < 4 {
             return None;
         }
         match &self.data()[0..4] {
-            b"\x00\x01\x00\x00" => Some("ttf"),
-            b"OTTO" => Some("otf"),
-            b"ttcf" => Some("ttf"),
-            b"wOFF" => Some("woff"),
-            b"wOF2" => Some("woff2"),
+            b"\x00\x01\x00\x00" => Some(FontFormat::Ttf),
+            b"OTTO" => Some(FontFormat::Otf),
+            b"ttcf" => Some(FontFormat::Ttf),
+            b"wOFF" => Some(FontFormat::Woff),
+            b"wOF2" => Some(FontFormat::Woff2),
             _ => None,
         }
     }
@@ -155,13 +158,13 @@ pub struct Font<'a> {
     inner: allsorts::Font<DynamicFontTableProvider<'a>>,
     head: HeadTable,
     os2: Os2,
-    format: Option<&'static str>,
+    format: Option<FontFormat>,
     name: Option<String>,
     family: Option<String>,
 }
 
 impl<'a> Font<'a> {
-    pub fn format(&self) -> Option<&'static str> {
+    pub fn format(&self) -> Option<FontFormat> {
         self.format
     }
 

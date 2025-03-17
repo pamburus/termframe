@@ -474,7 +474,7 @@ fn collect_font_faces(opt: &Options, used_font_faces: HashSet<usize>) -> Result<
                 FontStyle::Oblique => "oblique".into(),
             }),
             src_url: face.url.to_string(),
-            format: face.format,
+            format: face.format.map(|f| f.css()),
         })
         .collect::<Vec<_>>();
 

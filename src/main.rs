@@ -30,6 +30,7 @@ use config::{
     winstyle::WindowStyleConfig,
 };
 use error::{AppInfoProvider, Result, UsageRequest, UsageResponse};
+use fontformat::FontFormat;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use term::Terminal;
 use termwiz::color::SrgbaTuple;
@@ -40,6 +41,7 @@ mod cli;
 mod config;
 mod error;
 mod font;
+mod fontformat;
 mod render;
 mod term;
 mod theme;
@@ -279,8 +281,8 @@ impl App {
                     len = data.len()
                 );
                 faces[i].url = format!(
-                    "data:font/{};base64,{}",
-                    file.format().unwrap_or("ttf"),
+                    "data:{};base64,{}",
+                    file.format().unwrap_or(FontFormat::Ttf).mime(),
                     BASE64_STANDARD.encode(data)
                 );
             }

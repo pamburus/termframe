@@ -33,6 +33,9 @@ window:
 
 fonts:
   - family: "JetBrains Mono"
+    license:
+      type: "SIL Open Font License 1.1"
+      link: "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/OFL.txt"
     files:
       - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Thin.woff2"
       - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-ThinItalic.woff2"
@@ -50,6 +53,17 @@ fonts:
       - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-BoldItalic.woff2"
       - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-ExtraBold.woff2"
       - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-ExtraBoldItalic.woff2"
+
+  - family: "FiraCode Nerd Font Mono"
+    license:
+      type: "SIL Open Font License 1.1"
+      link: "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Regular/LICENSE"
+    files:
+      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Light/FiraCodeNerdFontMono-Light.ttf"
+      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Regular/FiraCodeNerdFontMono-Regular.ttf"
+      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Medium/FiraCodeNerdFontMono-Medium.ttf"
+      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/SemiBold/FiraCodeNerdFontMono-SemiBold.ttf"
+      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Bold/FiraCodeNerdFontMono-Bold.ttf"
 
   - family: "Spline Sans Mono"
     files:

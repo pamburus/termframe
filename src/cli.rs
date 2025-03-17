@@ -38,13 +38,13 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().font.weights.normal.into(), overrides_with = "font_weight", value_name = "WEIGHT")]
     pub font_weight: FontWeight,
 
-    /// Embed fonts, if possible (NOTE: make sure the font license allows this type of redistribution).
-    #[arg(long, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts")]
+    /// Embed fonts, if possible [note: make sure the font license allows this type of redistribution].
+    #[arg(long, num_args = 1, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts", value_name = "ENABLED")]
     pub embed_fonts: bool,
 
-    /// Do not embed fonts, overrides --embed-fonts option.
-    #[arg(long, overrides_with = "no_embed_fonts")]
-    _no_embed_fonts: bool,
+    /// Strip fonts by removing unused characters [experimental, known to have compatibility issues].
+    #[arg(long, num_args = 1, default_value_t = config::global::get().strip_fonts, overrides_with = "strip_fonts", value_name = "ENABLED")]
+    pub strip_fonts: bool,
 
     /// Use bright colors for bold text.
     #[arg(long, num_args = 1, default_value_t = config::global::get().bold_is_bright, overrides_with = "bold_is_bright", value_name = "ENABLED")]
@@ -75,20 +75,12 @@ pub struct Opt {
     pub theme: Option<String>,
 
     /// Enable window.
-    #[arg(long, default_value_t = config::global::get().window.enabled, overrides_with = "window")]
+    #[arg(long, num_args = 1, default_value_t = config::global::get().window.enabled, overrides_with = "window", value_name = "ENABLED")]
     pub window: bool,
 
-    /// Disable window, overrides --window option.
-    #[arg(long, overrides_with = "window")]
-    _no_window: bool,
-
     /// Enable window shadow.
-    #[arg(long, default_value_t = config::global::get().window.shadow, overrides_with = "window_shadow")]
+    #[arg(long, num_args = 1, default_value_t = config::global::get().window.shadow, overrides_with = "window_shadow", value_name = "ENABLED")]
     pub window_shadow: bool,
-
-    /// Disable window shadow, overrides --window-shadow option.
-    #[arg(long, overrides_with = "window_shadow")]
-    _no_window_shadow: bool,
 
     /// Override window margin, in pixels.
     #[arg(long, overrides_with = "window_margin", value_name = "PIXELS")]
@@ -166,6 +158,7 @@ impl config::Patch for Opt {
         settings.font.weights.bold = self.bold_font_weight.into();
         settings.font.weights.faint = self.faint_font_weight.into();
         settings.embed_fonts = self.embed_fonts;
+        settings.strip_fonts = self.strip_fonts;
         settings.faint_opacity = self.faint_opacity;
         settings.line_height = self.line_height;
         settings.bold_is_bright = self.bold_is_bright;

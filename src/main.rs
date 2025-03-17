@@ -1,5 +1,6 @@
 // std imports
 use std::{
+    borrow::Cow,
     collections::HashMap,
     io::{self, IsTerminal, stdout},
     process,
@@ -273,9 +274,21 @@ impl App {
             descender = metrics.descender
         );
 
+        log::debug!(
+            "prepare font faces: embed-fonts={e} strip-fonts={s}",
+            e = settings.embed_fonts,
+            s = settings.strip_fonts,
+        );
         if settings.embed_fonts {
             for (i, (_, file)) in files.iter().enumerate() {
-                let data = file.data();
+                let data = if settings.strip_fonts {
+                    let chars = used.iter().filter(|x| *x.1 & (1 << i) != 0).map(|x| *x.0);
+                    let data = fonts[i].2.subset(chars)?;
+                    faces[i].format = Some(FontFormat::Ttf);
+                    Cow::Owned(data)
+                } else {
+                    Cow::Borrowed(file.data())
+                };
                 log::debug!(
                     "prepare font face #{i:02} to be embedded: {len} bytes",
                     len = data.len()

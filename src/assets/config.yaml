@@ -11,6 +11,7 @@ font:
     faint: normal
 
 embed-fonts: true
+strip-fonts: false
 line-height: 1.2
 precision: 3
 padding:

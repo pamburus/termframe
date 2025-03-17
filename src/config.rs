@@ -37,6 +37,7 @@ pub struct Settings {
     pub theme: ThemeSetting,
     pub fonts: Fonts,
     pub embed_fonts: bool,
+    pub strip_fonts: bool,
     pub faint_opacity: f32,
     pub bold_is_bright: bool,
     pub padding: PaddingOption,

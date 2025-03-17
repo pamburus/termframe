@@ -4,6 +4,7 @@ use std::{
     io::{self, IsTerminal, stdout},
     process,
     rc::Rc,
+    time::Duration,
 };
 
 // third-party imports
@@ -124,7 +125,7 @@ impl App {
         if let Some(command) = opt.command {
             let mut command = CommandBuilder::new(command);
             command.args(&opt.args);
-            terminal.run(command)?;
+            terminal.run(command, Some(Duration::from_secs(opt.timeout)))?;
         } else {
             if io::stdin().is_terminal() {
                 return Ok(cli::Opt::command().print_help()?);

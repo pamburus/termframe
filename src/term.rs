@@ -1,8 +1,9 @@
 use std::io::{BufRead, BufReader};
 use std::thread;
+use std::time::Duration;
 
 use anyhow::{Context, Result};
-use portable_pty::{CommandBuilder, PtyPair, PtySize, native_pty_system};
+use portable_pty::{ChildKiller, CommandBuilder, PtyPair, PtySize, native_pty_system};
 use termwiz::{
     cell::AttributeChange,
     escape::{Action, CSI, ControlCode, csi::Sgr, parser::Parser},
@@ -57,7 +58,7 @@ impl Terminal {
         }
     }
 
-    pub fn run(&mut self, mut cmd: CommandBuilder) -> Result<()> {
+    pub fn run(&mut self, mut cmd: CommandBuilder, timeout: Option<Duration>) -> Result<()> {
         cmd.env("TERM", "xterm-256color");
         cmd.env("COLORTERM", "truecolor");
         if cmd.get_cwd().is_none() {
@@ -65,13 +66,14 @@ impl Terminal {
         }
 
         let reader = BufReader::new(self.pty.master.try_clone_reader()?);
-        let writer = self.pty.master.take_writer()?;
+        let _writer = self.pty.master.take_writer()?;
         let mut child = self.pty.slave.spawn_command(cmd)?;
+        let killer = child.clone_killer();
 
         thread::scope(|s| {
             let thread = s.spawn(move || self.feed(reader));
-            drop(writer);
-            child.wait()?;
+
+            with_timeout(timeout, killer, s, || child.wait())?;
             thread.join().unwrap()
         })?;
 
@@ -79,7 +81,30 @@ impl Terminal {
     }
 }
 
-pub(crate) fn apply_action_to_surface(surface: &mut Surface, action: Action) -> SequenceNo {
+fn with_timeout<'scope, 'env, R, F>(
+    timeout: Option<Duration>,
+    mut killer: Box<dyn ChildKiller + Send + Sync>,
+    s: &'scope thread::Scope<'scope, 'env>,
+    f: F,
+) -> R
+where
+    F: FnOnce() -> R,
+{
+    if let Some(timeout) = timeout {
+        let t = s.spawn(move || {
+            thread::sleep(timeout);
+            let _ = killer.kill();
+        });
+        let result = f();
+        t.thread().unpark();
+        t.join().unwrap();
+        result
+    } else {
+        f()
+    }
+}
+
+fn apply_action_to_surface(surface: &mut Surface, action: Action) -> SequenceNo {
     match action {
         Action::Print(ch) => surface.add_change(ch),
         Action::PrintString(s) => surface.add_change(s),

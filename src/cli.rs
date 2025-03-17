@@ -116,6 +116,14 @@ pub struct Opt {
     )]
     pub output: String,
 
+    #[arg(
+        long,
+        overrides_with = "timeout",
+        default_value_t = 1,
+        value_name = "SECONDS"
+    )]
+    pub timeout: u64,
+
     /// Print available color themes and exit.
     #[arg(long)]
     pub list_themes: bool,

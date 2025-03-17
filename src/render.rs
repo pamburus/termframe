@@ -2,6 +2,7 @@
 use std::{collections::HashSet, rc::Rc};
 
 // third-party imports
+use csscolorparser::Color;
 use termwiz::surface::Surface;
 
 // local imports
@@ -10,6 +11,7 @@ use crate::{
     config::{Padding, Settings, mode::Mode, winstyle::Window},
 };
 
+// modules
 pub mod svg;
 
 // re-exports
@@ -27,6 +29,18 @@ pub struct Options {
     pub theme: Rc<Theme>,
     pub window: Window,
     pub mode: Mode,
+    pub background: Option<Color>,
+    pub foreground: Option<Color>,
+}
+
+impl Options {
+    pub fn bg(&self) -> &Color {
+        self.background.as_ref().unwrap_or(&self.theme.bg)
+    }
+
+    pub fn fg(&self) -> &Color {
+        self.foreground.as_ref().unwrap_or(&self.theme.fg)
+    }
 }
 
 #[derive(Debug, Clone)]

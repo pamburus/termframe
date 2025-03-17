@@ -2854,6 +2854,7 @@ dependencies = [
  "known-folders",
  "log",
  "nu-ansi-term",
+ "num-traits",
  "portable-pty",
  "rayon",
  "rust-embed",

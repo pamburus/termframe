@@ -149,6 +149,8 @@ impl App {
             theme,
             window,
             mode,
+            background: Some(terminal.background().convert()),
+            foreground: Some(terminal.foreground().convert()),
         };
 
         let mut output: Box<dyn io::Write> = if opt.output != "-" {

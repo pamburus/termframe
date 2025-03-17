@@ -1,14 +1,16 @@
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, BufWriter};
+use std::sync::mpsc::{Sender, channel};
 use std::thread;
 use std::time::Duration;
 
 use anyhow::{Context, Result};
+use num_traits::FromPrimitive;
 use portable_pty::{ChildKiller, CommandBuilder, PtyPair, PtySize, native_pty_system};
 use termwiz::{
     cell::AttributeChange,
     color::SrgbaTuple,
     escape::{
-        Action, CSI, ControlCode, OperatingSystemCommand,
+        Action, CSI, ControlCode, OneBased, OperatingSystemCommand,
         csi::{Cursor, Sgr},
         osc::{ColorOrQuery, DynamicColorNumber},
         parser::Parser,
@@ -77,7 +79,7 @@ impl Terminal {
     pub fn feed(
         &mut self,
         mut reader: impl BufRead,
-        feedback: &mut dyn std::io::Write,
+        writer: &mut dyn std::io::Write,
     ) -> Result<()> {
         loop {
             let buffer = reader.fill_buf().context("error reading PTY")?;
@@ -86,7 +88,7 @@ impl Terminal {
             }
 
             self.parser.parse(buffer, |action| {
-                let seq = Self::apply_action(&mut self.surface, &mut self.state, feedback, action);
+                let seq = Self::apply_action(&mut self.surface, &mut self.state, writer, action);
                 self.surface.flush_changes_older_than(seq);
             });
 
@@ -103,9 +105,11 @@ impl Terminal {
         }
 
         let reader = BufReader::new(self.pty.master.try_clone_reader()?);
-        let mut writer = self.pty.master.take_writer()?;
+        let writer = self.pty.master.take_writer()?;
         let mut child = self.pty.slave.spawn_command(cmd)?;
         let killer = child.clone_killer();
+
+        let mut writer = BufWriter::new(ThreadedWriter::new(writer));
 
         thread::scope(|s| {
             let thread = s.spawn(move || self.feed(reader, &mut writer));
@@ -120,7 +124,7 @@ impl Terminal {
     fn apply_action(
         surface: &mut Surface,
         st: &mut State,
-        feedback: &mut dyn std::io::Write,
+        writer: &mut dyn std::io::Write,
         action: Action,
     ) -> SequenceNo {
         match action {
@@ -264,62 +268,121 @@ impl Terminal {
                     Cursor::SetLeftAndRightMargins { .. } => SEQ_ZERO,
                     Cursor::CursorStyle(_) => SEQ_ZERO,
                     Cursor::ActivePositionReport { .. } => SEQ_ZERO,
-                    Cursor::RequestActivePositionReport => SEQ_ZERO,
+                    Cursor::RequestActivePositionReport => {
+                        log::debug!("RequestActivePositionReport");
+                        let col = OneBased::from_zero_based(surface.cursor_position().0 as u32);
+                        let line = OneBased::from_zero_based(surface.cursor_position().1 as u32);
+                        let report = CSI::Cursor(Cursor::ActivePositionReport { line, col });
+                        log::debug!("ActivePositionReport {:?}", report);
+                        write!(writer, "{}", report).ok();
+                        writer.flush().ok();
+                        SEQ_ZERO
+                    }
                 },
-                _ => unimplemented!(),
+                CSI::Device(device) => {
+                    log::debug!("unsupported: CSI::Device({device:?})");
+                    SEQ_ZERO
+                }
+                CSI::Mode(mode) => {
+                    log::debug!("unsupported: CSI::Mode({mode:?})");
+                    SEQ_ZERO
+                }
+                CSI::Edit(edit) => {
+                    log::debug!("unsupported: CSI::Edit({edit:?})");
+                    SEQ_ZERO
+                }
+                CSI::Window(window) => {
+                    log::debug!("unsupported: CSI::Window({window:?})");
+                    SEQ_ZERO
+                }
+                CSI::Mouse(mouse) => {
+                    log::debug!("unsupported: CSI::Mouse({mouse:?})");
+                    SEQ_ZERO
+                }
+                CSI::Keyboard(keyboard) => {
+                    log::debug!("unsupported: CSI::Keyboard({keyboard:?})");
+                    SEQ_ZERO
+                }
+                CSI::SelectCharacterPath(p, n) => {
+                    log::debug!("unsupported: CSI::SelectCharacterPath({p:?}, {n:?})");
+                    SEQ_ZERO
+                }
+                CSI::Unspecified(v) => {
+                    log::debug!("unsupported: CSI::Unspecified({v:?})");
+                    SEQ_ZERO
+                }
             },
-            Action::DeviceControl(_) => unimplemented!(),
+            Action::DeviceControl(mode) => {
+                log::debug!("unsupported: DeviceControl({mode:?})");
+                SEQ_ZERO
+            }
             Action::OperatingSystemCommand(cmd) => match *cmd {
-                OperatingSystemCommand::ChangeDynamicColors(num, q) => {
-                    for q in q.iter() {
-                        match q {
-                            ColorOrQuery::Color(color) => match num {
-                                DynamicColorNumber::TextBackgroundColor => {
-                                    st.background = *color;
+                OperatingSystemCommand::ChangeDynamicColors(first_color, colors) => {
+                    let mut idx: u8 = first_color as u8;
+                    for color in colors {
+                        let which_color: Option<DynamicColorNumber> = FromPrimitive::from_u8(idx);
+                        log::debug!("ChangeDynamicColors({which_color:?}): {color:?}");
+                        if let Some(which_color) = which_color {
+                            let mut set_or_query = |target: &mut SrgbaTuple| match color {
+                                ColorOrQuery::Query => {
+                                    let response = OperatingSystemCommand::ChangeDynamicColors(
+                                        which_color,
+                                        vec![ColorOrQuery::Color(target.clone().into())],
+                                    );
+                                    log::debug!("Color Query response {:?}", response);
+                                    write!(writer, "{}", response).ok();
+                                    writer.flush().ok();
                                 }
+                                ColorOrQuery::Color(c) => {
+                                    log::debug!("{which_color:?} set to {c}", c = c.to_string());
+                                    *target = c.into()
+                                }
+                            };
+                            match which_color {
                                 DynamicColorNumber::TextForegroundColor => {
-                                    st.foreground = *color;
+                                    set_or_query(&mut st.foreground)
                                 }
-                                _ => unimplemented!("num={num:?} color={color:?}, q={q:?}"),
-                            },
-                            ColorOrQuery::Query => match num {
                                 DynamicColorNumber::TextBackgroundColor => {
-                                    let c = st.background.as_rgba_u8();
-                                    feedback
-                                        .write(
-                                            format!(
-                                                "\x1b]{};rgb:{:02x}/{:02x}/{:02x}\x07",
-                                                num as u8, c.0, c.1, c.2
-                                            )
-                                            .as_bytes(),
-                                        )
-                                        .map_err(|e| log::warn!("failed to write response: {e}"))
-                                        .ok();
+                                    set_or_query(&mut st.background)
                                 }
-                                DynamicColorNumber::TextForegroundColor => {
-                                    let c = st.foreground.as_rgba_u8();
-                                    feedback
-                                        .write(
-                                            format!(
-                                                "\x1b]{};rgb:{:02x}/{:02x}/{:02x}\x07",
-                                                num as u8, c.0, c.1, c.2
-                                            )
-                                            .as_bytes(),
-                                        )
-                                        .map_err(|e| log::warn!("failed to write response: {e}"))
-                                        .ok();
-                                }
-                                _ => unimplemented!("num={num:?}"),
-                            },
+                                DynamicColorNumber::TextCursorColor => unimplemented!(),
+                                DynamicColorNumber::HighlightForegroundColor => unimplemented!(),
+                                DynamicColorNumber::HighlightBackgroundColor => unimplemented!(),
+                                DynamicColorNumber::MouseForegroundColor
+                                | DynamicColorNumber::MouseBackgroundColor
+                                | DynamicColorNumber::TektronixForegroundColor
+                                | DynamicColorNumber::TektronixBackgroundColor
+                                | DynamicColorNumber::TektronixCursorColor => unimplemented!(),
+                            }
                         }
+                        idx += 1;
                     }
                     SEQ_ZERO
                 }
-                _ => unimplemented!("command: {cmd:?}"),
+                _ => {
+                    log::debug!("unsupported: OperatingSystemCommand({cmd:?})");
+                    SEQ_ZERO
+                }
             },
-            Action::Esc(esc) => SEQ_ZERO, //unimplemented!("esc: {esc:?}"),
-            Action::XtGetTcap(_) => unimplemented!(),
-            _ => unimplemented!(),
+            Action::Esc(esc) => match esc {
+                termwiz::escape::Esc::Code(termwiz::escape::EscCode::StringTerminator) => SEQ_ZERO,
+                _ => {
+                    log::debug!("unsupported: Esc({esc:?})");
+                    SEQ_ZERO
+                }
+            },
+            Action::XtGetTcap(cap) => {
+                log::debug!("unsupported: XtGetTcap({cap:?})");
+                SEQ_ZERO
+            }
+            Action::Sixel(sixel) => {
+                log::debug!("unsupported: Sixel({sixel:?})");
+                SEQ_ZERO
+            }
+            Action::KittyImage(image) => {
+                log::debug!("unsupported: KittyImage({image:?})");
+                SEQ_ZERO
+            }
         }
     }
 }
@@ -341,6 +404,56 @@ impl State {
     }
 }
 
+struct ThreadedWriter {
+    sender: Sender<WriterMessage>,
+}
+
+impl ThreadedWriter {
+    fn new(mut writer: Box<dyn std::io::Write + Send>) -> Self {
+        let (sender, receiver) = channel::<WriterMessage>();
+
+        std::thread::spawn(move || {
+            while let Ok(msg) = receiver.recv() {
+                match msg {
+                    WriterMessage::Data(buf) => {
+                        if writer.write(&buf).is_err() {
+                            break;
+                        }
+                    }
+                    WriterMessage::Flush => {
+                        if writer.flush().is_err() {
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        Self { sender }
+    }
+}
+
+impl std::io::Write for ThreadedWriter {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.sender
+            .send(WriterMessage::Data(buf.to_vec()))
+            .map_err(|err| std::io::Error::new(std::io::ErrorKind::BrokenPipe, err))?;
+        Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.sender
+            .send(WriterMessage::Flush)
+            .map_err(|err| std::io::Error::new(std::io::ErrorKind::BrokenPipe, err))?;
+        Ok(())
+    }
+}
+
+enum WriterMessage {
+    Data(Vec<u8>),
+    Flush,
+}
+
 fn with_timeout<'scope, 'env, R, F>(
     timeout: Option<Duration>,
     mut killer: Box<dyn ChildKiller + Send + Sync>,
@@ -352,12 +465,15 @@ where
 {
     if let Some(timeout) = timeout {
         let t = s.spawn(move || {
-            thread::sleep(timeout);
+            thread::park_timeout(timeout);
             let _ = killer.kill();
         });
         let result = f();
+        log::debug!("unpark timeout thread");
         t.thread().unpark();
+        log::debug!("join timeout thread");
         t.join().unwrap();
+        log::debug!("done");
         result
     } else {
         f()

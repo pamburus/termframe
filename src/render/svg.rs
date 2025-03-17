@@ -34,6 +34,9 @@ impl SvgRenderer {
         let opt = &self.options;
         let cfg = &opt.settings;
 
+        let bg = opt.bg();
+        let fg = opt.fg();
+
         let fp = cfg.precision; // floating point precision
         let lh = cfg.line_height.r2p(fp); // line height in em
         let fw = opt.font.metrics.width.r2p(fp); // font width in em
@@ -49,7 +52,7 @@ impl SvgRenderer {
         let background = element::Rectangle::new()
             .set("width", "100%")
             .set("height", "100%")
-            .set("fill", opt.theme.bg.to_hex_string());
+            .set("fill", bg.to_hex_string());
 
         let mut used_font_faces = HashSet::new();
 
@@ -63,7 +66,11 @@ impl SvgRenderer {
         for (row, line) in surface.screen_lines().iter().enumerate() {
             for cluster in line.cluster(None) {
                 let color = if cluster.attrs.reverse() {
-                    Some(opt.theme.resolve_fg(cluster.attrs.foreground()))
+                    Some(
+                        opt.theme
+                            .resolve(cluster.attrs.foreground())
+                            .unwrap_or_else(|| fg.clone()),
+                    )
                 } else {
                     opt.theme.resolve(cluster.attrs.background())
                 };
@@ -145,9 +152,13 @@ impl SvgRenderer {
                     };
 
                     let mut color = if cluster.attrs.reverse() {
-                        opt.theme.resolve_bg(cluster.attrs.background())
+                        opt.theme
+                            .resolve(cluster.attrs.background())
+                            .unwrap_or_else(|| bg.clone())
                     } else {
-                        opt.theme.resolve_fg(correct(cluster.attrs.foreground()))
+                        opt.theme
+                            .resolve(correct(cluster.attrs.foreground()))
+                            .unwrap_or_else(|| fg.clone())
                     };
 
                     if cluster.attrs.intensity() == Intensity::Half {
@@ -158,7 +169,7 @@ impl SvgRenderer {
                     }
                     color.a = 1.0;
 
-                    if color != opt.theme.fg {
+                    if color != *fg {
                         span = span.set("fill", color.to_hex_string());
                     }
 
@@ -238,7 +249,7 @@ impl SvgRenderer {
         let mut content = element::SVG::new()
             .set("x", format!("{}em", pad.left))
             .set("y", format!("{}em", pad.top))
-            .set("fill", opt.theme.fg.to_hex_string())
+            .set("fill", fg.to_hex_string())
             .add(group);
         content.unassign("xmlns");
 
@@ -318,7 +329,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
     // background
     window = window.add(
         element::Rectangle::new()
-            .set("fill", opt.theme.bg.to_hex_string())
+            .set("fill", opt.bg().to_hex_string())
             .set("rx", border.radius.r2p(fp))
             .set("ry", border.radius.r2p(fp))
             .set("width", width)

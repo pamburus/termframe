@@ -125,14 +125,6 @@ impl Theme {
             }
         }
     }
-
-    pub fn resolve_fg(&self, attr: ColorAttribute) -> Color {
-        self.resolve(attr).unwrap_or_else(|| self.fg.clone())
-    }
-
-    pub fn resolve_bg(&self, attr: ColorAttribute) -> Color {
-        self.resolve(attr).unwrap_or_else(|| self.bg.clone())
-    }
 }
 
 // ---

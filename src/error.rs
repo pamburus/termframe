@@ -6,7 +6,6 @@ use std::{
 };
 
 // third-party imports
-use cached::{DiskCacheError, stores::DiskCacheBuildError};
 use config::ConfigError;
 use itertools::Itertools;
 use nu_ansi_term::Color;
@@ -49,10 +48,6 @@ pub enum Error {
     ParseFloatError(#[from] ParseFloatError),
     #[error(transparent)]
     ParseIntError(#[from] ParseIntError),
-    #[error(transparent)]
-    DiskCacheError(#[from] DiskCacheError),
-    #[error(transparent)]
-    DiskCacheBuildError(#[from] DiskCacheBuildError),
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

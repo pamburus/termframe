@@ -5,17 +5,12 @@ use std::{
     io::{self, IsTerminal, stdout},
     process,
     rc::Rc,
-    sync::LazyLock,
     time::Duration,
 };
 
 // third-party imports
 use anyhow::Context;
 use base64::prelude::*;
-use cached::{
-    IOCached,
-    stores::{DiskCache, DiskCacheBuilder},
-};
 use clap::{CommandFactory, Parser};
 use csscolorparser::Color;
 use env_logger::{self as logger};
@@ -25,13 +20,15 @@ use portable_pty::CommandBuilder;
 use rayon::prelude::*;
 
 // local imports
+use cache::CacheMiddleware;
 use config::{
-    Load, Patch, Settings,
+    Load, Patch, Settings, app_dirs,
     load::{ItemInfo, Origin},
     theme::ThemeConfig,
     winstyle::WindowStyleConfig,
 };
 use error::{AppInfoProvider, Result, UsageRequest, UsageResponse};
+use font::FontFile;
 use fontformat::FontFormat;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use term::Terminal;
@@ -39,6 +36,7 @@ use termwiz::color::SrgbaTuple;
 use theme::{AdaptiveTheme, Theme};
 
 mod appdirs;
+mod cache;
 mod cli;
 mod config;
 mod error;
@@ -69,26 +67,23 @@ impl AppInfoProvider for AppInfo {
     }
 }
 
-static CACHE: LazyLock<Option<DiskCache<String, Vec<u8>>>> = LazyLock::new(|| {
-    let mut cache = None;
-
-    if let Some(dirs) = config::app_dirs() {
-        cache = DiskCacheBuilder::new("main")
-            .set_disk_directory(dirs.cache_dir.join(config::APP_NAME))
-            .set_lifespan(3600)
-            .build()
-            .map_err(|e| log::warn!("Failed to create disk cache: {e}"))
-            .ok();
-    }
-
-    cache
-});
-
-struct App {}
+struct App {
+    ua: Option<ureq::Agent>,
+}
 
 impl App {
     fn new() -> Self {
-        Self {}
+        let mut ua = None;
+        if let Some(dirs) = app_dirs() {
+            ua = Some(
+                ureq::Agent::config_builder()
+                    .middleware(CacheMiddleware::new(&dirs.cache_dir))
+                    .build()
+                    .into(),
+            );
+        }
+
+        Self { ua }
     }
 
     fn run(&self) -> Result<()> {
@@ -313,25 +308,20 @@ impl App {
         })
     }
 
-    fn load_font<S: AsRef<str>>(&self, file: S) -> Result<font::FontFile> {
+    fn load_font<S: AsRef<str>>(&self, file: S) -> Result<FontFile> {
         let file = file.as_ref();
-        let location = file.into();
+        let location = font::Location::from(file);
 
-        let cache = CACHE.as_ref();
-        let Some(cache) = cache else {
-            return Ok(font::FontFile::load(location)?);
-        };
-
-        let key = format!("font:{file}");
-        let file = if let Some(data) = cache.cache_get(&key)? {
-            log::debug!("loading font from cache: {file}");
-            font::FontFile::load_bytes(&data, location)?
-        } else {
-            let file = font::FontFile::load(location)?;
-            cache.cache_set(key, file.data().to_owned())?;
-            file
-        };
-        Ok(file)
+        match location {
+            font::Location::File(path) => Ok(FontFile::load_file(path)?),
+            font::Location::Url(url) => {
+                if let Some(ua) = &self.ua {
+                    Ok(FontFile::load_url_with_agent(url, ua)?)
+                } else {
+                    Ok(FontFile::load_url(url)?)
+                }
+            }
+        }
     }
 }
 

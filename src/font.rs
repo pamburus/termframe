@@ -28,6 +28,7 @@ pub type Result<T> = anyhow::Result<T>;
 pub type Fixed = allsorts::tables::Fixed;
 
 impl FontFile {
+    #[allow(dead_code)]
     pub fn load(location: Location) -> Result<Self> {
         match location {
             Location::File(path) => Self::load_file(path),
@@ -41,10 +42,14 @@ impl FontFile {
     }
 
     pub fn load_url(url: Url) -> Result<Self> {
+        Self::load_url_with_agent(url, &ureq::Agent::new_with_defaults())
+    }
+
+    pub fn load_url_with_agent(url: Url, agent: &ureq::Agent) -> Result<Self> {
         match url.scheme() {
             "file" | "" => Self::load_file(url.path().into()),
             _ => {
-                let bytes = ureq::get(url.as_ref()).call()?.body_mut().read_to_vec()?;
+                let bytes = agent.get(url.as_ref()).call()?.body_mut().read_to_vec()?;
                 Self::load_bytes(&bytes, Location::Url(url))
             }
         }

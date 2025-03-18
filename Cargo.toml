@@ -14,7 +14,7 @@ askama_escape = "0"
 allsorts = "0"
 anyhow = "1"
 base64 = "0"
-cached = { version = "0", features = ["disk_store"] }
+cacache = "13"
 clap = { version = "4", features = ["wrap_help", "derive", "env", "string"] }
 clap_complete = "4"
 clap_mangen = "0"
@@ -25,6 +25,8 @@ dark-light = "2"
 dirs = "6"
 dirs-sys = "0"
 env_logger = "0"
+hex = "0"
+http = "1"
 itertools = "0.14"
 known-folders = "1"
 log = "0"
@@ -36,6 +38,7 @@ rust-embed = "8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
 serde_yml = "0"
+sha2 = "0"
 strsim = "0"
 strum = { version = "0", features = ["derive"] }
 svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }

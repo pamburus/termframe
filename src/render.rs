@@ -1,5 +1,5 @@
 // std imports
-use std::{collections::HashSet, rc::Rc};
+use std::{collections::HashSet, io, rc::Rc};
 
 // third-party imports
 use csscolorparser::Color;
@@ -20,7 +20,7 @@ pub type Result<T> = anyhow::Result<T>;
 
 pub trait Render {
     #[allow(dead_code)]
-    fn render(&self, surface: &Surface, target: &mut dyn std::io::Write) -> Result<()>;
+    fn render(&self, surface: &Surface, target: &mut dyn io::Write) -> Result<()>;
 }
 
 #[derive(Debug, Clone)]

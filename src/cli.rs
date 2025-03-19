@@ -58,7 +58,7 @@ pub struct Opt {
     #[arg(long, default_value_t = config::global::get().faint_opacity, overrides_with = "faint_opacity", value_name = "0..1")]
     pub faint_opacity: f32,
 
-    // Faint text font weight.
+    /// Faint text font weight.
     #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "faint_font_weight", value_name = "WEIGHT")]
     pub faint_font_weight: FontWeight,
 
@@ -90,14 +90,6 @@ pub struct Opt {
     #[arg(long, overrides_with = "window_style", value_name = "NAME")]
     pub window_style: Option<String>,
 
-    /// First line to capture, if not specified, captures from the beginning of the input.
-    #[arg(long, overrides_with = "start", value_name = "LINE")]
-    pub start: Option<usize>,
-
-    /// Last line to capture, if not specified, captures to the end of the input.
-    #[arg(long, overrides_with = "end", value_name = "LINE")]
-    pub end: Option<usize>,
-
     /// Output file, by default prints to stdout.
     #[arg(
         long,
@@ -108,6 +100,7 @@ pub struct Opt {
     )]
     pub output: String,
 
+    /// Timeout for the command to run, in seconds.
     #[arg(
         long,
         overrides_with = "timeout",

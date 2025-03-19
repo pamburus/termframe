@@ -131,9 +131,24 @@ impl Terminal {
             Action::Print(ch) => surface.add_change(ch),
             Action::PrintString(s) => surface.add_change(s),
             Action::Control(code) => match code {
-                ControlCode::LineFeed => surface.add_change("\r\n"),
-                ControlCode::CarriageReturn | ControlCode::HorizontalTab => {
-                    surface.add_change(code as u8 as char)
+                ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed => {
+                    surface.add_change("\n")
+                }
+                ControlCode::CarriageReturn => surface.add_change("\r"),
+                ControlCode::HorizontalTab => surface.add_change(Change::CursorPosition {
+                    x: Position::Absolute(tabulate(surface.cursor_position().0, 1)),
+                    y: Position::Relative(0),
+                }),
+                ControlCode::Backspace => {
+                    surface.add_change(Change::CursorPosition {
+                        x: Position::Relative(-1),
+                        y: Position::Relative(0),
+                    });
+                    surface.add_change(" ");
+                    surface.add_change(Change::CursorPosition {
+                        x: Position::Relative(-1),
+                        y: Position::Relative(0),
+                    })
                 }
                 _ => {
                     log::debug!("unsupported: Control({code:?})");

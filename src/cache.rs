@@ -7,7 +7,6 @@ use std::{
 };
 
 use serde_json::{Map, Value};
-use sha2::{Digest, Sha256};
 use ureq::{
     Body, Error, SendBody,
     http::{Request, Response},
@@ -17,7 +16,6 @@ use ureq::{
 type Result<T, E = Error> = std::result::Result<T, E>;
 
 const KEY_HEADERS: &str = "headers";
-const KEY_HASH_SHA256: &str = "hash:sha256";
 
 pub struct CacheMiddleware {
     dir: PathBuf,
@@ -36,12 +34,8 @@ impl CacheMiddleware {
         let meta = cacache::metadata_sync(&self.dir, key).ok()??;
         let attrs = meta.metadata.as_object()?;
         let headers = attrs.get(KEY_HEADERS)?.as_object()?;
-        let sha256 = attrs.get(KEY_HASH_SHA256)?.as_str()?;
 
         let data = cacache::read_sync(&self.dir, key).ok()?;
-        if sha256_hash_hex(&data) != sha256 {
-            return None;
-        }
 
         let mut response = Response::builder();
 
@@ -64,11 +58,9 @@ impl CacheMiddleware {
         }
 
         let data = response.body();
-        let sha256 = sha256_hash_hex(&data);
 
         let mut attrs = Map::new();
         attrs.insert(KEY_HEADERS.to_string(), Value::Object(headers));
-        attrs.insert(KEY_HASH_SHA256.to_string(), Value::String(sha256));
 
         let mut cache = cacache::WriteOpts::new()
             .size(data.len())
@@ -183,10 +175,4 @@ impl Deref for Locker<'_> {
     fn deref(&self) -> &Self::Target {
         &self.lock
     }
-}
-
-fn sha256_hash_hex(data: impl AsRef<[u8]>) -> String {
-    let mut hasher = Sha256::new();
-    hasher.update(data);
-    hex::encode(hasher.finalize())
 }

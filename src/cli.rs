@@ -10,7 +10,7 @@ use crate::config::{self, FontFamilyOption, PaddingOption, Settings, ThemeSettin
 
 // ---
 
-/// Terminal output snapshot tool.
+/// Terminal output SVG screenshot tool.
 #[derive(Parser)]
 #[clap(version, disable_help_flag = true)]
 pub struct Opt {

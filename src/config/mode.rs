@@ -1,6 +1,9 @@
-use serde::Deserialize;
+// std imports
+use std::fmt;
 
+// third-party imports
 use clap::ValueEnum;
+use serde::Deserialize;
 
 #[derive(Debug, Clone, Copy, Deserialize, ValueEnum)]
 #[serde(rename_all = "kebab-case")]
@@ -44,12 +47,12 @@ pub enum ModeSetting {
     Light,
 }
 
-impl ToString for ModeSetting {
-    fn to_string(&self) -> String {
+impl fmt::Display for ModeSetting {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ModeSetting::Auto => "auto".to_string(),
-            ModeSetting::Dark => "dark".to_string(),
-            ModeSetting::Light => "light".to_string(),
+            ModeSetting::Auto => write!(f, "auto"),
+            ModeSetting::Dark => write!(f, "dark"),
+            ModeSetting::Light => write!(f, "light"),
         }
     }
 }

@@ -1,6 +1,6 @@
 // std imports
 use std::{
-    include_str,
+    fmt, include_str,
     path::{Path, PathBuf},
     sync::LazyLock,
 };
@@ -215,12 +215,12 @@ impl Default for FontWeight {
     }
 }
 
-impl ToString for FontWeight {
-    fn to_string(&self) -> String {
+impl fmt::Display for FontWeight {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Normal => "normal".to_string(),
-            Self::Bold => "bold".to_string(),
-            Self::Fixed(weight) => weight.to_string(),
+            Self::Normal => write!(f, "normal"),
+            Self::Bold => write!(f, "bold"),
+            Self::Fixed(weight) => write!(f, "{}", weight),
         }
     }
 }
@@ -333,21 +333,21 @@ impl Loader {
             .map(|dirs| dirs.system_config_dirs.clone())
             .unwrap_or_default()
             .into_iter()
-            .map(|dir| SourceFile::new(&Self::config(&dir)).required(false).into())
+            .map(|dir| SourceFile::new(Self::config(&dir)).required(false).into())
     }
 
     fn user(&self) -> impl Iterator<Item = Source> {
         self.dirs
             .as_ref()
             .map(|dirs| {
-                SourceFile::new(&Self::config(&dirs.config_dir))
+                SourceFile::new(Self::config(&dirs.config_dir))
                     .required(false)
                     .into()
             })
             .into_iter()
     }
 
-    fn custom<'a>(&'a self) -> impl Iterator<Item = Source> + 'a {
+    fn custom(&self) -> impl Iterator<Item = Source> {
         self.paths
             .iter()
             .map(|path| SourceFile::new(path).required(true).into())

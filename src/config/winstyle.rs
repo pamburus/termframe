@@ -94,7 +94,7 @@ impl Default for WindowStyleConfig {
 
 impl Default for &WindowStyleConfig {
     fn default() -> Self {
-        &*DEFAULT
+        &DEFAULT
     }
 }
 

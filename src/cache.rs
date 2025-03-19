@@ -133,7 +133,7 @@ impl Middleware for CacheMiddleware {
 struct LockerMap(Mutex<HashMap<String, Arc<Mutex<()>>>>);
 
 impl LockerMap {
-    fn locker<'a>(&'a self, key: String) -> Locker<'a> {
+    fn locker(&self, key: String) -> Locker {
         let mut lockers = self.0.lock().unwrap();
         Locker {
             map: self,
@@ -163,7 +163,7 @@ struct Locker<'a> {
     lock: Arc<Mutex<()>>,
 }
 
-impl<'a> Drop for Locker<'a> {
+impl Drop for Locker<'_> {
     fn drop(&mut self) {
         self.map.release(&self.key);
     }

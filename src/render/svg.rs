@@ -117,7 +117,7 @@ impl SvgRenderer {
                     continue;
                 }
 
-                for (text, mut range) in subdivide(&line, &cluster) {
+                for (text, mut range) in subdivide(line, &cluster) {
                     if text.trim().is_empty() {
                         continue;
                     }
@@ -278,7 +278,7 @@ impl SvgRenderer {
         };
 
         let faces = collect_font_faces(opt, used_font_faces)?;
-        if faces.len() != 0 {
+        if !faces.is_empty() {
             let style = element::Style::new(faces.join("\n"));
             doc = doc.add(style);
         }
@@ -564,7 +564,7 @@ struct Subclusters<'a> {
 
 impl<'a> Subclusters<'a> {
     fn split(&mut self) -> Option<(&'a str, Range<usize>)> {
-        if self.text_range.len() == 0 {
+        if self.text_range.is_empty() {
             return None;
         }
 
@@ -630,8 +630,8 @@ where
     where
         Self: Sized,
     {
-        let start = max(self.start().clone(), other.start().clone());
-        let end = min(self.end().clone(), other.end().clone());
+        let start = max(*self.start(), *other.start());
+        let end = min(*self.end(), *other.end());
 
         if start <= end {
             Some(start..=end)

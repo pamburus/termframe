@@ -33,21 +33,21 @@ pub enum Error {
     #[error(transparent)]
     WindowStyle(#[from] winstyle::Error),
     #[error("failed to parse utf-8 string: {0}")]
-    Utf8Error(#[from] std::str::Utf8Error),
+    Utf8(#[from] std::str::Utf8Error),
     #[error("failed to construct utf-8 string from bytes: {0}")]
-    FromUtf8Error(#[from] std::string::FromUtf8Error),
+    FromUtf8(#[from] std::string::FromUtf8Error),
     #[error("failed to parse yaml: {0}")]
-    YamlError(#[from] serde_yml::Error),
+    Yaml(#[from] serde_yml::Error),
     #[error("failed to parse toml: {0}")]
-    TomlError(#[from] toml::de::Error),
+    Toml(#[from] toml::de::Error),
     #[error("failed to parse json: {0}")]
-    JsonParseError(#[from] serde_json::Error),
+    JsonParse(#[from] serde_json::Error),
     #[error(transparent)]
-    TryFromIntError(#[from] TryFromIntError),
+    TryFromInt(#[from] TryFromIntError),
     #[error(transparent)]
-    ParseFloatError(#[from] ParseFloatError),
+    ParseFloat(#[from] ParseFloatError),
     #[error(transparent)]
-    ParseIntError(#[from] ParseIntError),
+    ParseInt(#[from] ParseIntError),
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

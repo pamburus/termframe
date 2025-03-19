@@ -345,7 +345,7 @@ impl Terminal {
                                 ColorOrQuery::Query => {
                                     let response = OperatingSystemCommand::ChangeDynamicColors(
                                         which_color,
-                                        vec![ColorOrQuery::Color(target.clone().into())],
+                                        vec![ColorOrQuery::Color(*target)],
                                     );
                                     log::debug!("Color Query response {:?}", response);
                                     write!(writer, "{}", response).ok();
@@ -353,7 +353,7 @@ impl Terminal {
                                 }
                                 ColorOrQuery::Color(c) => {
                                     log::debug!("{which_color:?} set to {c}", c = c.to_string());
-                                    *target = c.into()
+                                    *target = c
                                 }
                             };
                             match which_color {
@@ -472,10 +472,10 @@ enum WriterMessage {
     Flush,
 }
 
-fn with_timeout<'scope, 'env, R, F>(
+fn with_timeout<'scope, R, F>(
     timeout: Option<Duration>,
     mut killer: Box<dyn ChildKiller + Send + Sync>,
-    s: &'scope thread::Scope<'scope, 'env>,
+    s: &'scope thread::Scope<'scope, '_>,
     f: F,
 ) -> R
 where

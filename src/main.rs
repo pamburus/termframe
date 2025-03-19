@@ -96,19 +96,20 @@ impl App {
         }
 
         if let Some(shell) = opt.shell_completions {
-            return Ok(print_shell_completions(shell));
+            print_shell_completions(shell);
+            return Ok(());
         }
 
         if opt.man_page {
-            return Ok(print_man_page()?);
+            return print_man_page();
         }
 
         if opt.list_themes {
-            return Ok(list_themes()?);
+            return list_themes();
         }
 
         if opt.list_window_styles {
-            return Ok(list_window_styles()?);
+            return list_window_styles();
         }
 
         let settings = Rc::new(opt.patch(settings));
@@ -124,8 +125,8 @@ impl App {
         let window = WindowStyleConfig::load(&settings.window.style)?.window;
 
         let mut terminal = Terminal::new(term::Options {
-            cols: Some(opt.width.into()),
-            rows: Some(opt.height.into()),
+            cols: Some(opt.width),
+            rows: Some(opt.height),
             background: Some(theme.bg.convert()),
             foreground: Some(theme.fg.convert()),
         })?;
@@ -161,7 +162,7 @@ impl App {
         };
 
         let renderer = SvgRenderer::new(options);
-        renderer.render(&terminal.surface(), &mut output)?;
+        renderer.render(terminal.surface(), &mut output)?;
 
         Ok(())
     }
@@ -347,7 +348,7 @@ fn list_window_styles() -> Result<()> {
 
 fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
     let mut items: Vec<_> = items.into_iter().collect();
-    items.sort_by_key(|(name, info)| (info.origin.clone(), name.clone()));
+    items.sort_by_key(|(name, info)| (info.origin, name.clone()));
 
     let term = if stdout().is_terminal() {
         term_size::dimensions()
@@ -372,7 +373,7 @@ fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
 
     for (origin, group) in items
         .into_iter()
-        .chunk_by(|(_, info)| info.origin.clone())
+        .chunk_by(|(_, info)| info.origin)
         .into_iter()
     {
         let origin_str = match origin {
@@ -385,7 +386,7 @@ fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
         }
 
         let group: Vec<_> = group.collect();
-        let rows = (group.len() + columns - 1) / columns;
+        let rows = (group.len() + columns - 1).div_ceil(columns);
 
         for row in 0..rows {
             for col in 0..columns {
@@ -423,7 +424,7 @@ fn bootstrap() -> Result<Settings> {
     let (offset, no_default_configs) = opt
         .config
         .iter()
-        .rposition(|x| x == "" || x == "-")
+        .rposition(|x| x.is_empty() || x == "-")
         .map(|x| (x + 1, true))
         .unwrap_or_default();
     let configs = &opt.config[offset..];

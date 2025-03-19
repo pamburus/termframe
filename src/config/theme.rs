@@ -156,4 +156,4 @@ impl AliasMap {
 #[folder = "src/assets/themes/"]
 pub struct Assets;
 
-static ALIAS_MAP: LazyLock<AliasMap> = LazyLock::new(|| AliasMap::load());
+static ALIAS_MAP: LazyLock<AliasMap> = LazyLock::new(AliasMap::load);

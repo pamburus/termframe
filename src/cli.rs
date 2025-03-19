@@ -1,3 +1,6 @@
+// std imports
+use std::fmt;
+
 // third-party imports
 use clap::{ArgAction, Args, Parser, value_parser};
 use clap_complete::Shell;
@@ -143,7 +146,7 @@ impl config::Patch for Opt {
 
         settings.terminal.width = self.width;
         settings.terminal.height = self.height;
-        if self.font_family.len() != 0 {
+        if !self.font_family.is_empty() {
             settings.font.family = FontFamilyOption::Multiple(self.font_family.clone());
         }
         settings.font.size = self.font_size;
@@ -206,7 +209,7 @@ impl BootstrapOpt {
         let mut result = vec![first];
         let mut follow_up = false;
 
-        while let Some(arg) = args.next() {
+        for arg in args {
             match (arg.as_bytes(), follow_up) {
                 (b"--", _) => {
                     break;
@@ -282,12 +285,12 @@ impl std::str::FromStr for FontWeight {
     }
 }
 
-impl ToString for FontWeight {
-    fn to_string(&self) -> String {
+impl fmt::Display for FontWeight {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::Normal => "normal".to_string(),
-            Self::Bold => "bold".to_string(),
-            Self::Fixed(weight) => weight.to_string(),
+            Self::Normal => write!(f, "normal"),
+            Self::Bold => write!(f, "bold"),
+            Self::Fixed(weight) => write!(f, "{}", weight),
         }
     }
 }

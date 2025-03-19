@@ -168,17 +168,17 @@ pub struct Font<'a> {
     family: Option<String>,
 }
 
-impl<'a> Font<'a> {
+impl Font<'_> {
     pub fn format(&self) -> Option<FontFormat> {
         self.format
     }
 
     pub fn family(&self) -> Option<&str> {
-        self.family.as_ref().map(String::as_str)
+        self.family.as_deref()
     }
 
     pub fn name(&self) -> Option<&str> {
-        self.name.as_ref().map(String::as_str)
+        self.name.as_deref()
     }
 
     pub fn width(&mut self) -> f32 {

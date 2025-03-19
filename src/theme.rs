@@ -121,7 +121,7 @@ impl Theme {
             ColorAttribute::PaletteIndex(idx) => Some(self.palette[idx as usize].clone()),
             ColorAttribute::TrueColorWithDefaultFallback(c)
             | ColorAttribute::TrueColorWithPaletteFallback(c, _) => {
-                Some(Color::new(c.0.into(), c.1.into(), c.2.into(), c.3.into()))
+                Some(Color::new(c.0, c.1, c.2, c.3))
             }
         }
     }
@@ -169,7 +169,7 @@ impl Palette {
                 7 => Color::from_rgba8(0xc0, 0xc0, 0xc0, 0xff),
                 8 => Color::from_rgba8(0x80, 0x80, 0x80, 0xff),
                 15 => Color::from_rgba8(0xff, 0xff, 0xff, 0xff),
-                0..16 => {
+                1..=6 | 9..=14 => {
                     let k = if i & 8 != 0 { 0xff } else { 0x80 };
                     let r = (i & 1) * k;
                     let g = ((i >> 1) & 1) * k;
@@ -203,7 +203,7 @@ impl Default for Palette {
 
 impl Default for &Palette {
     fn default() -> Self {
-        static DEFAULT: LazyLock<Palette> = LazyLock::new(|| Palette::make_default());
+        static DEFAULT: LazyLock<Palette> = LazyLock::new(Palette::make_default);
         &DEFAULT
     }
 }

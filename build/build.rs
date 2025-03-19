@@ -31,7 +31,7 @@ fn update_theme_aliases() {
         }
     }
 
-    if let Some(existing) = std::fs::read(THEME_ALIASES).ok() {
+    if let Ok(existing) = std::fs::read(THEME_ALIASES) {
         let existing: BTreeMap<String, String> = serde_json::from_slice(&existing).unwrap();
         if existing == aliases {
             return;

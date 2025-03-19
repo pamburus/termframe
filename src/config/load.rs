@@ -67,10 +67,10 @@ pub trait Load {
         Self: DeserializeOwned + Sized,
     {
         match Self::load_from(&Self::dir(), name) {
-            Ok(r) => return Ok(r),
+            Ok(r) => Ok(r),
             Err(e) => match e.category() {
                 ErrorCategory::ItemNotFound => Self::embedded(name),
-                _ => return Err(e),
+                _ => Err(e),
             },
         }
     }
@@ -124,7 +124,7 @@ pub trait Load {
         }
     }
 
-    fn load_from(dir: &PathBuf, name: &str) -> Result<Self, Self::Error>
+    fn load_from(dir: &Path, name: &str) -> Result<Self, Self::Error>
     where
         Self: DeserializeOwned + Sized,
     {
@@ -159,7 +159,7 @@ pub trait Load {
     }
 
     fn filename(name: &str, format: Format) -> String {
-        if Self::strip_extension(&name, format).is_some() {
+        if Self::strip_extension(name, format).is_some() {
             return name.to_string();
         }
 
@@ -203,7 +203,7 @@ pub trait Load {
                     .path()
                     .file_name()
                     .and_then(|n| n.to_str())
-                    .and_then(|a| Self::strip_known_extension(&a).map(|n| n.to_string())))
+                    .and_then(|a| Self::strip_known_extension(a).map(|n| n.to_string())))
             })
             .filter_map(|x| x.transpose()))
     }

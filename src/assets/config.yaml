@@ -10,7 +10,7 @@ font:
     bold: bold
     faint: normal
 
-embed-fonts: true
+embed-fonts: false
 strip-fonts: false
 line-height: 1.2
 precision: 3
@@ -38,69 +38,24 @@ fonts:
       type: "SIL Open Font License 1.1"
       link: "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/OFL.txt"
     files:
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Thin.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-ThinItalic.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-ExtraLight.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-ExtraLightItalic.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Light.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-LightItalic.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Regular.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Italic.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Medium.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-MediumItalic.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-SemiBold.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-SemiBoldItalic.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-Bold.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-BoldItalic.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-ExtraBold.woff2"
-      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/webfonts/JetBrainsMono-ExtraBoldItalic.woff2"
-
-  - family: "FiraCode Nerd Font Mono"
-    license:
-      type: "SIL Open Font License 1.1"
-      link: "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Regular/LICENSE"
-    files:
-      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Light/FiraCodeNerdFontMono-Light.ttf"
-      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Regular/FiraCodeNerdFontMono-Regular.ttf"
-      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Medium/FiraCodeNerdFontMono-Medium.ttf"
-      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/SemiBold/FiraCodeNerdFontMono-SemiBold.ttf"
-      - "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/master/patched-fonts/FiraCode/Bold/FiraCodeNerdFontMono-Bold.ttf"
-
-  - family: "Spline Sans Mono"
-    files:
-      - "https://fonts.gstatic.com/s/splinesansmono/v10/R70BjzAei_CDNLfgZxrW6wrZOF2WX5yZmE-Z-lxguQ.woff2"
-      - "https://fonts.gstatic.com/s/splinesansmono/v10/R70HjzAei_CDNLfgZxrW6wrZOF2WX5eplEWe2F5QuFir.woff2"
-      - "https://fonts.gstatic.com/s/splinesansmono/v10/R70BjzAei_CDNLfgZxrW6wrZOF2WX5KZmE-Z-lw.woff2"
-      - "https://fonts.gstatic.com/s/splinesansmono/v10/R70HjzAei_CDNLfgZxrW6wrZOF2WX5epmkWe2F5QuA.woff2"
-
-  - family: "Victor Mono"
-    files:
-      - "https://fonts.gstatic.com/s/victormono/v3/Yq6Q-LGQWyfv-LGy7lEO0_ZdtxUGS7ZG.woff2"
-      - "https://fonts.gstatic.com/s/victormono/v3/Yq6S-LGQWyfv-LGy7lEO0_ZYhxcMTJRE49A.woff2"
-
-  - family: "Fira Code"
-    files:
-      - "https://fonts.gstatic.com/s/firacode/v22/uU9NCBsR6Z2vfE9aq3bh09SDqFGedCMX.woff2"
-      - "https://fonts.gstatic.com/s/firacode/v22/uU9NCBsR6Z2vfE9aq3bh3dSDqFGedA.woff2"
-
-  - family: "Roboto Mono"
-    files:
-      - "https://fonts.gstatic.com/s/robotomono/v23/L0x5DF4xlVMF-BfR8bXMIjhLq3-cXbKD.woff2"
-      - "https://fonts.gstatic.com/s/robotomono/v23/L0x7DF4xlVMF-BfR8bXMIjhOm32WWpCBC10.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/variable/JetBrainsMono%5Bwght%5D.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/variable/JetBrainsMono-Italic%5Bwght%5D.woff2"
 
   - family: "Source Code Pro"
+    license:
+      type: "SIL Open Font License 1.1"
+      link: "https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md"
     files:
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvZlMIFxGC8NAU.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvQlMIFxGC8NAU.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvYlMIFxGC8NAU.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvXlMIFxGC8NAU.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvblMIFxGC8NAU.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvalMIFxGC8NAU.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvUlMIFxGC8.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_SiYsKILxRpg3hIP6sJ7fM7PqlMOvWnsUnxlC9.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_SiYsKILxRpg3hIP6sJ7fM7PqlOevWnsUnxlC9.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_SiYsKILxRpg3hIP6sJ7fM7PqlMevWnsUnxlC9.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPuvWnsUnxlC9.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_SiYsKILxRpg3hIP6sJ7fM7PqlMuvWnsUnxlC9.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_SiYsKILxRpg3hIP6sJ7fM7PqlM-vWnsUnxlC9.woff2"
-      - "https://fonts.gstatic.com/s/sourcecodepro/v23/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevWnsUnxg.woff2"
+      - "https://raw.githubusercontent.com/adobe-fonts/source-code-pro/refs/tags/2.042R-u/1.062R-i/1.026R-vf/WOFF2/VF/SourceCodeVF-Upright.ttf.woff2"
+      - "https://raw.githubusercontent.com/adobe-fonts/source-code-pro/refs/tags/2.042R-u/1.062R-i/1.026R-vf/WOFF2/VF/SourceCodeVF-Italic.ttf.woff2"
+
+  - family: "Fira Code"
+    license:
+      type: "SIL Open Font License 1.1"
+      link: "https://github.com/tonsky/FiraCode/blob/6.2/LICENSE"
+    files:
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Bold.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Light.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Medium.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Regular.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-SemiBold.woff2"

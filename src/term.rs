@@ -135,7 +135,10 @@ impl Terminal {
                 ControlCode::CarriageReturn | ControlCode::HorizontalTab => {
                     surface.add_change(code as u8 as char)
                 }
-                _ => unimplemented!(),
+                _ => {
+                    log::debug!("unsupported: Control({code:?})");
+                    SEQ_ZERO
+                }
             },
             Action::CSI(csi) => match csi {
                 CSI::Sgr(sgr) => match sgr {

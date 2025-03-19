@@ -162,10 +162,7 @@ impl SvgRenderer {
                     };
 
                     if cluster.attrs.intensity() == Intensity::Half {
-                        color = opt
-                            .theme
-                            .bg
-                            .interpolate_lab(&color, cfg.faint_opacity as f64);
+                        color = opt.theme.bg.interpolate_oklab(&color, cfg.faint_opacity);
                     }
                     color.a = 1.0;
 

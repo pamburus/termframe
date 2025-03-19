@@ -406,8 +406,8 @@ fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
 }
 
 fn bootstrap() -> Result<Settings> {
-    if std::env::var(TERMSHOT_DEBUG_LOG).is_ok() {
-        logger::Builder::from_env(TERMSHOT_DEBUG_LOG)
+    if std::env::var(TERMFRAME_DEBUG_LOG).is_ok() {
+        logger::Builder::from_env(TERMFRAME_DEBUG_LOG)
             .format_timestamp_micros()
             .init();
         log::debug!("logging initialized");
@@ -470,7 +470,7 @@ fn make_font_face(
     }
 }
 
-const TERMSHOT_DEBUG_LOG: &str = "TERMSHOT_DEBUG_LOG";
+const TERMFRAME_DEBUG_LOG: &str = "TERMFRAME_DEBUG_LOG";
 const DEFAULT_FONT_METRICS: render::FontMetrics = render::FontMetrics {
     width: 0.6,
     ascender: 1.02,

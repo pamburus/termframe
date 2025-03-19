@@ -1,3 +1,3 @@
-# termshot
+# termframe
 
 Virtual terminal screenshot generator

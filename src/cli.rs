@@ -180,7 +180,7 @@ impl config::Patch for Opt {
 #[derive(Args)]
 pub struct BootstrapArgs {
     /// Configuration file path.
-    #[arg(long, value_name = "FILE", env = "TERMSHOT_CONFIG", num_args = 1)]
+    #[arg(long, value_name = "FILE", env = "TERMFRAME_CONFIG", num_args = 1)]
     pub config: Vec<String>,
 }
 

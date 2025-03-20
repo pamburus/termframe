@@ -1,0 +1,10 @@
+@font-face {
+	font-family: {{ font_family }};
+	font-weight: {{ font_weight }};
+	{% match font_style -%}
+    {% when Some with (font_style) -%}
+	font-style: {{ font_style }};
+	{% when None -%}
+	{% endmatch -%}
+	src: url({{ src_url }}) {% match format -%}{% when Some with (format) -%}format('{{ format }}'){% when None -%}{% endmatch -%};
+}

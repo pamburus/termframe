@@ -1,0 +1,61 @@
+terminal:
+  width: 96
+  height: 48
+
+font:
+  family: "JetBrains Mono"
+  size: 12
+  weights:
+    normal: normal
+    bold: bold
+    faint: normal
+
+embed-fonts: false
+strip-fonts: false
+line-height: 1.2
+precision: 3
+padding:
+  horizontal: 0.8
+  vertical: 0.6
+stroke: 0.01
+theme:
+  dark: "catppuccin-macchiato"
+  light: "catppuccin-latte"
+
+bold-is-bright: false
+faint-opacity: 0.5
+
+mode: auto
+
+window:
+  enabled: true
+  shadow: true
+  style: "macos"
+
+fonts:
+  - family: "JetBrains Mono"
+    license:
+      type: "SIL Open Font License 1.1"
+      link: "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/OFL.txt"
+    files:
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/variable/JetBrainsMono%5Bwght%5D.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/variable/JetBrainsMono-Italic%5Bwght%5D.woff2"
+
+  - family: "Source Code Pro"
+    license:
+      type: "SIL Open Font License 1.1"
+      link: "https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md"
+    files:
+      - "https://raw.githubusercontent.com/adobe-fonts/source-code-pro/refs/tags/2.042R-u/1.062R-i/1.026R-vf/WOFF2/VF/SourceCodeVF-Upright.ttf.woff2"
+      - "https://raw.githubusercontent.com/adobe-fonts/source-code-pro/refs/tags/2.042R-u/1.062R-i/1.026R-vf/WOFF2/VF/SourceCodeVF-Italic.ttf.woff2"
+
+  - family: "Fira Code"
+    license:
+      type: "SIL Open Font License 1.1"
+      link: "https://github.com/tonsky/FiraCode/blob/6.2/LICENSE"
+    files:
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Bold.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Light.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Medium.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Regular.woff2"
+      - "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-SemiBold.woff2"

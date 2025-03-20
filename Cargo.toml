@@ -1,0 +1,56 @@
+[package]
+name = "termframe"
+authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
+description = "Terminal output SVG screenshot tool"
+categories = ["command-line-utilities"]
+keywords = ["cli", "terminal", "screenshot", "svg"]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+build = "build/build.rs"
+
+[build-dependencies]
+voca_rs = "1"
+serde_json = { version = "1" }
+
+[dependencies]
+askama = "0"
+askama_escape = "0"
+allsorts = "0"
+anyhow = "1"
+base64 = "0"
+cacache = "13"
+clap = { version = "4", features = ["wrap_help", "derive", "env", "string"] }
+clap_complete = "4"
+clap_mangen = "0"
+closure = "0"
+config = { version = "0", features = ["yaml", "json", "toml"] }
+csscolorparser = { version = "0", features = ["serde"] }
+dark-light = "2"
+dirs = "6"
+dirs-sys = "0"
+env_logger = "0"
+hex = "0"
+http = "1"
+itertools = "0.14"
+known-folders = "1"
+log = "0"
+nu-ansi-term = "0"
+num-traits = "0"
+portable-pty = "0"
+rayon = "1"
+rust-embed = "8"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
+serde_yml = "0"
+strsim = "0"
+strum = { version = "0", features = ["derive"] }
+svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }
+termwiz = "0"
+term_size = "0"
+thiserror = "2"
+toml = "0"
+ureq = "3"
+url = "2"
+voca_rs = "1"
+wild = "2"

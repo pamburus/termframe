@@ -50,7 +50,7 @@ termwiz = "0"
 term_size = "0"
 thiserror = "2"
 toml = "0"
-ureq = "3"
+ureq = { version = "3", default-features = false }
 url = "2"
 voca_rs = "1"
 wild = "2"

@@ -1,7 +1,13 @@
-use std::io::{BufRead, BufReader, BufWriter};
-use std::sync::mpsc::{Sender, channel};
-use std::thread;
-use std::time::Duration;
+use std::{
+    io::{self, BufRead, BufReader, BufWriter},
+    mem,
+    sync::{
+        Arc, Mutex,
+        mpsc::{Sender, channel},
+    },
+    thread,
+    time::Duration,
+};
 
 use anyhow::{Context, Result};
 use num_traits::FromPrimitive;
@@ -76,11 +82,7 @@ impl Terminal {
         self.state.foreground
     }
 
-    pub fn feed(
-        &mut self,
-        mut reader: impl BufRead,
-        writer: &mut dyn std::io::Write,
-    ) -> Result<()> {
+    pub fn feed(&mut self, mut reader: impl BufRead, mut writer: impl io::Write) -> Result<()> {
         loop {
             let buffer = reader.fill_buf().context("error reading PTY")?;
             if buffer.is_empty() {
@@ -88,7 +90,8 @@ impl Terminal {
             }
 
             self.parser.parse(buffer, |action| {
-                let seq = Self::apply_action(&mut self.surface, &mut self.state, writer, action);
+                let seq =
+                    Self::apply_action(&mut self.surface, &mut self.state, &mut writer, action);
                 self.surface.flush_changes_older_than(seq);
             });
 
@@ -105,16 +108,23 @@ impl Terminal {
         }
 
         let reader = BufReader::new(self.pty.master.try_clone_reader()?);
-        let writer = self.pty.master.take_writer()?;
         let mut child = self.pty.slave.spawn_command(cmd)?;
         let killer = child.clone_killer();
 
-        let mut writer = BufWriter::new(ThreadedWriter::new(writer));
+        let writer = self.pty.master.take_writer()?;
+        let writer = ThreadedWriter::new(Box::new(writer));
+        let writer = DetachableWriter::new(Box::new(BufWriter::new(writer)));
 
         thread::scope(|s| {
-            let thread = s.spawn(move || self.feed(reader, &mut writer));
+            let wr = writer.clone();
+            let thread = s.spawn(move || self.feed(reader, wr));
 
             with_timeout(timeout, killer, s, || child.wait())?;
+
+            log::debug!("drop writer");
+            writer.detach().flush()?;
+
+            log::debug!("join processing thread");
             thread.join().unwrap()
         })?;
 
@@ -124,7 +134,7 @@ impl Terminal {
     fn apply_action(
         surface: &mut Surface,
         st: &mut State,
-        writer: &mut dyn std::io::Write,
+        mut writer: impl io::Write,
         action: Action,
     ) -> SequenceNo {
         match action {
@@ -427,7 +437,7 @@ struct ThreadedWriter {
 }
 
 impl ThreadedWriter {
-    fn new(mut writer: Box<dyn std::io::Write + Send>) -> Self {
+    fn new(mut writer: Box<dyn io::Write + Send>) -> Self {
         let (sender, receiver) = channel::<WriterMessage>();
 
         std::thread::spawn(move || {
@@ -451,18 +461,18 @@ impl ThreadedWriter {
     }
 }
 
-impl std::io::Write for ThreadedWriter {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+impl io::Write for ThreadedWriter {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.sender
             .send(WriterMessage::Data(buf.to_vec()))
-            .map_err(|err| std::io::Error::new(std::io::ErrorKind::BrokenPipe, err))?;
+            .map_err(|err| io::Error::new(io::ErrorKind::BrokenPipe, err))?;
         Ok(buf.len())
     }
 
-    fn flush(&mut self) -> std::io::Result<()> {
+    fn flush(&mut self) -> io::Result<()> {
         self.sender
             .send(WriterMessage::Flush)
-            .map_err(|err| std::io::Error::new(std::io::ErrorKind::BrokenPipe, err))?;
+            .map_err(|err| io::Error::new(io::ErrorKind::BrokenPipe, err))?;
         Ok(())
     }
 }
@@ -470,6 +480,38 @@ impl std::io::Write for ThreadedWriter {
 enum WriterMessage {
     Data(Vec<u8>),
     Flush,
+}
+
+#[derive(Clone)]
+struct DetachableWriter {
+    inner: Arc<Mutex<Box<dyn io::Write + Send>>>,
+}
+
+impl DetachableWriter {
+    fn new(writer: Box<dyn io::Write + Send>) -> Self {
+        Self {
+            inner: Arc::new(Mutex::new(writer)),
+        }
+    }
+
+    fn detach(&self) -> Box<dyn io::Write + Send> {
+        self.replace(Box::new(io::sink()))
+    }
+
+    fn replace(&self, writer: Box<dyn io::Write + Send>) -> Box<dyn io::Write + Send> {
+        let mut inner = self.inner.lock().unwrap();
+        mem::replace(&mut inner, writer)
+    }
+}
+
+impl io::Write for DetachableWriter {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.inner.lock().unwrap().write(buf)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.inner.lock().unwrap().flush()
+    }
 }
 
 fn with_timeout<'scope, R, F>(

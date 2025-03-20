@@ -8,7 +8,9 @@ This tool is a non-interactive terminal emulator that executes a single command,
 
 ### macOS
 
-  ```bash
+* Install using [homebrew](https://brew.sh) on macOS
+
+  ```sh
   brew tap pamburus/tap
   brew install termframe
   ```

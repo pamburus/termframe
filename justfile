@@ -8,10 +8,13 @@ install: && install-man-pages
     cargo install --path . --locked
 
 test *ARGS:
-    cargo test {{ ARGS }}
+    cargo test --locked --all-targets --all-features {{ ARGS }}
 
 clippy *ARGS:
-    cargo clippy {{ ARGS }}
+    cargo clippy --locked --all-targets --all-features {{ ARGS }}
+
+update *ARGS:
+    cargo update {{ ARGS }}
 
 install-man-pages:
     mkdir -p ~/share/man/man1

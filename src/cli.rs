@@ -107,7 +107,7 @@ pub struct Opt {
     #[arg(
         long,
         overrides_with = "timeout",
-        default_value_t = 1,
+        default_value_t = 5,
         value_name = "SECONDS"
     )]
     pub timeout: u64,

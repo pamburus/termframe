@@ -4,7 +4,7 @@ authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
 description = "Terminal output SVG screenshot tool"
 categories = ["command-line-utilities"]
 keywords = ["cli", "terminal", "screenshot", "svg"]
-version = "0.1.1-alpha.1"
+version = "0.1.1-alpha.2"
 edition = "2024"
 license = "MIT"
 build = "build/build.rs"
@@ -50,7 +50,7 @@ termwiz = "0"
 term_size = "0"
 thiserror = "2"
 toml = "0"
-ureq = "3"
+ureq = { version = "3", default-features = false }
 url = "2"
 voca_rs = "1"
 wild = "2"

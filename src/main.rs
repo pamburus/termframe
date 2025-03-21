@@ -140,7 +140,7 @@ impl App {
                 return Ok(cli::Opt::command().print_help()?);
             }
 
-            terminal.feed(io::BufReader::new(io::stdin()), &mut io::sink())?;
+            terminal.feed(io::BufReader::new(io::stdin()), io::sink())?;
         }
 
         let content = terminal.surface().screen_chars_to_string();

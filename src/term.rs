@@ -132,7 +132,7 @@ impl Terminal {
             Action::PrintString(s) => surface.add_change(s),
             Action::Control(code) => match code {
                 ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed => {
-                    surface.add_change("\n")
+                    surface.add_change("\r\n")
                 }
                 ControlCode::CarriageReturn => surface.add_change("\r"),
                 ControlCode::HorizontalTab => surface.add_change(Change::CursorPosition {

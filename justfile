@@ -23,3 +23,7 @@ install-man-pages:
 
 help:
     cargo run -- --help
+
+sample:
+    cargo run --locked -- --config - -W 79 -H 24 --embed-fonts true --mode dark --output doc/sample-dark.svg ./scripts/sample.sh dark
+    cargo run --locked -- --config - -W 79 -H 24 --embed-fonts true --mode light --output doc/sample-light.svg ./scripts/sample.sh light

@@ -44,9 +44,9 @@ padding:
 # For the list of available themes, run `termframe --list-themes`.
 theme:
   # Color theme for dark mode.
-  dark: "catppuccin-macchiato"
+  dark: "termframe"
   # Color theme for light mode.
-  light: "catppuccin-latte"
+  light: "termframe"
 
 # Use bright colors for bold text.
 bold-is-bright: false

@@ -4,6 +4,11 @@ Terminal output SVG screenshot tool.
 
 This tool is a non-interactive terminal emulator that executes a single command, renders its output in an internal virtual session, and exports a screenshot as an SVG file.
 
+## Sample
+
+![sample-dark](doc/sample-dark.svg#gh-dark-mode-only)
+![sample-light](doc/sample-light.svg#gh-light-mode-only)
+
 ## Installation
 
 ### macOS
@@ -31,7 +36,7 @@ This tool is a non-interactive terminal emulator that executes a single command,
 
 ### Windows
 
-* Install from [Scoop](https://scoop.sh)
+* Install using [scoop](https://scoop.sh)
 
     ```sh
     scoop bucket add pamburus https://github.com/pamburus/scoop-bucket.git

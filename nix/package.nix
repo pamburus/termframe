@@ -19,6 +19,7 @@ rustPlatform.buildRustPackage {
     lockFile = ../Cargo.lock;
     outputHashes = {
        "svg-0.18.0" = "sha256-4U0ZtrevD5KIdtxO8/z80hwOmzOAKNtC19yIr/FrNzY=";
+       "pathfinder_simd-0.5.4" = "sha256-1IIMAow7bw0kmbaJUp8GLaKo7Hx/QzYSQ2dE93wqlDc=";
     };
   };
 

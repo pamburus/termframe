@@ -5,7 +5,6 @@ use std::{
     io::{self, IsTerminal, stdout},
     process,
     rc::Rc,
-    time::Duration,
 };
 
 // third-party imports
@@ -131,10 +130,15 @@ impl App {
             foreground: Some(theme.fg.convert()),
         })?;
 
+        #[cfg(windows)]
+        let timeout = None;
+        #[cfg(not(windows))]
+        let timeout = Some(std::time::Duration::from_secs(opt.timeout));
+
         if let Some(command) = opt.command {
             let mut command = CommandBuilder::new(command);
             command.args(&opt.args);
-            terminal.run(command, Some(Duration::from_secs(opt.timeout)))?;
+            terminal.run(command, timeout)?;
         } else {
             if io::stdin().is_terminal() {
                 return Ok(cli::Opt::command().print_help()?);

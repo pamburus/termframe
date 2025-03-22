@@ -1,5 +1,0 @@
-.screen {
-    font-family: {{ font_family }};
-    font-size: {{ font_size }}px;
-    fill: {{ fill }};
-}

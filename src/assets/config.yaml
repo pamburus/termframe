@@ -1,37 +1,79 @@
+# Terminal settings.
 terminal:
+  # Terminal width in characters.
   width: 96
+  # Terminal width in characters.
   height: 48
 
+# Font settings.
 font:
+  # Font family.
   family: "JetBrains Mono"
+  # Font size in pixels.
   size: 12
+  # Font weights per ANSI style.
   weights:
+    # Font weight for normal ANSI style.
     normal: normal
+    # Font weight for bol ANSI style.
     bold: bold
+    # Font weight for faint/dim ANSI style.
     faint: normal
 
+# Embed fonts in the output SVG file.
 embed-fonts: false
-strip-fonts: false
+
+# Subset fonts to only include the characters used in the output SVG file.
+# Experimental feature, has compatibility issues with some browsers.
+subset-fonts: false
+
+# Line height in em units, that is relative the font size.
 line-height: 1.2
+
+# Floating point precision for rendering.
 precision: 3
+
+# Text padding in em units.
 padding:
+  # Horizontal padding.
   horizontal: 0.8
+  # Vertical padding.
   vertical: 0.6
-stroke: 0.01
+
+# Color theme.
+# For the list of available themes, run `termframe --list-themes`.
 theme:
+  # Color theme for dark mode.
   dark: "catppuccin-macchiato"
+  # Color theme for light mode.
   light: "catppuccin-latte"
 
+# Use bright colors for bold text.
 bold-is-bright: false
+
+# Faint/dim text opacity.
 faint-opacity: 0.5
 
+# Dark or light mode.
+# Possible values: [auto, dark, light].
 mode: auto
 
+# Extra stroke over the filled background elements.
+# This is needed to avoid rendering artifacts in some browsers.
+stroke: 0.01
+
+# Terminal window settings.
 window:
+  # Enable or disable terminal window in the output SVG file.
   enabled: true
+  # Enable or disable shadow for the terminal window.
   shadow: true
+  # Terminal window style.
+  # For the list of available styles, run `termframe --list-window-styles`.
   style: "macos"
 
+# Font settings.
+# For the list of available fonts, run `termframe --list-fonts`.
 fonts:
   - family: "JetBrains Mono"
     license:

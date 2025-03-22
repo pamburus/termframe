@@ -684,14 +684,6 @@ mod styles {
     use askama::Template;
 
     #[derive(Template)]
-    #[template(path = "styles/screen.css")]
-    pub struct Screen<'a> {
-        pub font_family: &'a str,
-        pub font_size: f32,
-        pub fill: &'a str,
-    }
-
-    #[derive(Template)]
     #[template(path = "styles/font-face.css")]
     pub struct FontFace {
         pub font_family: String,

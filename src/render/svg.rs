@@ -375,6 +375,22 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
     let sp = opt.window.buttons.spacing.r2p(fp);
     let buttons = &opt.window.buttons;
 
+    if let Some(title) = &opt.title {
+        let cfg = &opt.window.title;
+        let mut title = element::Text::new(title)
+            .set("x", (width / 2.0).r2p(fp))
+            .set("y", (hh2).r2p(fp))
+            .set("fill", cfg.color.resolve(opt.mode).to_hex_string())
+            .set("font-size", cfg.font.size.r2p(fp))
+            .set("font-family", cfg.font.family.join(", "))
+            .set("text-anchor", "middle")
+            .set("dominant-baseline", "central");
+        if let Some(weight) = &cfg.font.weight {
+            title = title.set("font-weight", weight.as_str())
+        }
+        window = window.add(title);
+    }
+
     // buttons
     window = window
         .add(

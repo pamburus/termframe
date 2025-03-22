@@ -19,6 +19,22 @@ window:
       dark: "#383837"
       light: "#dcdcdd"
     height: 28
+  title:
+    color:
+      dark: "#b3b3b3"
+      light: "#474747"
+    font:
+      family:
+        - "system-ui"
+        - "-apple-system"
+        - "BlinkMacSystemFont"
+        - "Segoe UI"
+        - "Roboto"
+        - "Helvetica Neue"
+        - "Arial"
+        - "sans-serif"
+      size: 14
+      weight: "bold"
   buttons:
     radius: 6
     spacing: 20

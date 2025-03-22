@@ -29,6 +29,7 @@ pub struct Options {
     pub font: FontOptions,
     pub theme: Rc<Theme>,
     pub window: Window,
+    pub title: Option<String>,
     pub mode: Mode,
     pub background: Option<Color>,
     pub foreground: Option<Color>,

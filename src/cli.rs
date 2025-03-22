@@ -93,6 +93,10 @@ pub struct Opt {
     #[arg(long, overrides_with = "window_style", value_name = "NAME")]
     pub window_style: Option<String>,
 
+    /// Window title.
+    #[arg(long, overrides_with = "title", value_name = "TITLE")]
+    pub title: Option<String>,
+
     /// Output file, by default prints to stdout.
     #[arg(
         long,

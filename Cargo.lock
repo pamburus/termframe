@@ -1909,8 +1909,7 @@ dependencies = [
 [[package]]
 name = "pathfinder_simd"
 version = "0.5.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cf07ef4804cfa9aea3b04a7bbdd5a40031dbb6b4f2cbaf2b011666c80c5b4f2"
+source = "git+https://github.com/servo/pathfinder.git?rev=8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd#8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd"
 dependencies = [
  "rustc_version",
 ]
@@ -2757,7 +2756,7 @@ dependencies = [
 
 [[package]]
 name = "termframe"
-version = "0.1.1-alpha.3"
+version = "0.1.1-alpha.4"
 dependencies = [
  "allsorts",
  "anyhow",

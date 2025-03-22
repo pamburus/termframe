@@ -4,7 +4,7 @@ authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
 description = "Terminal output SVG screenshot tool"
 categories = ["command-line-utilities"]
 keywords = ["cli", "terminal", "screenshot", "svg"]
-version = "0.1.1-alpha.3"
+version = "0.1.1-alpha.4"
 edition = "2024"
 license = "MIT"
 build = "build/build.rs"
@@ -45,7 +45,7 @@ serde_json = { version = "1" }
 serde_yml = "0"
 strsim = "0"
 strum = { version = "0", features = ["derive"] }
-svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }
+svg = "0"
 termwiz = "0"
 term_size = "0"
 thiserror = "2"
@@ -54,3 +54,7 @@ ureq = "3"
 url = "2"
 voca_rs = "1"
 wild = "2"
+
+[patch.crates-io]
+pathfinder_simd = { git = "https://github.com/servo/pathfinder.git", rev = "8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd" }
+svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }

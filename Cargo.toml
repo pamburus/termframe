@@ -4,7 +4,7 @@ authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
 description = "Terminal output SVG screenshot tool"
 categories = ["command-line-utilities"]
 keywords = ["cli", "terminal", "screenshot", "svg"]
-version = "0.2.0"
+version = "0.3.0-alpha.1"
 edition = "2024"
 license = "MIT"
 build = "build/build.rs"
@@ -43,6 +43,7 @@ rust-embed = "8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
 serde_yml = "0"
+shell-escape = "0"
 strsim = "0"
 strum = { version = "0", features = ["derive"] }
 svg = "0"

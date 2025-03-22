@@ -103,6 +103,7 @@ pub struct Window {
     pub margin: PaddingOption,
     pub border: WindowBorder,
     pub header: WindowHeader,
+    pub title: WindowTitle,
     pub buttons: WindowButtons,
     pub shadow: WindowShadow,
 }
@@ -124,6 +125,19 @@ pub struct WindowBorderColors {
 pub struct WindowHeader {
     pub color: SelectiveColor,
     pub height: f32,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct WindowTitle {
+    pub color: SelectiveColor,
+    pub font: Font,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Font {
+    pub family: Vec<String>,
+    pub size: f32,
+    pub weight: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]

@@ -134,7 +134,7 @@ impl App {
         #[cfg(not(windows))]
         let timeout = Some(std::time::Duration::from_secs(opt.timeout));
 
-        if let Some(command) = opt.command {
+        if let Some(command) = &opt.command {
             let mut command = CommandBuilder::new(command);
             command.args(&opt.args);
             terminal.run(command, timeout)?;
@@ -153,6 +153,9 @@ impl App {
             font: self.make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
             theme,
             window,
+            title: opt
+                .title
+                .or_else(|| command_to_title(opt.command, &opt.args)),
             mode,
             background: Some(terminal.background().convert()),
             foreground: Some(terminal.foreground().convert()),
@@ -525,4 +528,22 @@ impl Convert<Color> for SrgbaTuple {
     fn convert(&self) -> Color {
         self.as_rgba_u8().into()
     }
+}
+
+// ---
+
+fn command_to_title(
+    command: Option<impl AsRef<str>>,
+    args: impl IntoIterator<Item = impl AsRef<str>>,
+) -> Option<String> {
+    use shell_escape::escape;
+
+    Some(
+        std::iter::once(escape(command?.as_ref().into()))
+            .chain(
+                args.into_iter()
+                    .map(|arg| escape(arg.as_ref().to_owned().into())),
+            )
+            .join(" "),
+    )
 }

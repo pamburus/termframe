@@ -106,8 +106,7 @@ Options:
       --font-family <NAME>...       Font family, multiple comma separated values can be provided
       --font-size <SIZE>            Font size [default: 12]
       --font-weight <WEIGHT>        Normal font weight [default: normal]
-      --embed-fonts <ENABLED>       Embed fonts, if possible [note: make sure the font license allows this type of redistribution] [default: false] [possible values: true,
-                                    false]
+      --embed-fonts <ENABLED>       Embed fonts, if possible [note: make sure the font license allows this type of redistribution] [default: false] [possible values: true, false]
       --subset-fonts <ENABLED>      Subset fonts by removing unused characters [experimental, known to have compatibility issues] [default: false] [possible values: true, false]
       --bold-is-bright <ENABLED>    Use bright colors for bold text [default: false] [possible values: true, false]
       --bold-font-weight <WEIGHT>   Bold text font weight [default: bold]
@@ -120,6 +119,7 @@ Options:
       --window-shadow <ENABLED>     Enable window shadow [default: true] [possible values: true, false]
       --window-margin <PIXELS>      Override window margin, in pixels
       --window-style <NAME>         Window style
+      --title <TITLE>               Window title
   -o, --output <FILE>               Output file, by default prints to stdout [default: -]
       --timeout <SECONDS>           Timeout for the command to run, in seconds [default: 5]
       --list-themes                 Print available color themes and exit

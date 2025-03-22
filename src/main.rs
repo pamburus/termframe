@@ -93,22 +93,21 @@ impl App {
         if opt.help {
             return Ok(cli::Opt::command().print_help()?);
         }
-
         if let Some(shell) = opt.shell_completions {
             print_shell_completions(shell);
             return Ok(());
         }
-
         if opt.man_page {
             return print_man_page();
         }
-
         if opt.list_themes {
             return list_themes();
         }
-
         if opt.list_window_styles {
             return list_window_styles();
+        }
+        if opt.list_fonts {
+            return list_fonts(&settings);
         }
 
         let settings = Rc::new(opt.patch(settings));
@@ -278,13 +277,13 @@ impl App {
         );
 
         log::debug!(
-            "prepare font faces: embed-fonts={e} strip-fonts={s}",
+            "prepare font faces: embed-fonts={e} subset-fonts={s}",
             e = settings.embed_fonts,
-            s = settings.strip_fonts,
+            s = settings.subset_fonts,
         );
         if settings.embed_fonts {
             for (i, (_, file)) in files.iter().enumerate() {
-                let data = if settings.strip_fonts {
+                let data = if settings.subset_fonts {
                     let chars = used.iter().filter(|x| *x.1 & (1 << i) != 0).map(|x| *x.0);
                     let data = fonts[i].2.subset(chars)?;
                     faces[i].format = Some(FontFormat::Ttf);
@@ -348,6 +347,13 @@ fn list_themes() -> Result<()> {
 
 fn list_window_styles() -> Result<()> {
     list_assets(WindowStyleConfig::list()?)
+}
+
+fn list_fonts(settings: &Settings) -> Result<()> {
+    for font in &settings.fonts {
+        println!("{}", font.family);
+    }
+    Ok(())
 }
 
 fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {

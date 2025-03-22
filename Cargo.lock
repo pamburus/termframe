@@ -2756,13 +2756,13 @@ dependencies = [
 
 [[package]]
 name = "termframe"
-version = "0.1.1"
+version = "0.2.0-alpha.1"
 dependencies = [
  "allsorts",
  "anyhow",
  "askama",
  "askama_escape",
- "base64 0.22.1",
+ "base64 0.21.7",
  "cacache",
  "clap",
  "clap_complete",

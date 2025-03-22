@@ -98,11 +98,12 @@ Options:
   -W, --width <COLUMNS>             Width of the virtual terminal window [default: 96]
   -H, --height <LINES>              Height of the virtual terminal window [default: 48]
       --padding <EM>                Override padding for the inner text in font size units
-      --font-family <NAME>...       Font family, can be specified multiple times
+      --font-family <NAME>...       Font family, multiple comma separated values can be provided
       --font-size <SIZE>            Font size [default: 12]
       --font-weight <WEIGHT>        Normal font weight [default: normal]
-      --embed-fonts <ENABLED>       Embed fonts, if possible [note: make sure the font license allows this type of redistribution] [default: false] [possible values: true, false]
-      --strip-fonts <ENABLED>       Strip fonts by removing unused characters [experimental, known to have compatibility issues] [default: false] [possible values: true, false]
+      --embed-fonts <ENABLED>       Embed fonts, if possible [note: make sure the font license allows this type of redistribution] [default: false] [possible values: true,
+                                    false]
+      --subset-fonts <ENABLED>      Subset fonts by removing unused characters [experimental, known to have compatibility issues] [default: false] [possible values: true, false]
       --bold-is-bright <ENABLED>    Use bright colors for bold text [default: false] [possible values: true, false]
       --bold-font-weight <WEIGHT>   Bold text font weight [default: bold]
       --faint-opacity <0..1>        Faint text opacity [default: 0.5]
@@ -115,9 +116,10 @@ Options:
       --window-margin <PIXELS>      Override window margin, in pixels
       --window-style <NAME>         Window style
   -o, --output <FILE>               Output file, by default prints to stdout [default: -]
-      --timeout <SECONDS>           Timeout for the command to run, in seconds [default: 1]
+      --timeout <SECONDS>           Timeout for the command to run, in seconds [default: 5]
       --list-themes                 Print available color themes and exit
       --list-window-styles          Print available window styles and exit
+      --list-fonts                  Print configured fonts and exit, any font not listed here cannot be embedded and may not be properly rendered
       --help                        Print help and exit
       --shell-completions <SHELL>   Print shell auto-completion script and exit [possible values: bash, elvish, fish, powershell, zsh]
       --man-page                    Print man page and exit

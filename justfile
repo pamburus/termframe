@@ -20,3 +20,6 @@ install-man-pages:
     mkdir -p ~/share/man/man1
     cargo run --release --locked -- --config - --man-page >~/share/man/man1/termframe.1
     @echo $(tput bold)$(tput setaf 3)note:$(tput sgr0) ensure $(tput setaf 2)~/share/man$(tput sgr0) is added to $(tput setaf 2)MANPATH$(tput sgr0) environment variable
+
+help:
+    cargo run -- --help

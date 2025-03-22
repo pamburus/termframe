@@ -29,8 +29,8 @@ pub struct Opt {
     #[arg(long, overrides_with = "padding", value_name = "EM")]
     pub padding: Option<f32>,
 
-    /// Font family, can be specified multiple times.
-    #[arg(long, value_parser = trim, num_args = 1.., value_delimiter = ',', value_name = "NAME")]
+    /// Font family, multiple comma separated values can be provided.
+    #[arg(long, value_parser = trim, num_args = 1.., value_delimiter = ',', overrides_with = "font_family", value_name = "NAME")]
     pub font_family: Vec<String>,
 
     /// Font size.
@@ -45,9 +45,9 @@ pub struct Opt {
     #[arg(long, num_args = 1, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts", value_name = "ENABLED")]
     pub embed_fonts: bool,
 
-    /// Strip fonts by removing unused characters [experimental, known to have compatibility issues].
-    #[arg(long, num_args = 1, default_value_t = config::global::get().strip_fonts, overrides_with = "strip_fonts", value_name = "ENABLED")]
-    pub strip_fonts: bool,
+    /// Subset fonts by removing unused characters [experimental, known to have compatibility issues].
+    #[arg(long, num_args = 1, default_value_t = config::global::get().subset_fonts, overrides_with = "subset_fonts", value_name = "ENABLED")]
+    pub subset_fonts: bool,
 
     /// Use bright colors for bold text.
     #[arg(long, num_args = 1, default_value_t = config::global::get().bold_is_bright, overrides_with = "bold_is_bright", value_name = "ENABLED")]
@@ -121,6 +121,10 @@ pub struct Opt {
     #[arg(long)]
     pub list_window_styles: bool,
 
+    /// Print configured fonts and exit, any font not listed here cannot be embedded and may not be properly rendered.
+    #[arg(long)]
+    pub list_fonts: bool,
+
     /// Print help and exit.
     #[arg(long, default_value_t = false, action = ArgAction::SetTrue)]
     pub help: bool,
@@ -155,7 +159,7 @@ impl config::Patch for Opt {
         settings.font.weights.bold = self.bold_font_weight.into();
         settings.font.weights.faint = self.faint_font_weight.into();
         settings.embed_fonts = self.embed_fonts;
-        settings.strip_fonts = self.strip_fonts;
+        settings.subset_fonts = self.subset_fonts;
         settings.faint_opacity = self.faint_opacity;
         settings.line_height = self.line_height;
         settings.bold_is_bright = self.bold_is_bright;

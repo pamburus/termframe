@@ -28,7 +28,7 @@ jobs:
       - name: Create pull request for flake.lock update
         uses: peter-evans/create-pull-request@v7
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
           commit-message: "build(nix): update flake.lock"
           branch: update-flake-lock

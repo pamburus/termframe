@@ -1,9 +1,14 @@
-name: nix-update
+name: Update flake.lock
 
 on:
   schedule:
     - cron: "0 0 * * 0" # Every Sunday at midnight
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
 
 jobs:
   update-lock:

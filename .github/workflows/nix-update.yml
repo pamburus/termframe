@@ -35,3 +35,8 @@ jobs:
           title: "build(nix): update flake.lock"
           body: "This pull request updates the flake.lock file with the latest flake inputs."
           sign-commits: true
+
+      - name: Debug Logging
+        run: |
+          echo "Pull Request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
+          echo "Pull Request Number: ${{ steps.create_pr.outputs.pull-request-number }}"

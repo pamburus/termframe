@@ -5,10 +5,17 @@ on:
     branches: [main, release/**]
   pull_request:
     branches: [main, release/**]
+  workflow_dispatch:
   workflow_run:
-    workflows: [nix-update]
+    workflows: ["Update flake.lock"]
     types:
       - completed
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: read
+
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: "-Dwarnings"

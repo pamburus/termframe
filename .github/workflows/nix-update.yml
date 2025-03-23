@@ -32,8 +32,6 @@ jobs:
           git config commit.gpgSign true
           git config user.name "GitHub Actions Bot"
           git config user.email "github-actions.pamburus.stapling152@passinbox.com"
-          echo "use-agent" >> ~/.gnupg/gpg.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
           echo '#!/bin/sh' > ~/.gpg-no-tty.sh
           echo 'exec gpg --no-tty --batch --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" "$@"' >> ~/.gpg-no-tty.sh
           chmod +x ~/.gpg-no-tty.sh

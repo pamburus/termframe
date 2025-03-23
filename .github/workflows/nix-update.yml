@@ -25,6 +25,7 @@ jobs:
           git config commit.gpgSign true
           git config user.name "GitHub Actions Bot"
           git config user.email "12778560+github-actions@users.noreply.github.com"
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

@@ -25,6 +25,7 @@ jobs:
           git config commit.gpgSign true
           git config user.name "GitHub Actions Bot"
           git config user.email "12778560+github-actions@users.noreply.github.com"
+          echo "use-agent" >> ~/.gnupg/gpg.conf
           echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -48,11 +49,12 @@ jobs:
       - name: Commit and push changes
         if: env.changes_detected == 'true'
         run: |
+          export GPG_TTY=$(tty)
           git checkout -b $BRANCH_NAME
+          echo $GPG_PASSPHRASE | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --sign-key $(git config --local user.signingkey)
           git commit -m "build(nix): update flake.lock" -S
           git push origin $BRANCH_NAME
         env:
-          GPG_TTY: $(tty)
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Create pull request for flake.lock update

@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Install Nix
         uses: cachix/install-nix-action@v30
@@ -25,6 +27,8 @@ jobs:
 
       - name: Create pull request for flake.lock update
         uses: peter-evans/create-pull-request@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }
         with:
           commit-message: "build(nix): update flake.lock"
           branch: update-flake-lock

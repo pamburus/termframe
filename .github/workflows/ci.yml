@@ -5,7 +5,10 @@ on:
     branches: [main, release/**]
   pull_request:
     branches: [main, release/**]
-
+  workflow_run:
+    workflows: [nix-update]
+    types:
+      - completed
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: "-Dwarnings"

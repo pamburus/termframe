@@ -40,7 +40,7 @@ impl SvgRenderer {
         let fp = cfg.precision; // floating point precision
         let lh = cfg.line_height.r2p(fp); // line height in em
         let fw = opt.font.metrics.width.r2p(fp); // font width in em
-        let dimensions = surface.dimensions(); // surface dimensions in cells
+        let dimensions = (surface.dimensions().0, cfg.terminal.height); // surface dimensions in cells
         let size = (
             // terminal surface size in em
             (dimensions.0 as f32 * fw).r2p(fp),
@@ -63,7 +63,21 @@ impl SvgRenderer {
             group = group.set("font-weight", svg_weight(default_weight));
         }
 
+        let th = cfg.terminal.height as usize;
+        let mut rows = Vec::with_capacity(th);
+        let mut wrapping = false;
         for (row, line) in surface.screen_lines().iter().enumerate() {
+            if cfg.terminal.wrap || !wrapping {
+                let wrap = cfg.terminal.wrap;
+                log::debug!("adding row {row} because wrap={wrap} and wrapping={wrapping}");
+                rows.push(row);
+            }
+            wrapping = line.last_cell_was_wrapped();
+            log::debug!("row {row}: wrapping={wrapping}");
+        }
+
+        for &row in &rows[rows.len() - min(th, rows.len())..] {
+            let line = &surface.screen_lines()[row];
             for cluster in line.cluster(None) {
                 let color = if cluster.attrs.reverse() {
                     Some(

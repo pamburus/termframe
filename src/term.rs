@@ -63,7 +63,7 @@ impl Terminal {
         let pair = pty.openpty(size)?;
 
         Ok(Self {
-            surface: Surface::new(cols.into(), rows.into()),
+            surface: Surface::new(cols.into(), 1024),
             parser: Parser::new(),
             state: State::new(background, foreground),
             pty: pair,

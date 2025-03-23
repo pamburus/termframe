@@ -25,6 +25,10 @@ pub struct Opt {
     #[arg(long, short = 'H', default_value_t = config::global::get().terminal.height, overrides_with = "height", value_name = "LINES")]
     pub height: u16,
 
+    /// Wrap text at the terminal width.
+    #[arg(long, num_args = 1, default_value_t = config::global::get().terminal.wrap, overrides_with = "wrap", value_name = "ENABLED")]
+    pub wrap: bool,
+
     /// Override padding for the inner text in font size units.
     #[arg(long, overrides_with = "padding", value_name = "EM")]
     pub padding: Option<f32>,
@@ -155,6 +159,7 @@ impl config::Patch for Opt {
 
         settings.terminal.width = self.width;
         settings.terminal.height = self.height;
+        settings.terminal.wrap = self.wrap;
         if !self.font_family.is_empty() {
             settings.font.family = FontFamilyOption::Multiple(self.font_family.clone());
         }

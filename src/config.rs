@@ -141,6 +141,7 @@ pub struct FontFaceFallback {
 pub struct Terminal {
     pub width: u16,
     pub height: u16,
+    pub wrap: bool,
 }
 
 #[derive(Debug, Deserialize, Clone)]

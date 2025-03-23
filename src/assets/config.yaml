@@ -4,6 +4,8 @@ terminal:
   width: 96
   # Terminal width in characters.
   height: 48
+  # Wrap text to the next line if it exceeds the terminal width.
+  wrap: true
 
 # Font settings.
 font:

@@ -5,6 +5,9 @@ on:
     - cron: "0 0 * * 0" # Every Sunday at midnight
   workflow_dispatch:
 
+env:
+  BRANCH_NAME: update-flake-lock
+
 jobs:
   update-lock:
     runs-on: ubuntu-latest
@@ -20,17 +23,42 @@ jobs:
           echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
           git config --global user.signingkey $(gpg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2)
           git config --global commit.gpgSign true
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "12778560+github-actions@users.noreply.github.com"
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          
+
       - name: Update flake.lock
         run: nix flake update
 
+      - name: Check for changes
+        id: check_changes
+        run: |
+          git add flake.lock
+          if git diff-index --quiet HEAD; then
+            echo "No changes to commit."
+            echo "changes_detected=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected."
+            echo "changes_detected=true" >> $GITHUB_ENV
+          fi
+
+      - name: Commit and push changes
+        if: env.changes_detected == 'true'
+        run: |
+          git checkout -b $BRANCH_NAME
+          git commit -m "build(nix): update flake.lock" -S
+          git push origin $BRANCH_NAME
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
       - name: Create pull request for flake.lock update
+        if: env.changes_detected == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "build(nix): update flake.lock"
-          branch: update-flake-lock
+          branch: $BRANCH_NAME
           title: "build(nix): update flake.lock"
           body: "This pull request updates the flake.lock file with the latest flake inputs."
+          token: ${{ secrets.GH_TOKEN }}

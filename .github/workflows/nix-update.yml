@@ -52,6 +52,7 @@ jobs:
           git commit -m "build(nix): update flake.lock" -S
           git push origin $BRANCH_NAME
         env:
+          GPG_TTY: $(tty)
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Create pull request for flake.lock update

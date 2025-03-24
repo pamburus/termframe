@@ -1,4 +1,4 @@
-# termframe [![Build Status][ci-img]][ci] [![Release][release-img]][release]
+# 📸 termframe [![Build Status][ci-img]][ci] [![Release][release-img]][release]
 
 Terminal output SVG screenshot tool.
 

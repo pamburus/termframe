@@ -60,10 +60,10 @@ This tool is a non-interactive terminal emulator that executes a single command,
 * The path to the configuration file can be overridden using the `TERMFRAME_CONFIG` environment variable or the `--config` command-line option.
 
   The order in which the configuration files are searched and loaded is as follows:
-  * The system-wide location.
-  * The user profile location.
-  * The location specified by the `TERMFRAME_CONFIG` environment variable (unless the `--config` option is used).
-  * The locations specified by the `--config` option (can be specified multiple times).
+  1. The system-wide location.
+  2. The user profile location.
+  3. The location specified by the `TERMFRAME_CONFIG` environment variable (unless the `--config` option is used).
+  4. The locations specified by the `--config` option (can be specified multiple times).
 
   If a configuration file is found in multiple locations, the file in each subsequent location overrides only the parameters it contains.
 

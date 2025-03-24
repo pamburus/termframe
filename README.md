@@ -49,6 +49,20 @@ This tool is a non-interactive terminal emulator that executes a single command,
 
 * Download latest release from [download page](https://github.com/pamburus/termframe/releases/latest)
 
+## Usage
+
+* Run a command and save the output to an SVG file
+
+    ```sh
+    termframe -o hello.svg -- echo "Hello, World"
+    ```
+
+* Redirect output of a command to termframe
+
+    ```sh
+    echo "Hello, World" | termframe -o hello.svg
+    ```
+
 ## Configuration
 
 ### Configuration files

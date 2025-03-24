@@ -54,6 +54,10 @@ BG_BRIGHT_MAGENTA="\e[105m"
 BG_BRIGHT_CYAN="\e[106m"
 BG_BRIGHT_WHITE="\e[107m"
 
+# 256-color palette
+PITCH_BLACK="\e[38;5;16m"
+SNOW_WHITE="\e[38;5;231m"
+
 # List of text styles
 printf "${BOLD}Available Text Styles:${RESET}\n"
 printf "• Bold:          ${BOLD}This is bold text${RESET}\n"
@@ -92,21 +96,21 @@ printf "• ${ITALIC}${GREEN}Italic green text${RESET}\n"
 printf "• ${UNDERLINE}${BLUE}Underlined blue text${RESET}\n"
 printf "• ${BOLD}${UNDERLINE}${MAGENTA}Bold underlined magenta text${RESET}\n\n"
 
-FG=${BLACK}
+FG=${PITCH_BLACK}
 if [ "$1" == "light" ]; then
-    FG=${BRIGHT_WHITE}
+    FG=${SNOW_WHITE}
 fi
 
 # Basic Background Colors with contrasting text
 printf "${BOLD}Basic Background Colors:${RESET}\n"
-printf "${BG_BLACK}${WHITE} Black BG ${RESET}"
+printf "${BG_BLACK}${SNOW_WHITE} Black BG ${RESET}"
 printf "${BG_RED}${FG} Red BG ${RESET}"
 printf "${BG_GREEN}${FG} Green BG ${RESET}"
-printf "${BG_YELLOW}${BLACK} Yellow BG ${RESET}"
+printf "${BG_YELLOW}${FG} Yellow BG ${RESET}"
 printf "${BG_BLUE}${FG} Blue BG ${RESET}"
 printf "${BG_MAGENTA}${FG} Magenta BG ${RESET}"
 printf "${BG_CYAN}${FG} Cyan BG ${RESET}"
-printf "${BG_WHITE}${BLACK} White BG ${RESET}\n\n"
+printf "${BG_WHITE}${PITCH_BLACK} White BG ${RESET}\n\n"
 
 # 24-bit True Color Background Gradient (79 characters wide)
 printf "${BOLD}24-bit True Color Background:${RESET}\n"

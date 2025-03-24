@@ -24,6 +24,15 @@ install-man-pages:
 help:
     cargo run -- --help
 
-sample:
-    cargo run --locked -- --config - -W 79 -H 24 --embed-fonts true --mode dark --output doc/sample-dark.svg ./scripts/sample.sh dark
-    cargo run --locked -- --config - -W 79 -H 24 --embed-fonts true --mode light --output doc/sample-light.svg ./scripts/sample.sh light
+sample: (sample-for-mode "dark") (sample-for-mode "light")
+
+sample-for-mode mode:
+    cargo run --locked -- \
+        --config - \
+        -W 79 -H 24 \
+        --embed-fonts true \
+        --font-family "JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace" \
+        --mode {{mode}} \
+        --title "termframe sample" \
+        --output doc/sample-{{mode}}.svg \
+        ./scripts/sample.sh {{mode}}

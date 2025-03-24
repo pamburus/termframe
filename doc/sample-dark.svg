@@ -9,11 +9,11 @@
 <rect height="28" width="588"/>
 </clipPath>
 <rect clip-path="url(#header)" fill="#383837" height="56" rx="10" ry="10" width="588"/>
-<line stroke="#000000" stroke-width="0.5" x1="0" x2="588" y1="28" y2="28"/><text dominant-baseline="central" fill="#b3b3b3" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" x="294" y="14">./scripts/sample.sh dark</text>
+<line stroke="#000000" stroke-width="0.5" x1="0" x2="588" y1="28" y2="28"/><text dominant-baseline="central" fill="#b3b3b3" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" x="294" y="14">termframe sample</text>
 <circle cx="14" cy="14" fill="#ff5f56" r="6"/>
 <circle cx="34" cy="14" fill="#ffbd2e" r="6"/>
 <circle cx="54" cy="14" fill="#28c941" r="6"/>
-<svg font-family="JetBrains Mono" font-size="12" height="30em" width="49em" y="28">
+<svg font-family="JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace" font-size="12" height="30em" width="49em" y="28">
 <svg fill="#dcdfe4" x="0.8em" y="0.6em">
 <g>
 <rect fill="#dcdfe4" height="1.22em" width="3.02em" x="10.19em" y="7.19em"/>
@@ -172,7 +172,7 @@
 <text xml:space="preserve" y="0.96em"><tspan font-weight="bold">Basic </tspan><tspan font-weight="bold">Background </tspan><tspan font-weight="bold">Colors:</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="47.4em" y="22.8em">
-<text xml:space="preserve" y="0.96em"><tspan x="0.6em">Black </tspan><tspan>BG </tspan><tspan fill="#3e4451" x="6.6em">Red </tspan><tspan fill="#3e4451">BG </tspan><tspan fill="#3e4451" x="11.4em">Green </tspan><tspan fill="#3e4451">BG </tspan><tspan fill="#3e4451" x="17.4em">Yellow </tspan><tspan fill="#3e4451">BG </tspan><tspan fill="#3e4451" x="24em">Blue </tspan><tspan fill="#3e4451">BG </tspan><tspan fill="#3e4451" x="29.4em">Magenta </tspan><tspan fill="#3e4451">BG </tspan><tspan fill="#3e4451" x="36.6em">Cyan </tspan><tspan fill="#3e4451">BG </tspan><tspan fill="#3e4451" x="42em">White </tspan><tspan fill="#3e4451">BG </tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan fill="#ffffff" x="0.6em">Black </tspan><tspan fill="#ffffff">BG </tspan><tspan fill="#000000" x="6.6em">Red </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="11.4em">Green </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="17.4em">Yellow </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="24em">Blue </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="29.4em">Magenta </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="36.6em">Cyan </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="42em">White </tspan><tspan fill="#000000">BG </tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="47.4em" y="25.2em">
 <text xml:space="preserve" y="0.96em"><tspan font-weight="bold">24-bit </tspan><tspan font-weight="bold">True </tspan><tspan font-weight="bold">Color </tspan><tspan font-weight="bold">Background:</tspan></text>

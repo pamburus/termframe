@@ -10,6 +10,12 @@ jobs:
     name: Publish for ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
 
+    permissions:
+      contents: read
+      packages: write
+      issues: read
+      actions: read
+
     env:
       CARGO: cargo
 

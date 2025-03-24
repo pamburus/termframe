@@ -1,9 +1,9 @@
 # Terminal settings.
 terminal:
   # Terminal width in characters.
-  width: 96
+  width: 80
   # Terminal width in characters.
-  height: 48
+  height: 24
 
 # Font settings.
 font:

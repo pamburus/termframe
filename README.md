@@ -6,8 +6,13 @@ This tool is a non-interactive terminal emulator that executes a single command,
 
 ## Sample
 
-![sample-dark](doc/sample-dark.svg#gh-dark-mode-only)
-![sample-light](doc/sample-light.svg#gh-light-mode-only)
+<p align="center">
+    <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="doc/sample-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="doc/sample-light.svg" />
+    <img alt="screenshot" src="doc/sample-dark.svg" />
+    </picture>
+</p>
 
 ## Installation
 

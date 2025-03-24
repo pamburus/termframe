@@ -59,17 +59,17 @@ This tool is a non-interactive terminal emulator that executes a single command,
 
 * The path to the configuration file can be overridden using the `TERMFRAME_CONFIG` environment variable or the `--config` command-line option.
 
-    The order in which the configuration files are searched and loaded is as follows:
-    1. __The system-wide location.__
-    2. __The user profile location.__
-    3. __The location specified by the `TERMFRAME_CONFIG` environment variable__ (unless the `--config` option is used).
-    4. __The locations specified by the `--config` option__ (can be specified multiple times).
+  The order in which the configuration files are searched and loaded is as follows:
+  * The system-wide location.
+  * The user profile location.
+  * The location specified by the `TERMFRAME_CONFIG` environment variable (unless the `--config` option is used).
+  * The locations specified by the `--config` option (can be specified multiple times).
 
-    If a configuration file is found in multiple locations, the file in each subsequent location overrides only the parameters it contains.
+  If a configuration file is found in multiple locations, the file in each subsequent location overrides only the parameters it contains.
 
-    If `TERMFRAME_CONFIG` or `--config` specifies `-` or an empty string, all default locations and any locations specified by previous `--config` options are discarded. The search for the configuration file locations starts over.
+  If `TERMFRAME_CONFIG` or `--config` specifies `-` or an empty string, all default locations and any locations specified by previous `--config` options are discarded. The search for the configuration file locations starts over.
 
-    To disable loading of configuration files and use the built-in defaults, `--config -` can be used.
+  To disable loading of configuration files and use the built-in defaults, `--config -` can be used.
 
 * All parameters in the configuration file are optional and can be omitted. In such cases, default values will be used.
 

@@ -73,7 +73,14 @@ impl Default for AdaptiveTheme {
         palette[13] = Color::from_rgba8(0xc6, 0x71, 0xeb, 0xff); // bright magenta
         palette[14] = Color::from_rgba8(0x69, 0xc6, 0xd1, 0xff); // bright cyan
         palette[15] = Color::from_rgba8(0xcc, 0xcc, 0xcc, 0xff); // bright white
-        let dark = Theme { bg, fg, palette }.into();
+        let bright_fg = Some(palette[15].clone());
+        let dark = Theme {
+            bg,
+            fg,
+            bright_fg,
+            palette,
+        }
+        .into();
 
         let bg = Color::from_rgba8(0xf9, 0xf9, 0xf9, 0xff);
         let fg = Color::from_rgba8(0x2a, 0x2c, 0x33, 0xff);
@@ -94,7 +101,14 @@ impl Default for AdaptiveTheme {
         palette[13] = Color::from_rgba8(0xff, 0x76, 0xff, 0xff); // bright magenta
         palette[14] = Color::from_rgba8(0x5f, 0xfd, 0xff, 0xff); // bright cyan
         palette[15] = Color::from_rgba8(0xff, 0xfe, 0xff, 0xff); // bright white
-        let light = Theme { bg, fg, palette }.into();
+        let bright_fg = Some(palette[15].clone());
+        let light = Theme {
+            bg,
+            fg,
+            bright_fg,
+            palette,
+        }
+        .into();
 
         Self { dark, light }
     }
@@ -104,6 +118,7 @@ impl Default for AdaptiveTheme {
 pub struct Theme {
     pub bg: Color,
     pub fg: Color,
+    pub bright_fg: Option<Color>,
     pub palette: Palette,
 }
 
@@ -111,8 +126,14 @@ impl Theme {
     pub fn from_config(cfg: &config::theme::Colors) -> Self {
         let bg = cfg.background.clone();
         let fg = cfg.foreground.clone();
+        let bright_fg = cfg.bright_foreground.clone();
         let palette = Palette::from_config(&cfg.palette);
-        Self { bg, fg, palette }
+        Self {
+            bg,
+            fg,
+            bright_fg,
+            palette,
+        }
     }
 
     pub fn resolve(&self, attr: ColorAttribute) -> Option<Color> {

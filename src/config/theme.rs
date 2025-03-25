@@ -95,25 +95,30 @@ impl Load for ThemeConfig {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct Fixed {
     pub colors: Colors,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct Adaptive {
     pub modes: Modes,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct Modes {
     pub dark: Fixed,
     pub light: Fixed,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct Colors {
     pub background: Color,
     pub foreground: Color,
+    pub bright_foreground: Option<Color>,
     pub palette: Palette,
 }
 

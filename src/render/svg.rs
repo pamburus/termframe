@@ -139,16 +139,20 @@ impl SvgRenderer {
                         range.end = range.start + 1;
                     }
 
-                    let correct = |mut color: ColorAttribute| {
+                    let resolve_fg = || {
+                        let mut color = cluster.attrs.foreground();
                         if cfg.bold_is_bright && cluster.attrs.intensity() == Intensity::Bold {
                             match color {
                                 ColorAttribute::PaletteIndex(i) if i < 8 => {
                                     color = ColorAttribute::PaletteIndex(i + 8)
                                 }
+                                ColorAttribute::Default => {
+                                    return opt.theme.bright_fg.as_ref().unwrap_or(fg).clone();
+                                }
                                 _ => {}
                             }
                         }
-                        color
+                        opt.theme.resolve(color).unwrap_or_else(|| fg.clone())
                     };
 
                     let mut color = if cluster.attrs.reverse() {
@@ -156,9 +160,7 @@ impl SvgRenderer {
                             .resolve(cluster.attrs.background())
                             .unwrap_or_else(|| bg.clone())
                     } else {
-                        opt.theme
-                            .resolve(correct(cluster.attrs.foreground()))
-                            .unwrap_or_else(|| fg.clone())
+                        resolve_fg()
                     };
 
                     if cluster.attrs.intensity() == Intensity::Half {

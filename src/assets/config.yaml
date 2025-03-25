@@ -44,9 +44,9 @@ padding:
 # For the list of available themes, run `termframe --list-themes`.
 theme:
   # Color theme for dark mode.
-  dark: "termframe"
+  dark: "one-double"
   # Color theme for light mode.
-  light: "termframe"
+  light: "one-double"
 
 # Use bright colors for bold text.
 bold-is-bright: false
@@ -60,7 +60,7 @@ mode: auto
 
 # Extra stroke over the filled background elements.
 # This is needed to avoid rendering artifacts in some browsers.
-stroke: 0.01
+stroke: 0.02
 
 # Terminal window settings.
 window:

@@ -36,8 +36,8 @@ impl AdaptiveTheme {
                 }
             }
             ThemeConfig::Adaptive(cfg) => {
-                let light = Rc::new(Theme::from_config(&cfg.modes.light));
-                let dark = Rc::new(Theme::from_config(&cfg.modes.dark));
+                let light = Rc::new(Theme::from_config(&cfg.modes.light.colors));
+                let dark = Rc::new(Theme::from_config(&cfg.modes.dark.colors));
                 Self { light, dark }
             }
         }

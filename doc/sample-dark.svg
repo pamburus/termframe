@@ -151,7 +151,7 @@
 <text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Normal: </tspan><tspan fill="#3e4451">Black</tspan><tspan fill="#e06c75" x="9.6em">Red</tspan><tspan fill="#98c379" x="12em">Green</tspan><tspan fill="#e5c07b" x="15.6em">Yellow</tspan><tspan fill="#61afef" x="19.8em">Blue</tspan><tspan fill="#c678dd" x="22.8em">Magenta</tspan><tspan fill="#56b6c2" x="27.6em">Cyan</tspan><tspan x="30.6em">White</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="47.4em" y="12em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Bright: </tspan><tspan fill="#545d6d">Black</tspan><tspan fill="#ff808b" x="9.6em">Red</tspan><tspan fill="#aef37d" x="12em">Green</tspan><tspan fill="#ffda94" x="15.6em">Yellow</tspan><tspan fill="#84c8ff" x="19.8em">Blue</tspan><tspan fill="#e489ff" x="22.8em">Magenta</tspan><tspan fill="#53e5f8" x="27.6em">Cyan</tspan><tspan fill="#f7f9fc" x="30.6em">White</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Bright: </tspan><tspan fill="#545d6d">Black</tspan><tspan fill="#fd807f" x="9.6em">Red</tspan><tspan fill="#82d782" x="12em">Green</tspan><tspan fill="#edc273" x="15.6em">Yellow</tspan><tspan fill="#84c8ff" x="19.8em">Blue</tspan><tspan fill="#ee82ee" x="22.8em">Magenta</tspan><tspan fill="#3ae1f7" x="27.6em">Cyan</tspan><tspan fill="#f7f9fc" x="30.6em">White</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="47.4em" y="14.4em">
 <text xml:space="preserve" y="0.96em"><tspan font-weight="bold">Mixed </tspan><tspan font-weight="bold">Styles </tspan><tspan font-weight="bold">with </tspan><tspan font-weight="bold">Colors:</tspan></text>

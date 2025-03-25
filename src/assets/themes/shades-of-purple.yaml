@@ -1,6 +1,7 @@
 colors:
   background: "#1e1d40"
   foreground: "#ffffff"
+  bright-foreground: "#f9fdff"
   palette:
     0: "#000000"
     1: "#d90429"

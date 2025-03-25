@@ -66,8 +66,8 @@ impl ThemeConfig {
         match self {
             ThemeConfig::Fixed(fixed) => &fixed.colors,
             ThemeConfig::Adaptive(dynamic) => match mode {
-                Mode::Dark => &dynamic.modes.dark,
-                Mode::Light => &dynamic.modes.light,
+                Mode::Dark => &dynamic.modes.dark.colors,
+                Mode::Light => &dynamic.modes.light.colors,
             },
         }
     }
@@ -106,8 +106,8 @@ pub struct Adaptive {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Modes {
-    pub dark: Colors,
-    pub light: Colors,
+    pub dark: Fixed,
+    pub light: Fixed,
 }
 
 #[derive(Debug, Deserialize, Clone)]

@@ -63,49 +63,67 @@ impl SvgRenderer {
             group = group.set("font-weight", svg_weight(default_weight));
         }
 
-        for (row, line) in surface.screen_lines().iter().enumerate() {
-            for cluster in line.cluster(None) {
-                let color = if cluster.attrs.reverse() {
-                    Some(
-                        opt.theme
-                            .resolve(cluster.attrs.foreground())
-                            .unwrap_or_else(|| fg.clone()),
-                    )
-                } else {
-                    opt.theme.resolve(cluster.attrs.background())
-                };
-
-                if let Some(mut color) = color {
-                    color.a = 1.0;
-
-                    let x = (cluster.first_cell_idx as f32 * fw - cfg.stroke).r2p(fp);
-                    let y = (row as f32 * lh - cfg.stroke).r2p(fp);
-                    let width = (cluster.width as f32 * fw + cfg.stroke * 2.0).r2p(fp);
-                    let height = (lh + cfg.stroke * 2.0).r2p(fp);
-
-                    let rect = element::Rectangle::new()
-                        .set("x", format!("{}em", x))
-                        .set("y", format!("{}em", y))
-                        .set("width", format!("{}em", width))
-                        .set("height", format!("{}em", height))
-                        .set("fill", color.to_hex_string());
-
-                    group = group.add(rect);
-                }
+        let cell_bg = |cell: CellRef| {
+            if cell.attrs().reverse() {
+                Some(
+                    opt.theme
+                        .resolve(cell.attrs().foreground())
+                        .unwrap_or_else(|| fg.clone()),
+                )
+            } else {
+                opt.theme.resolve(cell.attrs().background())
             }
+        };
+
+        let lines = surface.screen_lines();
+
+        let shapes = super::tracing::trace(dimensions.0, dimensions.1, |x, y| {
+            cell_bg(lines[y].get_cell(x)?)
+        });
+
+        let mut bg_group = element::Group::new();
+        if let Some(stroke) = opt.settings.stroke {
+            bg_group = bg_group.set("stroke-width", stroke.r2p(fp));
         }
 
-        for (row, line) in surface.screen_lines().iter().enumerate() {
+        for shape in shapes {
+            let mut d = String::new();
+
+            for contour in &shape.path {
+                if !d.is_empty() {
+                    d.push(' ');
+                }
+
+                build_svg_path(&mut d, contour, lh, fw, fp);
+            }
+
+            let color = shape.key.to_hex_string();
+            let mut path = element::Path::new().set("fill", color.clone()).set("d", d);
+            if opt.settings.stroke.is_some() {
+                path = path.set("stroke", color);
+            }
+
+            bg_group = bg_group.add(path);
+        }
+
+        group = group.add(
+            container()
+                .set("viewBox", format!("0 0 {w} {h}", w = size.0, h = size.1))
+                .set("width", format!("{}em", size.0))
+                .set("height", format!("{}em", size.1))
+                .add(bg_group),
+        );
+
+        for (row, line) in lines.iter().enumerate() {
             if line.is_whitespace() {
                 continue;
             }
 
-            let mut sl = element::SVG::new()
+            let mut sl = container()
                 .set("y", format!("{}em", (row as f32 * lh).r2p(fp)))
                 .set("width", format!("{}em", size.0))
                 .set("height", format!("{}em", lh))
                 .set("overflow", "hidden");
-            sl.unassign("xmlns");
 
             let mut tl = element::Text::new("")
                 .set("y", format!("{}em", tyo))
@@ -245,12 +263,11 @@ impl SvgRenderer {
             group = group.add(sl);
         }
 
-        let mut content = element::SVG::new()
+        let content = container()
             .set("x", format!("{}em", pad.left))
             .set("y", format!("{}em", pad.top))
             .set("fill", fg.to_hex_string())
             .add(group);
-        content.unassign("xmlns");
 
         let width = (size.0 + pad.left + pad.right).r2p(fp);
         let height = (size.1 + pad.top + pad.bottom).r2p(fp);
@@ -287,6 +304,37 @@ impl SvgRenderer {
 
         Ok(svg::write(target, &doc)?)
     }
+}
+
+fn build_svg_path(d: &mut String, contour: &[(i32, i32)], lh: f32, fw: f32, fp: u8) {
+    let fx = |x| (x as f32 * fw).r2p(fp);
+    let fy = |y| (y as f32 * lh).r2p(fp);
+
+    let mut prev = None;
+    for &(x, y) in contour {
+        match prev {
+            Some((px, py)) => {
+                if x == px {
+                    d.push_str(&format!("V{} ", fy(y)));
+                } else if y == py {
+                    d.push_str(&format!("H{} ", fx(x)));
+                } else {
+                    d.push_str(&format!("{},{} ", fx(x), fy(y),));
+                }
+            }
+            None => {
+                d.push_str(&format!("M{},{} ", fx(x), fy(y)));
+            }
+        }
+        prev = Some((x, y));
+    }
+    d.push('Z');
+}
+
+fn container() -> element::SVG {
+    let mut container = element::SVG::new();
+    container.unassign("xmlns");
+    container
 }
 
 fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> element::SVG {

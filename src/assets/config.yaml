@@ -60,7 +60,7 @@ mode: auto
 
 # Extra stroke over the filled background elements.
 # This is needed to avoid rendering artifacts in some browsers.
-stroke: 0.02
+stroke: 0.025
 
 # Terminal window settings.
 window:

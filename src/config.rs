@@ -41,7 +41,7 @@ pub struct Settings {
     pub faint_opacity: f32,
     pub bold_is_bright: bool,
     pub padding: PaddingOption,
-    pub stroke: f32,
+    pub stroke: Option<f32>,
     pub mode: mode::ModeSetting,
     pub window: Window,
 }

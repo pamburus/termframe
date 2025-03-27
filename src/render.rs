@@ -14,6 +14,7 @@ use crate::{
 
 // modules
 pub mod svg;
+mod tracing;
 
 // re-exports
 pub type Result<T> = anyhow::Result<T>;

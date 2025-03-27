@@ -17,10 +17,10 @@ pub struct Shape<K> {
 ///   - None for an empty cell.
 pub fn trace<K, F>(cols: usize, rows: usize, group: F) -> Vec<Shape<K>>
 where
-    F: Fn(usize, usize) -> Option<K>,
+    F: FnMut(usize, usize) -> Option<K>,
     K: PartialEq,
 {
-    let clusters = find_clusters(cols, rows, &group);
+    let clusters = find_clusters(cols, rows, group);
     let mut result = Vec::new();
     for (key, cluster) in clusters {
         let mask = create_mask(&cluster, cols, rows);
@@ -104,9 +104,9 @@ fn optimize_contour(mut contour: Contour) -> Contour {
 /// or None if a cell is empty. Cells that are empty
 /// (i.e. where comparing a cell to itself returns None) are skipped.
 /// For each cluster, the group key is saved along with the list of cells belonging to the cluster.
-fn find_clusters<K, F>(cols: usize, rows: usize, group: &F) -> Vec<(K, Vec<Position>)>
+fn find_clusters<K, F>(cols: usize, rows: usize, mut group: F) -> Vec<(K, Vec<Position>)>
 where
-    F: Fn(usize, usize) -> Option<K>,
+    F: FnMut(usize, usize) -> Option<K>,
     K: PartialEq,
 {
     let mut visited = Mask::new(cols, rows);

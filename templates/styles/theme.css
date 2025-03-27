@@ -1,0 +1,5 @@
+.{{ name }} {
+{%- for var in vars %}
+    {{ var.0 }}: {{ var.1 }};
+{%- endfor %}
+}

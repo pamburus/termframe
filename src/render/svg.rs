@@ -1,22 +1,25 @@
 // std imports
 use std::{
+    borrow::Cow,
     cmp::{max, min},
-    collections::HashSet,
+    collections::{BTreeMap, HashSet},
     ops::{Range, RangeInclusive},
+    rc::Rc,
 };
 
 // third-party imports
 use askama::Template;
+use csscolorparser::Color;
 use svg::{Document, Node, node::element};
 use termwiz::{
     cell::{Intensity, Underline},
     cellcluster::CellCluster,
-    color::ColorAttribute,
+    color::{ColorAttribute, SrgbaTuple},
     surface::{Line, Surface, line::CellRef},
 };
 
 // local imports
-use super::{FontFace, FontStyle, FontWeight, Padding, Render};
+use super::{FontFace, FontStyle, FontWeight, Padding, Render, Theme};
 
 // re-exports
 pub use super::{Options, Result};
@@ -49,10 +52,12 @@ impl SvgRenderer {
         let pad = cfg.padding.resolve().r2p(fp); // padding in pixels
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
 
+        let mut palette = PaletteBuilder::new(bg.clone(), fg.clone(), opt.theme.clone());
+
         let background = element::Rectangle::new()
             .set("width", "100%")
             .set("height", "100%")
-            .set("fill", bg.to_hex_string());
+            .set("fill", palette.bg(ColorAttribute::Default));
 
         let mut used_font_faces = HashSet::new();
 
@@ -63,15 +68,16 @@ impl SvgRenderer {
             group = group.set("font-weight", svg_weight(default_weight));
         }
 
-        let cell_bg = |cell: CellRef| {
+        let mut cell_bg = |cell: CellRef| {
             if cell.attrs().reverse() {
-                Some(
-                    opt.theme
-                        .resolve(cell.attrs().foreground())
-                        .unwrap_or_else(|| fg.clone()),
-                )
+                Some(palette.fg(cell.attrs().foreground()))
             } else {
-                opt.theme.resolve(cell.attrs().background())
+                let bg = cell.attrs().background();
+                if bg == ColorAttribute::Default {
+                    None
+                } else {
+                    Some(palette.bg(bg))
+                }
             }
         };
 
@@ -97,7 +103,7 @@ impl SvgRenderer {
                 build_svg_path(&mut d, contour, lh, fw, fp);
             }
 
-            let color = shape.key.to_hex_string();
+            let color = shape.key;
             let mut path = element::Path::new().set("fill", color.clone()).set("d", d);
             if opt.settings.stroke.is_some() {
                 path = path.set("stroke", color);
@@ -157,37 +163,27 @@ impl SvgRenderer {
                         range.end = range.start + 1;
                     }
 
-                    let resolve_fg = || {
-                        let mut color = cluster.attrs.foreground();
+                    let mut resolve_fg = || {
+                        let color = cluster.attrs.foreground();
                         if cfg.bold_is_bright && cluster.attrs.intensity() == Intensity::Bold {
-                            match color {
-                                ColorAttribute::PaletteIndex(i) if i < 8 => {
-                                    color = ColorAttribute::PaletteIndex(i + 8)
-                                }
-                                ColorAttribute::Default => {
-                                    return opt.theme.bright_fg.as_ref().unwrap_or(fg).clone();
-                                }
-                                _ => {}
-                            }
+                            palette.bright_fg(color)
+                        } else {
+                            palette.fg(color)
                         }
-                        opt.theme.resolve(color).unwrap_or_else(|| fg.clone())
                     };
 
-                    let mut color = if cluster.attrs.reverse() {
-                        opt.theme
-                            .resolve(cluster.attrs.background())
-                            .unwrap_or_else(|| bg.clone())
+                    let color = if cluster.attrs.reverse() {
+                        palette.bg(cluster.attrs.background())
                     } else {
                         resolve_fg()
                     };
 
-                    if cluster.attrs.intensity() == Intensity::Half {
-                        color = opt.theme.bg.interpolate_oklab(&color, cfg.faint_opacity);
+                    if cluster.attrs.intensity() == Intensity::Half && cfg.faint_opacity < 1.0 {
+                        span = span.set("opacity", cfg.faint_opacity.r2p(fp));
                     }
-                    color.a = 1.0;
 
-                    if color != *fg {
-                        span = span.set("fill", color.to_hex_string());
+                    if color != ColorStyleId::DefaultForeground {
+                        span = span.set("fill", color);
                     }
 
                     match cluster.attrs.intensity() {
@@ -266,7 +262,7 @@ impl SvgRenderer {
         let content = container()
             .set("x", format!("{}em", pad.left))
             .set("y", format!("{}em", pad.top))
-            .set("fill", fg.to_hex_string())
+            .set("fill", palette.fg(ColorAttribute::Default))
             .add(group);
 
         let width = (size.0 + pad.left + pad.right).r2p(fp);
@@ -274,6 +270,7 @@ impl SvgRenderer {
 
         let font_family_list = opt.font.family.join(", ");
 
+        let class = "terminal";
         let mut screen = element::SVG::new()
             .set("width", format!("{}em", width))
             .set("height", format!("{}em", height))
@@ -282,7 +279,7 @@ impl SvgRenderer {
         if !cfg.window.enabled {
             screen = screen.add(background)
         }
-        screen = screen.add(content);
+        screen = screen.add(content).set("class", class);
 
         let mut doc = if cfg.window.enabled {
             let width = (opt.font.size * width).r2p(fp);
@@ -296,11 +293,16 @@ impl SvgRenderer {
             screen
         };
 
+        let mut ss = palette.template(class).render()?;
+
         let faces = collect_font_faces(opt, used_font_faces)?;
         if !faces.is_empty() {
-            let style = element::Style::new(faces.join("\n"));
-            doc = doc.add(style);
+            ss += "\n";
+            ss += &faces.join("\n");
         }
+
+        let style = element::Style::new(ss);
+        doc = doc.add(style);
 
         Ok(svg::write(target, &doc)?)
     }
@@ -709,6 +711,192 @@ where
 
 // ---
 
+struct PaletteBuilder {
+    bg: Color,
+    fg: Color,
+    theme: Rc<Theme>,
+    has_bg: bool,
+    has_fg: bool,
+    has_br_fg: bool,
+    palette: BTreeMap<u8, Color>,
+}
+
+impl PaletteBuilder {
+    fn new(bg: Color, fg: Color, theme: Rc<Theme>) -> Self {
+        Self {
+            bg,
+            fg,
+            theme,
+            has_bg: false,
+            has_fg: false,
+            has_br_fg: false,
+            palette: BTreeMap::new(),
+        }
+    }
+
+    fn bg(&mut self, attr: ColorAttribute) -> ColorStyle {
+        match attr {
+            ColorAttribute::Default => {
+                self.has_bg = true;
+                ColorStyleId::DefaultBackground.into()
+            }
+            ColorAttribute::PaletteIndex(i) => {
+                let bg = self.bg.clone();
+                self.palette
+                    .entry(i)
+                    .or_insert_with(|| self.theme.resolve(attr).unwrap_or(bg));
+                ColorStyleId::Palette(i).into()
+            }
+            ColorAttribute::TrueColorWithDefaultFallback(c)
+            | ColorAttribute::TrueColorWithPaletteFallback(c, _) => Self::custom(c),
+        }
+    }
+
+    fn fg(&mut self, attr: ColorAttribute) -> ColorStyle {
+        match attr {
+            ColorAttribute::Default => {
+                self.has_fg = true;
+                ColorStyleId::DefaultForeground.into()
+            }
+            ColorAttribute::PaletteIndex(i) => {
+                let fg = self.fg.clone();
+                self.palette
+                    .entry(i)
+                    .or_insert_with(|| self.theme.resolve(attr).unwrap_or(fg));
+                ColorStyleId::Palette(i).into()
+            }
+            ColorAttribute::TrueColorWithDefaultFallback(c)
+            | ColorAttribute::TrueColorWithPaletteFallback(c, _) => Self::custom(c),
+        }
+    }
+
+    fn bright_fg(&mut self, attr: ColorAttribute) -> ColorStyle {
+        let attr = match attr {
+            ColorAttribute::Default => {
+                self.has_br_fg = true;
+                return ColorStyleId::BrightForeground.into();
+            }
+            ColorAttribute::PaletteIndex(i) if i < 8 => ColorAttribute::PaletteIndex(i + 8),
+            _ => attr,
+        };
+        self.fg(attr)
+    }
+
+    fn template(&self, name: &str) -> styles::Theme {
+        let mut vars = Vec::new();
+        if self.has_bg {
+            vars.push((
+                ColorStyleId::DefaultBackground.name().into(),
+                self.bg.to_hex_string(),
+            ));
+        }
+        if self.has_fg {
+            vars.push((
+                ColorStyleId::DefaultForeground.name().into(),
+                self.fg.to_hex_string(),
+            ));
+        }
+        if self.has_br_fg {
+            vars.push((
+                ColorStyleId::BrightForeground.name().into(),
+                self.theme
+                    .bright_fg
+                    .as_ref()
+                    .unwrap_or(&self.fg)
+                    .to_hex_string(),
+            ));
+        }
+        for (i, color) in &self.palette {
+            vars.push((
+                ColorStyleId::Palette(*i).name().into(),
+                color.to_hex_string(),
+            ));
+        }
+
+        styles::Theme {
+            name: name.into(),
+            vars,
+        }
+    }
+
+    fn custom(c: SrgbaTuple) -> ColorStyle {
+        ColorStyle::Custom(Color::new(c.0, c.1, c.2, c.3))
+    }
+}
+
+// ---
+
+#[derive(Debug, Clone, PartialEq)]
+enum ColorStyle {
+    Themed(ColorStyleId),
+    Custom(Color),
+}
+
+impl ColorStyle {
+    fn render(&self) -> Cow<'static, str> {
+        match self {
+            ColorStyle::Themed(id) => format!("var({id})").into(),
+            ColorStyle::Custom(color) => color.to_hex_string().into(),
+        }
+    }
+}
+
+impl PartialEq<ColorStyleId> for ColorStyle {
+    fn eq(&self, id: &ColorStyleId) -> bool {
+        match self {
+            ColorStyle::Themed(i) => i == id,
+            _ => false,
+        }
+    }
+}
+
+impl std::fmt::Display for ColorStyle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.render())
+    }
+}
+
+impl From<ColorStyle> for svg::node::Value {
+    fn from(style: ColorStyle) -> Self {
+        style.render().as_ref().into()
+    }
+}
+
+impl From<ColorStyleId> for ColorStyle {
+    fn from(id: ColorStyleId) -> Self {
+        ColorStyle::Themed(id)
+    }
+}
+
+// ---
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ColorStyleId {
+    DefaultBackground,
+    DefaultForeground,
+    BrightForeground,
+    Palette(u8),
+}
+
+impl ColorStyleId {
+    fn name(&self) -> Cow<'static, str> {
+        match self {
+            ColorStyleId::DefaultBackground => "--bg".into(),
+            ColorStyleId::DefaultForeground => "--fg".into(),
+            ColorStyleId::BrightForeground => "--br-fg".into(),
+            ColorStyleId::Palette(i) => format!("--c-{}", i).into(),
+        }
+    }
+}
+
+impl std::fmt::Display for ColorStyleId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name())
+    }
+}
+
+// ---
+
 fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle, ch: char) -> bool {
     let target: (u16, u16) = match weight {
         FontWeight::Normal => (400, 400),
@@ -757,5 +945,12 @@ mod styles {
         pub font_style: Option<String>,
         pub src_url: String,
         pub format: Option<&'static str>,
+    }
+
+    #[derive(Template)]
+    #[template(path = "styles/theme.css")]
+    pub struct Theme {
+        pub name: String,
+        pub vars: Vec<(String, String)>,
     }
 }

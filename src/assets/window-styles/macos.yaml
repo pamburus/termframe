@@ -6,6 +6,7 @@ window:
     bottom: 48
   border:
     width: 0.5
+    gap: 0.5
     radius: 10
     colors:
       outer:
@@ -17,8 +18,13 @@ window:
   header:
     color:
       dark: "#383837"
-      light: "#dcdcdd"
+      light: "#eef0f1"
     height: 28
+    border:
+      width: 0.5
+      color:
+        dark: "#000000c0"
+        light: "#80808080"
   title:
     color:
       dark: "#b3b3b3"
@@ -36,14 +42,28 @@ window:
       size: 14
       weight: "bold"
   buttons:
-    radius: 6
-    spacing: 20
-    close:
-      color: "#ff5f56"
-    minimize:
-      color: "#ffbd2e"
-    maximize:
-      color: "#28c941"
+    position: left
+    shape: circle
+    size: 6
+    items:
+      - offset: 14
+        fill: "#ff5f56"
+        stroke:
+          dark: "#ff5f56"
+          light: "#d85a51"
+        stroke-width: 0.5
+      - offset: 34
+        fill: "#ffbd2e"
+        stroke:
+          dark: "#ffbd2e"
+          light: "#d19d36"
+        stroke-width: 0.5
+      - offset: 54
+        fill: "#28c941"
+        stroke:
+          dark: "#28c941"
+          light: "#39ac42"
+        stroke-width: 0.5
   shadow:
     enabled: true
     color: "#000000c0"

@@ -110,6 +110,7 @@ impl Default for &WindowStyleConfig {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct Window {
     pub margin: PaddingOption,
     pub border: WindowBorder,
@@ -120,31 +121,45 @@ pub struct Window {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct WindowBorder {
     pub colors: WindowBorderColors,
     pub width: f32,
     pub radius: f32,
+    pub gap: Option<f32>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct WindowBorderColors {
     pub outer: SelectiveColor,
     pub inner: SelectiveColor,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct WindowHeader {
     pub color: SelectiveColor,
     pub height: f32,
+    pub border: Option<WindowHeaderBorder>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct WindowHeaderBorder {
+    pub color: SelectiveColor,
+    pub width: f32,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct WindowTitle {
     pub color: SelectiveColor,
     pub font: Font,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct Font {
     pub family: Vec<String>,
     pub size: f32,
@@ -152,20 +167,68 @@ pub struct Font {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct WindowButtons {
-    pub radius: f32,
-    pub spacing: f32,
-    pub close: WindowButton,
-    pub minimize: WindowButton,
-    pub maximize: WindowButton,
+    pub position: WindowButtonsPosition,
+    pub shape: Option<WindowButtonShape>,
+    pub size: f32,
+    pub roundness: Option<f32>,
+    pub items: Vec<WindowButton>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct WindowButton {
-    pub color: SelectiveColor,
+    pub offset: f32,
+    pub fill: Option<SelectiveColor>,
+    pub stroke: Option<SelectiveColor>,
+    pub stroke_width: Option<f32>,
+    pub icon: Option<WindowButtonIcon>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub enum WindowButtonsPosition {
+    Left,
+    Right,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub enum WindowButtonShape {
+    Circle,
+    Square,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct WindowButtonIcon {
+    pub kind: WindowButtonIconKind,
+    pub size: f32,
+    pub stroke: SelectiveColor,
+    pub stroke_width: Option<f32>,
+    pub stroke_linecap: Option<LineCap>,
+    pub roundness: Option<f32>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub enum WindowButtonIconKind {
+    Close,
+    Minimize,
+    Maximize,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub enum LineCap {
+    Round,
+    Square,
+    Butt,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub struct WindowShadow {
     pub enabled: bool,
     pub color: SelectiveColor,

@@ -20,6 +20,9 @@ use termwiz::{
 
 // local imports
 use super::{FontFace, FontStyle, FontWeight, Padding, Render, Theme};
+use crate::config::winstyle::{
+    LineCap, WindowButton, WindowButtonIconKind, WindowButtonShape, WindowButtonsPosition,
+};
 
 // re-exports
 pub use super::{Options, Result};
@@ -356,6 +359,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
         format!("translate({mx},{my})", mx = margin.left, my = margin.top),
     );
 
+    // shadow
     if cfg.window.shadow && opt.window.shadow.enabled {
         let shadow = &opt.window.shadow;
         window = window
@@ -403,30 +407,22 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("width", width)
                 .set("height", 2.0 * header.height.r2p(fp))
                 .set("clip-path", "url(#header)"),
-        )
-        .add(
+        );
+    if let Some(border) = &header.border {
+        window = window.add(
             element::Line::new()
                 .set("x1", "0")
                 .set("x2", width)
                 .set("y1", header.height.r2p(fp))
                 .set("y2", header.height.r2p(fp))
-                .set(
-                    "stroke",
-                    opt.window
-                        .border
-                        .colors
-                        .outer
-                        .resolve(opt.mode)
-                        .to_hex_string(),
-                )
+                .set("stroke", border.color.resolve(opt.mode).to_hex_string())
                 .set("stroke-width", border.width.r2p(fp)),
         );
+    }
 
     let hh2 = (opt.window.header.height / 2.0).r2p(fp);
-    let r = opt.window.buttons.radius.r2p(fp);
-    let sp = opt.window.buttons.spacing.r2p(fp);
-    let buttons = &opt.window.buttons;
 
+    // title
     if let Some(title) = &opt.title {
         let cfg = &opt.window.title;
         let mut title = element::Text::new(title)
@@ -444,42 +440,13 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
     }
 
     // buttons
-    window = window
-        .add(
-            element::Circle::new()
-                .set("cx", (hh2).r2p(fp))
-                .set("cy", hh2)
-                .set("r", r)
-                .set(
-                    "fill",
-                    buttons.close.color.resolve(opt.mode).to_hex_string(),
-                ),
-        )
-        .add(
-            element::Circle::new()
-                .set("cx", (hh2 + sp).r2p(fp))
-                .set("cy", hh2)
-                .set("r", r)
-                .set(
-                    "fill",
-                    buttons.minimize.color.resolve(opt.mode).to_hex_string(),
-                ),
-        )
-        .add(
-            element::Circle::new()
-                .set("cx", (hh2 + sp * 2.0).r2p(fp))
-                .set("cy", hh2)
-                .set("r", r)
-                .set(
-                    "fill",
-                    buttons.maximize.color.resolve(opt.mode).to_hex_string(),
-                ),
-        );
+    window = window.add(make_buttons(opt, width));
 
     // screen
     window = window.add(screen);
 
     // frame border
+    let gap = border.width + border.gap.unwrap_or(0.0);
     window = window
         .add(
             element::Rectangle::new()
@@ -496,24 +463,140 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
         )
         .add(
             element::Rectangle::new()
-                .set("width", (width - 2.0).r2p(fp))
-                .set("height", (height - 2.0).r2p(fp))
-                .set("x", (1.0).r2p(fp))
-                .set("y", (1.0).r2p(fp))
+                .set("width", (width - gap * 2.0).r2p(fp))
+                .set("height", (height - gap * 2.0).r2p(fp))
+                .set("x", gap.r2p(fp))
+                .set("y", gap.r2p(fp))
                 .set("fill", "none")
                 .set(
                     "stroke",
                     border.colors.inner.resolve(opt.mode).to_hex_string(),
                 )
                 .set("stroke-width", border.width.r2p(fp))
-                .set("rx", (border.radius - 1.0).r2p(fp))
-                .set("ry", (border.radius - 1.0).r2p(fp)),
+                .set("rx", (border.radius - gap).r2p(fp))
+                .set("ry", (border.radius - gap).r2p(fp)),
         );
 
     Document::new()
         .set("width", (width + margin.left + margin.right).r2p(fp))
         .set("height", (height + margin.top + margin.bottom).r2p(fp))
         .add(window)
+}
+
+fn make_buttons(opt: &Options, width: f32) -> element::Group {
+    let cfg = &opt.window.buttons;
+    let fp = opt.settings.precision; // floating point precision
+
+    let (x, factor) = match cfg.position {
+        WindowButtonsPosition::Left => (0.0, 1.0),
+        WindowButtonsPosition::Right => (width, -1.0),
+    };
+    let y = (opt.window.header.height / 2.0).r2p(fp);
+
+    let mut group = element::Group::new();
+
+    for button in &cfg.items {
+        let x = (x + factor * button.offset).r2p(fp);
+
+        match &cfg.shape {
+            Some(WindowButtonShape::Circle) => {
+                let mut shape = element::Circle::new()
+                    .set("cx", x)
+                    .set("cy", y)
+                    .set("r", cfg.size.r2p(fp));
+                set_button_style(opt, button, &mut shape);
+                group.append(shape);
+            }
+            Some(WindowButtonShape::Square) => {
+                let mut shape = element::Rectangle::new()
+                    .set("x", (x - cfg.size / 2.0).r2p(fp))
+                    .set("y", (y - cfg.size / 2.0).r2p(fp))
+                    .set("width", cfg.size.r2p(fp))
+                    .set("height", cfg.size.r2p(fp));
+                if let Some(r) = cfg.roundness {
+                    shape = shape.set("rx", r.r2p(fp)).set("ry", r.r2p(fp));
+                }
+                set_button_style(opt, button, &mut shape);
+                group.append(shape);
+            }
+            None => {}
+        }
+
+        if let Some(icon) = &button.icon {
+            let mut path = match icon.kind {
+                WindowButtonIconKind::Close => element::Path::new().set(
+                    "d",
+                    format!(
+                        "M{x1},{y1} {x2},{y2} M{x1},{y2} {x2},{y1}",
+                        x1 = (x - icon.size / 2.0).r2p(fp),
+                        y1 = (y - icon.size / 2.0).r2p(fp),
+                        x2 = (x + icon.size / 2.0).r2p(fp),
+                        y2 = (y + icon.size / 2.0).r2p(fp),
+                    ),
+                ),
+                WindowButtonIconKind::Minimize => element::Path::new().set(
+                    "d",
+                    format!(
+                        "M{x1},{y1} {x2},{y1}",
+                        x1 = (x - icon.size / 2.0).r2p(fp),
+                        y1 = y.r2p(fp),
+                        x2 = (x + icon.size / 2.0).r2p(fp),
+                    ),
+                ),
+                WindowButtonIconKind::Maximize => {
+                    let r = icon.roundness.unwrap_or(2.0);
+                    let x1 = (x - icon.size / 2.0).r2p(fp);
+                    let x4 = (x + icon.size / 2.0).r2p(fp);
+                    let x2 = (x1 + r).r2p(fp);
+                    let x3 = (x4 - r).r2p(fp);
+                    let y1 = (y - icon.size / 2.0).r2p(fp);
+                    let y4 = (y + icon.size / 2.0).r2p(fp);
+                    let y2 = (y1 + r).r2p(fp);
+                    let y3 = (y4 - r).r2p(fp);
+
+                    element::Path::new().set("d",format!("M{x2},{y1} L{x3},{y1} Q{x4},{y1},{x4},{y2} L{x4},{y3} Q{x4},{y4},{x3},{y4} L{x2},{y4} Q{x1},{y4},{x1},{y3} L{x1},{y2} Q{x1},{y1},{x2},{y1}"))
+                }
+            };
+
+            path.assign("fill", "none");
+            path.assign("stroke", icon.stroke.resolve(opt.mode).to_hex_string());
+            if let Some(stroke_width) = icon.stroke_width {
+                path.assign("stroke-width", stroke_width.r2p(fp));
+            }
+            if let Some(linecap) = &icon.stroke_linecap {
+                path.assign(
+                    "stroke-linecap",
+                    match linecap {
+                        LineCap::Round => "round",
+                        LineCap::Square => "square",
+                        LineCap::Butt => "butt",
+                    },
+                );
+            }
+
+            group.append(path);
+        }
+    }
+
+    group
+}
+
+fn set_button_style<N: svg::Node>(opt: &Options, cfg: &WindowButton, node: &mut N) {
+    let fp = opt.settings.precision; // floating point precision
+
+    if let Some(fill) = &cfg.fill {
+        node.assign("fill", fill.resolve(opt.mode).to_hex_string());
+    } else {
+        node.assign("fill", "none");
+    }
+
+    if let Some(stroke) = &cfg.stroke {
+        node.assign("stroke", stroke.resolve(opt.mode).to_hex_string());
+    }
+
+    if let Some(stroke_width) = cfg.stroke_width {
+        node.assign("stroke-width", stroke_width.r2p(fp));
+    }
 }
 
 fn collect_font_faces(opt: &Options, used_font_faces: HashSet<usize>) -> Result<Vec<String>> {

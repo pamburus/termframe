@@ -8,11 +8,13 @@
 <clipPath id="header">
 <rect height="28" width="588"/>
 </clipPath>
-<rect clip-path="url(#header)" fill="#dcdcdd" height="56" rx="10" ry="10" width="588"/>
+<rect clip-path="url(#header)" fill="#eef0f1" height="56" rx="10" ry="10" width="588"/>
 <line stroke="#80808080" stroke-width="0.5" x1="0" x2="588" y1="28" y2="28"/><text dominant-baseline="central" fill="#474747" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" x="294" y="14">termframe sample</text>
-<circle cx="14" cy="14" fill="#ff5f56" r="6"/>
-<circle cx="34" cy="14" fill="#ffbd2e" r="6"/>
-<circle cx="54" cy="14" fill="#28c941" r="6"/>
+<g>
+<circle cx="14" cy="14" fill="#ff5f56" r="6" stroke="#d85a51" stroke-width="0.5"/>
+<circle cx="34" cy="14" fill="#ffbd2e" r="6" stroke="#d19d36" stroke-width="0.5"/>
+<circle cx="54" cy="14" fill="#28c941" r="6" stroke="#39ac42" stroke-width="0.5"/>
+</g>
 <svg class="terminal" font-family="JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace" font-size="12" height="30em" width="49em" y="28">
 <svg fill="var(--fg)" x="0.8em" y="0.6em">
 <g>

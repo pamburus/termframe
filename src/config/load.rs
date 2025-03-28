@@ -15,7 +15,7 @@ use strum::{EnumIter, IntoEnumIterator};
 use thiserror::Error;
 
 // local imports
-use crate::xerr::Suggestions;
+use crate::xerr::{Highlight, Suggestions};
 
 // ---
 
@@ -23,12 +23,16 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("unknown item {name:?} in {category:?}")]
+    #[error("unknown item {name} in {category}", name=.name.hl(), category=.category.hl())]
     ItemNotFound {
         name: String,
         category: &'static str,
         suggestions: Suggestions,
     },
+    #[error("invalid file path {path}", path=.path.hl())]
+    InvalidFilePath { path: PathBuf },
+    #[error("file {path} not found", path=.path.hl())]
+    FileNotFound { path: PathBuf },
     #[error(transparent)]
     Io(#[from] io::Error),
     #[error(transparent)]
@@ -158,6 +162,25 @@ pub trait Load {
         .into())
     }
 
+    fn load_hybrid(theme_or_path: &str) -> Result<Self, Self::Error>
+    where
+        Self: DeserializeOwned + Sized,
+    {
+        let theme = theme_or_path;
+        let path = PathBuf::from(theme);
+        match (path.parent(), path.file_name().and_then(|x| x.to_str())) {
+            (Some(dir), _) if dir == Path::new("") => Self::load(theme),
+            (Some(dir), Some(filename)) => match Self::load_from(dir, filename) {
+                Ok(cfg) => Ok(cfg),
+                Err(err) if Self::is_not_found_error(&err) => {
+                    Err(Error::FileNotFound { path }.into())
+                }
+                Err(err) => Err(err),
+            },
+            _ => Err(Error::InvalidFilePath { path }.into()),
+        }
+    }
+
     fn filename(name: &str, format: Format) -> String {
         if Self::strip_extension(name, format).is_some() {
             return name.to_string();
@@ -174,6 +197,7 @@ pub trait Load {
 
     fn category() -> &'static str;
     fn dir_name() -> &'static str;
+    fn is_not_found_error(err: &Self::Error) -> bool;
 
     fn resolve_embedded_name_alias(name_or_alias: &str) -> &str {
         name_or_alias

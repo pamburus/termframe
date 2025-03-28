@@ -1,5 +1,5 @@
 // std imports
-use std::{collections::HashMap, io, sync::LazyLock};
+use std::{collections::HashMap, io, path::PathBuf, sync::LazyLock};
 
 // third-party imports
 use csscolorparser::Color;
@@ -24,6 +24,10 @@ pub enum Error {
         name: String,
         suggestions: Suggestions,
     },
+    #[error("theme file {} not found", .path.hl())]
+    ThemeFileNotFound { path: PathBuf },
+    #[error("invalid theme file path {}", .path.hl())]
+    InvalidThemeFilePath { path: PathBuf },
     #[error(transparent)]
     Io(#[from] io::Error),
     #[error(transparent)]
@@ -36,6 +40,8 @@ impl From<load::Error> for Error {
             load::Error::ItemNotFound {
                 name, suggestions, ..
             } => Error::ThemeNotFound { name, suggestions },
+            load::Error::FileNotFound { path } => Error::ThemeFileNotFound { path },
+            load::Error::InvalidFilePath { path } => Error::InvalidThemeFilePath { path },
             load::Error::Io(err) => Error::Io(err),
             load::Error::Parse(err) => Error::Parse(err),
         }
@@ -91,6 +97,10 @@ impl Load for ThemeConfig {
 
     fn preferred_embedded_name_alias(name: &str) -> &str {
         ALIAS_MAP.alias(name).unwrap_or(name)
+    }
+
+    fn is_not_found_error(err: &Error) -> bool {
+        matches!(err, Error::ThemeNotFound { .. })
     }
 }
 

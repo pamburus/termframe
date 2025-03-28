@@ -8,7 +8,16 @@ terminal:
 # Font settings.
 font:
   # Font family.
-  family: "JetBrains Mono"
+  family:
+    - "JetBrains Mono"
+    - "Fira Code"
+    - "Source Code Pro"
+    - "Cascadia Code"
+    - "Consolas"
+    - "Menlo"
+    - "Monaco"
+    - "DejaVu Sans Mono"
+    - "monospace"
   # Font size in pixels.
   size: 12
   # Font weights per ANSI style.

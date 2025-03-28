@@ -62,7 +62,7 @@ impl Error {
                 if let Some(s) = did_you_mean(suggestions) {
                     vec![s]
                 } else if let Some(usage) = usage(app, UsageRequest::ListThemes) {
-                    vec![format!("run {usage} to list themes")]
+                    vec![format!("run {usage} to list available themes")]
                 } else {
                     Vec::new()
                 }
@@ -71,7 +71,7 @@ impl Error {
                 if let Some(s) = did_you_mean(suggestions) {
                     vec![s]
                 } else if let Some(usage) = usage(app, UsageRequest::ListWindowStyles) {
-                    vec![format!("run {usage} to list window styles")]
+                    vec![format!("run {usage} to list available window styles")]
                 } else {
                     Vec::new()
                 }

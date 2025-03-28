@@ -1,6 +1,7 @@
 // std imports
 use std::{
     io,
+    path::PathBuf,
     sync::{Arc, LazyLock},
 };
 
@@ -32,6 +33,10 @@ pub enum Error {
         name: String,
         suggestions: Suggestions,
     },
+    #[error("window style file {} not found", .path.hl())]
+    WindowStyleFileNotFound { path: PathBuf },
+    #[error("invalid window style file path {}", .path.hl())]
+    InvalidWindowStyleFilePath { path: PathBuf },
     #[error(transparent)]
     Io(#[from] io::Error),
     #[error(transparent)]
@@ -44,6 +49,8 @@ impl From<load::Error> for Error {
             load::Error::ItemNotFound {
                 name, suggestions, ..
             } => Error::WindowStyleNotFound { name, suggestions },
+            load::Error::FileNotFound { path } => Error::WindowStyleFileNotFound { path },
+            load::Error::InvalidFilePath { path } => Error::InvalidWindowStyleFilePath { path },
             load::Error::Io(err) => Error::Io(err),
             load::Error::Parse(err) => Error::Parse(err),
         }
@@ -83,6 +90,10 @@ impl Load for WindowStyleConfig {
 
     fn dir_name() -> &'static str {
         "window-styles"
+    }
+
+    fn is_not_found_error(err: &Error) -> bool {
+        matches!(err, Error::WindowStyleNotFound { .. })
     }
 }
 

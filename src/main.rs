@@ -118,9 +118,10 @@ impl App {
         let theme = if theme == "-" {
             AdaptiveTheme::default().resolve(mode)
         } else {
-            Rc::new(Theme::from_config(ThemeConfig::load(theme)?.resolve(mode)))
+            let cfg = ThemeConfig::load_hybrid(theme)?;
+            Rc::new(Theme::from_config(cfg.resolve(mode)))
         };
-        let window = WindowStyleConfig::load(&settings.window.style)?.window;
+        let window = WindowStyleConfig::load_hybrid(&settings.window.style)?.window;
 
         let mut terminal = Terminal::new(term::Options {
             cols: Some(opt.width),

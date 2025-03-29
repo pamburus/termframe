@@ -5,10 +5,10 @@ window:
     radius: 6
     colors:
       outer:
-        dark: "#1b1f23"
+        dark: "#0b0f1380"
         light: "#545c6380"
       inner:
-        dark: "#ffffff80"
+        dark: "#ffffff40"
         light: "#ffffff80"
   header:
     color:
@@ -18,7 +18,7 @@ window:
     border:
       width: 0.5
       color:
-        dark: "#00000040"
+        dark: "#00000080"
         light: "#40404040"
   title:
     color:

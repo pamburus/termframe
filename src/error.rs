@@ -59,29 +59,21 @@ impl Error {
     {
         match self {
             Error::Theme(theme::Error::ThemeNotFound { suggestions, .. }) => {
-                if let Some(s) = did_you_mean(suggestions) {
-                    vec![s]
-                } else if let Some(usage) = usage(app, UsageRequest::ListThemes) {
-                    vec![format!("run {usage} to list available themes")]
-                } else {
-                    Vec::new()
-                }
+                let tip1 = did_you_mean(suggestions);
+                let tip2 = usage(app, UsageRequest::ListThemes)
+                    .map(|usage| format!("run {usage} to list available themes"));
+                tip1.into_iter().chain(tip2).collect()
             }
             Error::WindowStyle(winstyle::Error::WindowStyleNotFound { suggestions, .. }) => {
-                if let Some(s) = did_you_mean(suggestions) {
-                    vec![s]
-                } else if let Some(usage) = usage(app, UsageRequest::ListWindowStyles) {
-                    vec![format!("run {usage} to list available window styles")]
-                } else {
-                    Vec::new()
-                }
+                let tip1 = did_you_mean(suggestions);
+                let tip2 = usage(app, UsageRequest::ListWindowStyles)
+                    .map(|usage| format!("run {usage} to list available window styles"));
+                tip1.into_iter().chain(tip2).collect()
             }
             _ => Vec::new(),
         }
     }
-}
 
-impl Error {
     pub fn log<A>(&self, app: &A)
     where
         A: AppInfoProvider,

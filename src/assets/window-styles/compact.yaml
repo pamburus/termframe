@@ -34,7 +34,7 @@ window:
         - "Helvetica Neue"
         - "Arial"
         - "sans-serif"
-      size: 14
+      size: 13
       weight: "bold"
   buttons:
     position: right

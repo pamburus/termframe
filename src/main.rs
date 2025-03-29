@@ -358,8 +358,8 @@ fn list_fonts(settings: &Settings) -> Result<()> {
 }
 
 fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
-    let mut items: Vec<_> = items.into_iter().collect();
-    items.sort_by_key(|(name, info)| (info.origin, name.clone()));
+    let mut items: Vec<_> = items.into_iter().map(|x| (x.1.origin, x.0)).collect();
+    items.sort();
 
     let term = if stdout().is_terminal() {
         term_size::dimensions()
@@ -370,23 +370,16 @@ fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
     let max_len = if term.is_some() {
         items
             .iter()
-            .map(|(name, _)| name.len())
+            .map(|(_, name)| name.len())
             .max()
             .unwrap_or_default()
     } else {
         0
     };
 
-    let columns = match term {
-        Some((w, _)) => w / (max_len + 4),
-        None => 1,
-    };
+    let columns = term.map(|d| d.0 / (max_len + 4)).unwrap_or(1);
 
-    for (origin, group) in items
-        .into_iter()
-        .chunk_by(|(_, info)| info.origin)
-        .into_iter()
-    {
+    for (origin, group) in items.into_iter().chunk_by(|i| i.0).into_iter() {
         let origin_str = match origin {
             Origin::Stock => "stock",
             Origin::Custom => "custom",
@@ -397,11 +390,11 @@ fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
         }
 
         let group: Vec<_> = group.collect();
-        let rows = (group.len() + columns - 1).div_ceil(columns);
+        let rows = group.len().div_ceil(columns);
 
         for row in 0..rows {
             for col in 0..columns {
-                if let Some((name, _)) = group.get(row + col * rows) {
+                if let Some((_, name)) = group.get(row + col * rows) {
                     if term.is_some() {
                         print!("• {:width$}", name, width = max_len + 2);
                     } else {

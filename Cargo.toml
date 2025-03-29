@@ -17,7 +17,7 @@ serde_json = { version = "1" }
 allsorts = "0.15"
 anyhow = "1"
 askama = "0.12"
-askama_escape = "0.10"
+askama_escape = "0.13"
 base64 = "0.22"
 cacache = "13"
 clap = { version = "4", features = ["wrap_help", "derive", "env", "string"] }

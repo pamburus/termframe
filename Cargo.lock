@@ -154,7 +154,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b79091df18a97caea757e28cd2d5fda49c6cd4bd01ddffd7ff01ace0c0ad2c28"
 dependencies = [
  "askama_derive",
- "askama_escape",
+ "askama_escape 0.10.3",
  "humansize",
  "num-traits",
  "percent-encoding",
@@ -181,6 +181,12 @@ name = "askama_escape"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "619743e34b5ba4e9703bba34deac3427c72507c7159f5fd030aea8cac0cfe341"
+
+[[package]]
+name = "askama_escape"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3df27b8d5ddb458c5fb1bbc1ce172d4a38c614a97d550b0ac89003897fb01de4"
 
 [[package]]
 name = "askama_parser"
@@ -2767,7 +2773,7 @@ dependencies = [
  "allsorts",
  "anyhow",
  "askama",
- "askama_escape",
+ "askama_escape 0.13.0",
  "base64 0.22.1",
  "cacache",
  "clap",

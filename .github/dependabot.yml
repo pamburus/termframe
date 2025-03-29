@@ -21,6 +21,21 @@ updates:
           - "*"
         update-types:
           - "patch"
+      askama-sec:
+        applies-to: security-updates
+        patterns:
+          - "askama"
+          - "askama-*"
+          - "askama_*"
+      askama-ver:
+        applies-to: version-updates
+        patterns:
+          - "askama"
+          - "askama-*"
+          - "askama_*"
+        update-types:
+          - "major"
+          - "minor"
       anstyle-sec:
         applies-to: security-updates
         patterns:

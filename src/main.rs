@@ -130,9 +130,6 @@ impl App {
             foreground: Some(theme.fg.convert()),
         });
 
-        #[cfg(windows)]
-        let timeout = None;
-        #[cfg(not(windows))]
         let timeout = Some(std::time::Duration::from_secs(opt.timeout));
 
         if let Some(command) = &opt.command {

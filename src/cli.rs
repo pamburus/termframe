@@ -108,7 +108,6 @@ pub struct Opt {
     pub output: String,
 
     /// Timeout for the command to run, in seconds.
-    #[cfg(not(windows))]
     #[arg(
         long,
         overrides_with = "timeout",

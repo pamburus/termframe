@@ -127,8 +127,8 @@ impl Terminal {
             log::debug!("drop child");
             drop(child);
 
-            log::debug!("drop pty slave");
-            drop(pair.slave);
+            log::debug!("drop pty pair");
+            drop(pair);
 
             log::debug!("join processing thread");
             thread.join().unwrap()

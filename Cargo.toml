@@ -16,7 +16,7 @@ serde_json = { version = "1" }
 [dependencies]
 allsorts = "0.15"
 anyhow = "1"
-askama = "0.12"
+askama = "0.13"
 askama_escape = "0.10"
 base64 = "0.22"
 cacache = "13"

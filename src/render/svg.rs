@@ -12,7 +12,7 @@ use askama::Template;
 use csscolorparser::Color;
 use svg::{Document, Node, node::element};
 use termwiz::{
-    cell::{Intensity, Underline},
+    cell::{CellAttributes, Intensity, Underline},
     cellcluster::CellCluster,
     color::{ColorAttribute, SrgbaTuple},
     surface::{Line, Surface, line::CellRef},
@@ -71,11 +71,20 @@ impl SvgRenderer {
             group = group.set("font-weight", svg_weight(default_weight));
         }
 
-        let mut cell_bg = |cell: CellRef| {
-            if cell.attrs().reverse() {
-                Some(palette.fg(cell.attrs().foreground()))
+        let resolve_fg = |palette: &mut PaletteBuilder, attrs: &CellAttributes| {
+            let color = attrs.foreground();
+            if cfg.bold_is_bright && attrs.intensity() == Intensity::Bold {
+                palette.bright_fg(color)
             } else {
-                let bg = cell.attrs().background();
+                palette.fg(color)
+            }
+        };
+
+        let resolve_bg = |palette: &mut PaletteBuilder, attrs: &CellAttributes| {
+            if attrs.reverse() {
+                Some(resolve_fg(palette, attrs))
+            } else {
+                let bg = attrs.background();
                 if bg == ColorAttribute::Default {
                     None
                 } else {
@@ -87,7 +96,7 @@ impl SvgRenderer {
         let lines = surface.screen_lines();
 
         let shapes = super::tracing::trace(dimensions.0, dimensions.1, |x, y| {
-            cell_bg(lines[y].get_cell(x)?)
+            resolve_bg(&mut palette, lines[y].get_cell(x)?.attrs())
         });
 
         let mut bg_group = element::Group::new();
@@ -166,19 +175,10 @@ impl SvgRenderer {
                         range.end = range.start + 1;
                     }
 
-                    let mut resolve_fg = || {
-                        let color = cluster.attrs.foreground();
-                        if cfg.bold_is_bright && cluster.attrs.intensity() == Intensity::Bold {
-                            palette.bright_fg(color)
-                        } else {
-                            palette.fg(color)
-                        }
-                    };
-
                     let color = if cluster.attrs.reverse() {
                         palette.bg(cluster.attrs.background())
                     } else {
-                        resolve_fg()
+                        resolve_fg(&mut palette, &cluster.attrs)
                     };
 
                     if cluster.attrs.intensity() == Intensity::Half && cfg.faint_opacity < 1.0 {

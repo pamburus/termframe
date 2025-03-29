@@ -11,7 +11,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use num_traits::FromPrimitive;
-use portable_pty::{ChildKiller, CommandBuilder, PtyPair, PtySize, native_pty_system};
+use portable_pty::{ChildKiller, CommandBuilder, PtySize, native_pty_system};
 use termwiz::{
     cell::AttributeChange,
     color::SrgbaTuple,
@@ -36,11 +36,11 @@ pub struct Terminal {
     surface: Surface,
     parser: Parser,
     state: State,
-    pty: PtyPair,
+    size: PtySize,
 }
 
 impl Terminal {
-    pub fn new(options: Options) -> Result<Self> {
+    pub fn new(options: Options) -> Self {
         let cols = options.cols.unwrap_or(80);
         let rows = options.rows.unwrap_or(24);
         let background = options
@@ -58,16 +58,12 @@ impl Terminal {
             pixel_height: 0,
         };
 
-        // Create a PTY pair using portable-pty.
-        let pty = native_pty_system();
-        let pair = pty.openpty(size)?;
-
-        Ok(Self {
+        Self {
             surface: Surface::new(cols.into(), rows.into()),
             parser: Parser::new(),
             state: State::new(background, foreground),
-            pty: pair,
-        })
+            size,
+        }
     }
 
     pub fn surface(&self) -> &Surface {
@@ -107,11 +103,15 @@ impl Terminal {
             cmd.cwd(".");
         }
 
-        let reader = BufReader::new(self.pty.master.try_clone_reader()?);
-        let mut child = self.pty.slave.spawn_command(cmd)?;
+        // Create a PTY pair using portable-pty.
+        let pty = native_pty_system();
+        let pair = pty.openpty(self.size)?;
+
+        let reader = BufReader::new(pair.master.try_clone_reader()?);
+        let mut child = pair.slave.spawn_command(cmd)?;
         let killer = child.clone_killer();
 
-        let writer = self.pty.master.take_writer()?;
+        let writer = pair.master.take_writer()?;
         let writer = ThreadedWriter::new(Box::new(writer));
         let writer = DetachableWriter::new(Box::new(BufWriter::new(writer)));
 
@@ -123,6 +123,12 @@ impl Terminal {
 
             log::debug!("drop writer");
             writer.detach().flush()?;
+
+            log::debug!("drop child");
+            drop(child);
+
+            log::debug!("drop pty slave");
+            drop(pair.slave);
 
             log::debug!("join processing thread");
             thread.join().unwrap()

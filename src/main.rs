@@ -128,7 +128,7 @@ impl App {
             rows: Some(opt.height),
             background: Some(theme.bg.convert()),
             foreground: Some(theme.fg.convert()),
-        })?;
+        });
 
         #[cfg(windows)]
         let timeout = None;

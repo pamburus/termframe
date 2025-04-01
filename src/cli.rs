@@ -2,7 +2,11 @@
 use std::fmt;
 
 // third-party imports
-use clap::{ArgAction, Args, Parser, value_parser};
+use clap::{
+    ArgAction, Args, Parser,
+    builder::{Styles, styling::AnsiColor},
+    value_parser,
+};
 use clap_complete::Shell;
 
 // local imports
@@ -10,9 +14,15 @@ use crate::config::{self, FontFamilyOption, PaddingOption, Settings, ThemeSettin
 
 // ---
 
+const STYLES: Styles = Styles::styled()
+    .header(AnsiColor::Green.on_default().bold())
+    .usage(AnsiColor::Green.on_default().bold())
+    .literal(AnsiColor::Cyan.on_default().bold())
+    .placeholder(AnsiColor::Cyan.on_default());
+
 /// Terminal output SVG screenshot tool.
 #[derive(Parser)]
-#[clap(version, disable_help_flag = true)]
+#[command(version, styles = STYLES, disable_help_flag = true)]
 pub struct Opt {
     #[command(flatten)]
     pub bootstrap: BootstrapArgs,

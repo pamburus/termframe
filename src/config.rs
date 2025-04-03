@@ -270,7 +270,7 @@ pub struct Padding {
 
 // ---
 
-static DEFAULT_SETTINGS_RAW: &str = include_str!("assets/config.yaml");
+static DEFAULT_SETTINGS_RAW: &str = include_str!("../assets/config.yaml");
 static DEFAULT_SETTINGS: LazyLock<Settings> =
     LazyLock::new(|| Settings::load([Source::string("", FileFormat::Yaml)]).unwrap());
 

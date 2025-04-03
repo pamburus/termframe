@@ -259,7 +259,13 @@ impl PaddingOption {
     }
 }
 
-#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
+impl Default for PaddingOption {
+    fn default() -> Self {
+        Self::Uniform(4.0)
+    }
+}
+
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq, Default)]
 #[serde(rename_all = "kebab-case")]
 pub struct Padding {
     pub top: f32,

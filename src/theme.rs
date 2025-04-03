@@ -27,15 +27,15 @@ pub struct AdaptiveTheme {
 impl AdaptiveTheme {
     #[allow(dead_code)]
     pub fn from_config(cfg: &ThemeConfig) -> Self {
-        match cfg {
-            ThemeConfig::Fixed(cfg) => {
+        match &cfg.theme {
+            config::theme::Theme::Fixed(cfg) => {
                 let theme = Rc::new(Theme::from_config(&cfg.colors));
                 Self {
                     light: theme.clone(),
                     dark: theme,
                 }
             }
-            ThemeConfig::Adaptive(cfg) => {
+            config::theme::Theme::Adaptive(cfg) => {
                 let light = Rc::new(Theme::from_config(&cfg.modes.light.colors));
                 let dark = Rc::new(Theme::from_config(&cfg.modes.dark.colors));
                 Self { light, dark }
@@ -177,7 +177,9 @@ impl Palette {
     pub fn from_config(cfg: &config::theme::Palette) -> Self {
         let mut colors = Self::make_default().0;
         for (i, c) in cfg.iter() {
-            colors[*i as usize] = c.clone();
+            if let Some(i) = i.resolve() {
+                colors[i as usize] = c.clone();
+            }
         }
         Self::new(colors)
     }

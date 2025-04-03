@@ -1,0 +1,233 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/window-style",
+  "definitions": {
+    "window-style": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "window": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "margin": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "horizonal": { "type": "number" },
+                    "vertical": { "type": "number" }
+                  },
+                  "required": ["horizontal", "vertical"]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "left": { "type": "number" },
+                    "right": { "type": "number" },
+                    "top": { "type": "number" },
+                    "bottom": { "type": "number" }
+                  },
+                  "required": ["left", "right", "top", "bottom"]
+                }
+              ]
+            },
+            "border": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "width": { "type": "number" },
+                "radius": { "type": "number" },
+                "gap": { "type": "number" },
+                "colors": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "outer": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "dark": { "$ref": "#/definitions/hex-color" },
+                        "light": { "$ref": "#/definitions/hex-color" }
+                      },
+                      "required": ["dark", "light"]
+                    },
+                    "inner": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "dark": { "$ref": "#/definitions/hex-color" },
+                        "light": { "$ref": "#/definitions/hex-color" }
+                      },
+                      "required": ["dark", "light"]
+                    }
+                  },
+                  "required": ["outer", "inner"]
+                }
+              },
+              "required": ["width", "radius", "colors"]
+            },
+            "header": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "color": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "dark": { "$ref": "#/definitions/hex-color" },
+                    "light": { "$ref": "#/definitions/hex-color" }
+                  },
+                  "required": ["dark", "light"]
+                },
+                "height": { "type": "number" },
+                "border": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "width": { "type": "number" },
+                    "color": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "dark": { "$ref": "#/definitions/hex-color" },
+                        "light": { "$ref": "#/definitions/hex-color" }
+                      },
+                      "required": ["dark", "light"]
+                    }
+                  },
+                  "required": ["width", "color"]
+                }
+              },
+              "required": ["color", "height", "border"]
+            },
+            "title": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "color": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "dark": { "$ref": "#/definitions/hex-color" },
+                    "light": { "$ref": "#/definitions/hex-color" }
+                  },
+                  "required": ["dark", "light"]
+                },
+                "font": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "family": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "size": { "type": "number" },
+                    "weight": { "type": "string" }
+                  },
+                  "required": ["family", "size", "weight"]
+                }
+              },
+              "required": ["color", "font"]
+            },
+            "buttons": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "position": {
+                  "type": "string",
+                  "enum": ["left", "right", "top", "bottom"]
+                },
+                "shape": { "type": "string" },
+                "size": { "type": "number" },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "offset": { "type": "number" },
+                      "icon": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "enum": ["close", "minimize", "maximize"]
+                          },
+                          "size": { "type": "number" },
+                          "stroke": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "dark": { "$ref": "#/definitions/hex-color" },
+                              "light": { "$ref": "#/definitions/hex-color" }
+                            },
+                            "required": ["dark", "light"]
+                          },
+                          "stroke-width": { "type": "number" },
+                          "stroke-linecap": { "type": "string" },
+                          "roundness": { "type": "number" }
+                        },
+                        "required": [
+                          "kind",
+                          "size",
+                          "stroke",
+                          "stroke-width",
+                          "stroke-linecap"
+                        ]
+                      },
+                      "fill": { "$ref": "#/definitions/hex-color" },
+                      "stroke": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "dark": { "$ref": "#/definitions/hex-color" },
+                          "light": { "$ref": "#/definitions/hex-color" }
+                        },
+                        "required": ["dark", "light"]
+                      },
+                      "stroke-width": { "type": "number" }
+                    },
+                    "required": ["offset"]
+                  }
+                }
+              },
+              "required": ["position", "size", "items"]
+            },
+            "shadow": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "color": { "$ref": "#/definitions/hex-color" },
+                "blur": { "type": "number" },
+                "x": { "type": "number" },
+                "y": { "type": "number" }
+              },
+              "required": ["enabled", "color", "blur", "x", "y"]
+            }
+          },
+          "required": [
+            "margin",
+            "border",
+            "header",
+            "title",
+            "buttons",
+            "shadow"
+          ]
+        }
+      },
+      "required": ["window"]
+    },
+    "hex-color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6,8}$"
+    }
+  }
+}

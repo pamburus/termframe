@@ -8,6 +8,7 @@ use clap::{
     value_parser,
 };
 use clap_complete::Shell;
+use enumset_ext::convert::str::EnumSet;
 
 // local imports
 use crate::config::{self, FontFamilyOption, PaddingOption, Settings, ThemeSetting};
@@ -126,9 +127,15 @@ pub struct Opt {
     )]
     pub timeout: u64,
 
-    /// Print available color themes and exit.
-    #[arg(long)]
-    pub list_themes: bool,
+    /// Print available themes optionally filtered by tags.
+    #[arg(
+        long,
+        num_args=0..=1,
+        value_name = "TAGS",
+        require_equals = true,
+        value_parser = ThemeTagSet::clap_parser(),
+    )]
+    pub list_themes: Option<Option<ThemeTagSet>>,
 
     /// Print available window styles and exit.
     #[arg(long)]
@@ -258,6 +265,10 @@ impl BootstrapOpt {
         result
     }
 }
+
+// --
+
+pub type ThemeTagSet = EnumSet<config::theme::Tag>;
 
 // ---
 

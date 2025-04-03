@@ -16,7 +16,7 @@ use super::{
     load::{self, Categorize, ErrorCategory, Load},
     mode::Mode,
 };
-use crate::xerr::{Highlight, Suggestions};
+use crate::xerr::{HighlightQuoted, Suggestions};
 
 // ---
 
@@ -28,19 +28,24 @@ pub use super::PaddingOption;
 /// Error is an error which may occur in the application.
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("unknown window style {}", .name.hl())]
+    #[error("unknown window style {}", .name.hlq())]
     WindowStyleNotFound {
-        name: String,
+        name: Arc<str>,
         suggestions: Suggestions,
     },
-    #[error("window style file {} not found", .path.hl())]
+    #[error("window style file {} not found", .path.hlq())]
     WindowStyleFileNotFound { path: PathBuf },
-    #[error("invalid window style file path {}", .path.hl())]
+    #[error("invalid window style file path {}", .path.hlq())]
     InvalidWindowStyleFilePath { path: PathBuf },
-    #[error(transparent)]
-    Io(#[from] io::Error),
-    #[error(transparent)]
-    Parse(#[from] load::ParseError),
+    #[error("failed to list window styles: {source}")]
+    FailedToListWindowStyles { source: io::Error },
+    #[error("failed to load window style {name}: {source}", name=.name.hlq())]
+    Io { name: Arc<str>, source: io::Error },
+    #[error("failed to parse window style {name}: {source}", name=.name.hlq())]
+    FailedToParseWindowStyle {
+        name: Arc<str>,
+        source: load::ParseError,
+    },
 }
 
 impl From<load::Error> for Error {
@@ -48,11 +53,16 @@ impl From<load::Error> for Error {
         match err {
             load::Error::ItemNotFound {
                 name, suggestions, ..
-            } => Error::WindowStyleNotFound { name, suggestions },
-            load::Error::FileNotFound { path } => Error::WindowStyleFileNotFound { path },
-            load::Error::InvalidFilePath { path } => Error::InvalidWindowStyleFilePath { path },
-            load::Error::Io(err) => Error::Io(err),
-            load::Error::Parse(err) => Error::Parse(err),
+            } => Self::WindowStyleNotFound { name, suggestions },
+            load::Error::FileNotFound { path } => Self::WindowStyleFileNotFound { path },
+            load::Error::InvalidFilePath { path } => Self::InvalidWindowStyleFilePath { path },
+            load::Error::FailedToListItems { source, .. } => {
+                Self::FailedToListWindowStyles { source }
+            }
+            load::Error::Io { name, source, .. } => Self::Io { name, source },
+            load::Error::Parse { name, source, .. } => {
+                Self::FailedToParseWindowStyle { name, source }
+            }
         }
     }
 }
@@ -112,6 +122,7 @@ impl Default for &WindowStyleConfig {
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Window {
+    #[serde(default)]
     pub margin: PaddingOption,
     pub border: WindowBorder,
     pub header: WindowHeader,
@@ -124,9 +135,9 @@ pub struct Window {
 #[serde(rename_all = "kebab-case")]
 pub struct WindowBorder {
     pub colors: WindowBorderColors,
-    pub width: f32,
-    pub radius: f32,
-    pub gap: Option<f32>,
+    pub width: Float,
+    pub radius: Float,
+    pub gap: Option<Float>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -140,7 +151,7 @@ pub struct WindowBorderColors {
 #[serde(rename_all = "kebab-case")]
 pub struct WindowHeader {
     pub color: SelectiveColor,
-    pub height: f32,
+    pub height: Float,
     pub border: Option<WindowHeaderBorder>,
 }
 
@@ -148,7 +159,7 @@ pub struct WindowHeader {
 #[serde(rename_all = "kebab-case")]
 pub struct WindowHeaderBorder {
     pub color: SelectiveColor,
-    pub width: f32,
+    pub width: Float,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -162,7 +173,7 @@ pub struct WindowTitle {
 #[serde(rename_all = "kebab-case")]
 pub struct Font {
     pub family: Vec<String>,
-    pub size: f32,
+    pub size: Float,
     pub weight: Option<String>,
 }
 
@@ -171,18 +182,18 @@ pub struct Font {
 pub struct WindowButtons {
     pub position: WindowButtonsPosition,
     pub shape: Option<WindowButtonShape>,
-    pub size: f32,
-    pub roundness: Option<f32>,
+    pub size: Float,
+    pub roundness: Option<Float>,
     pub items: Vec<WindowButton>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowButton {
-    pub offset: f32,
+    pub offset: Float,
     pub fill: Option<SelectiveColor>,
     pub stroke: Option<SelectiveColor>,
-    pub stroke_width: Option<f32>,
+    pub stroke_width: Option<Float>,
     pub icon: Option<WindowButtonIcon>,
 }
 
@@ -204,11 +215,11 @@ pub enum WindowButtonShape {
 #[serde(rename_all = "kebab-case")]
 pub struct WindowButtonIcon {
     pub kind: WindowButtonIconKind,
-    pub size: f32,
+    pub size: Float,
     pub stroke: SelectiveColor,
-    pub stroke_width: Option<f32>,
+    pub stroke_width: Option<Float>,
     pub stroke_linecap: Option<LineCap>,
-    pub roundness: Option<f32>,
+    pub roundness: Option<Float>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -232,9 +243,9 @@ pub enum LineCap {
 pub struct WindowShadow {
     pub enabled: bool,
     pub color: SelectiveColor,
-    pub x: f32,
-    pub y: f32,
-    pub blur: f32,
+    pub x: Float,
+    pub y: Float,
+    pub blur: Float,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -254,6 +265,106 @@ impl SelectiveColor {
                 Mode::Dark => dark,
             },
         }
+    }
+}
+
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
+#[serde(untagged)]
+pub enum Float {
+    Int(u16),
+    Float(f32),
+}
+
+impl Float {
+    pub fn f32(self) -> f32 {
+        self.into()
+    }
+}
+
+impl Default for Float {
+    fn default() -> Self {
+        Self::Float(0.0)
+    }
+}
+
+impl From<Float> for f32 {
+    fn from(value: Float) -> Self {
+        match value {
+            Float::Int(i) => i as f32,
+            Float::Float(f) => f,
+        }
+    }
+}
+
+impl std::ops::Add for Float {
+    type Output = f32;
+
+    fn add(self, rhs: Float) -> Self::Output {
+        self + f32::from(rhs)
+    }
+}
+
+impl std::ops::Add<f32> for Float {
+    type Output = f32;
+
+    fn add(self, rhs: f32) -> Self::Output {
+        f32::from(self) + rhs
+    }
+}
+
+impl std::ops::Add<Float> for f32 {
+    type Output = f32;
+
+    fn add(self, rhs: Float) -> Self::Output {
+        self + f32::from(rhs)
+    }
+}
+
+impl std::ops::Sub<f32> for Float {
+    type Output = f32;
+
+    fn sub(self, rhs: f32) -> Self::Output {
+        f32::from(self) - rhs
+    }
+}
+
+impl std::ops::Sub<Float> for f32 {
+    type Output = f32;
+
+    fn sub(self, rhs: Float) -> Self::Output {
+        self - f32::from(rhs)
+    }
+}
+
+impl std::ops::Mul<f32> for Float {
+    type Output = f32;
+
+    fn mul(self, rhs: f32) -> Self::Output {
+        f32::from(self) * rhs
+    }
+}
+
+impl std::ops::Mul<Float> for f32 {
+    type Output = f32;
+
+    fn mul(self, rhs: Float) -> Self::Output {
+        self * f32::from(rhs)
+    }
+}
+
+impl std::ops::Div<f32> for Float {
+    type Output = f32;
+
+    fn div(self, rhs: f32) -> Self::Output {
+        f32::from(self) / rhs
+    }
+}
+
+impl std::ops::Div<Float> for f32 {
+    type Output = f32;
+
+    fn div(self, rhs: Float) -> Self::Output {
+        self / f32::from(rhs)
     }
 }
 

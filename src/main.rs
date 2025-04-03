@@ -12,18 +12,16 @@ use anyhow::Context;
 use base64::prelude::*;
 use clap::{CommandFactory, Parser};
 use csscolorparser::Color;
+use enumset_ext::EnumSetExt;
 use env_logger::{self as logger};
 use itertools::Itertools;
-use nu_ansi_term::Color as NuColor;
 use portable_pty::CommandBuilder;
 use rayon::prelude::*;
 
 // local imports
 use cache::CacheMiddleware;
 use config::{
-    Load, Patch, Settings, app_dirs,
-    load::{ItemInfo, Origin},
-    theme::ThemeConfig,
+    Load, Patch, Settings, app_dirs, load::ItemInfo, theme::ThemeConfig,
     winstyle::WindowStyleConfig,
 };
 use error::{AppInfoProvider, Result, UsageRequest, UsageResponse};
@@ -34,6 +32,7 @@ use term::Terminal;
 use termwiz::color::SrgbaTuple;
 use theme::{AdaptiveTheme, Theme};
 
+// private modules
 mod appdirs;
 mod cache;
 mod cli;
@@ -41,6 +40,7 @@ mod config;
 mod error;
 mod font;
 mod fontformat;
+mod help;
 mod render;
 mod term;
 mod theme;
@@ -100,8 +100,8 @@ impl App {
         if opt.man_page {
             return print_man_page();
         }
-        if opt.list_themes {
-            return list_themes();
+        if let Some(tags) = opt.list_themes {
+            return list_themes(tags);
         }
         if opt.list_window_styles {
             return list_window_styles();
@@ -119,7 +119,7 @@ impl App {
             AdaptiveTheme::default().resolve(mode)
         } else {
             let cfg = ThemeConfig::load_hybrid(theme)?;
-            Rc::new(Theme::from_config(cfg.resolve(mode)))
+            Rc::new(Theme::from_config(cfg.theme.resolve(mode)))
         };
         let window = WindowStyleConfig::load_hybrid(&settings.window.style)?.window;
 
@@ -342,10 +342,6 @@ fn print_shell_completions(shell: clap_complete::Shell) {
     clap_complete::generate(shell, &mut cmd, name, &mut stdout());
 }
 
-fn list_themes() -> Result<()> {
-    list_assets(ThemeConfig::list()?)
-}
-
 fn list_window_styles() -> Result<()> {
     list_assets(WindowStyleConfig::list()?)
 }
@@ -357,56 +353,42 @@ fn list_fonts(settings: &Settings) -> Result<()> {
     Ok(())
 }
 
-fn list_assets(items: HashMap<String, ItemInfo>) -> Result<()> {
-    let mut items: Vec<_> = items.into_iter().map(|x| (x.1.origin, x.0)).collect();
-    items.sort();
+fn list_themes(tags: Option<cli::ThemeTagSet>) -> Result<()> {
+    let items = ThemeConfig::list()?;
+    let mut formatter = help::Formatter::new(stdout());
 
-    let term = if stdout().is_terminal() {
-        term_size::dimensions()
-    } else {
-        None
-    };
-
-    let max_len = if term.is_some() {
+    formatter.format_grouped_list(
         items
-            .iter()
-            .map(|(_, name)| name.len())
-            .max()
-            .unwrap_or_default()
-    } else {
-        0
-    };
-
-    let columns = term.map(|d| d.0 / (max_len + 4)).unwrap_or(1);
-
-    for (origin, group) in items.into_iter().chunk_by(|i| i.0).into_iter() {
-        let origin_str = match origin {
-            Origin::Stock => "stock",
-            Origin::Custom => "custom",
-        };
-
-        if term.is_some() {
-            println!("{}:", NuColor::Default.bold().paint(origin_str));
-        }
-
-        let group: Vec<_> = group.collect();
-        let rows = group.len().div_ceil(columns);
-
-        for row in 0..rows {
-            for col in 0..columns {
-                if let Some((_, name)) = group.get(row + col * rows) {
-                    if term.is_some() {
-                        print!("• {:width$}", name, width = max_len + 2);
-                    } else {
-                        println!("{}", name);
-                    }
+            .into_iter()
+            .filter(|(name, _)| {
+                if let Some(tags) = tags {
+                    ThemeConfig::load(name)
+                        .ok()
+                        .map(|theme| theme.tags.includes(*tags))
+                        .unwrap_or(false)
+                } else {
+                    true
                 }
-            }
-            if term.is_some() {
-                println!();
-            }
-        }
-    }
+            })
+            .sorted_by_key(|x| (x.1.origin, x.0.clone()))
+            .chunk_by(|x| x.1.origin)
+            .into_iter()
+            .map(|(origin, group)| (origin, group.map(|x| x.0))),
+    )?;
+    Ok(())
+}
+
+fn list_assets(items: impl IntoIterator<Item = (String, ItemInfo)>) -> Result<()> {
+    let mut formatter = help::Formatter::new(stdout());
+
+    formatter.format_grouped_list(
+        items
+            .into_iter()
+            .sorted_by_key(|x| (x.1.origin, x.0.clone()))
+            .chunk_by(|x| x.1.origin)
+            .into_iter()
+            .map(|(origin, group)| (origin, group.map(|x| x.0))),
+    )?;
     Ok(())
 }
 

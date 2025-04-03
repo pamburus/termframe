@@ -118,8 +118,8 @@ Arguments:
 
 Options:
       --config <FILE>               Configuration file path [env: TERMFRAME_CONFIG=]
-  -W, --width <COLUMNS>             Width of the virtual terminal window [default: 96]
-  -H, --height <LINES>              Height of the virtual terminal window [default: 48]
+  -W, --width <COLUMNS>             Width of the virtual terminal window [default: 80]
+  -H, --height <LINES>              Height of the virtual terminal window [default: 24]
       --padding <EM>                Override padding for the inner text in font size units
       --font-family <NAME>...       Font family, multiple comma separated values can be provided
       --font-size <SIZE>            Font size [default: 12]
@@ -140,7 +140,7 @@ Options:
       --title <TITLE>               Window title
   -o, --output <FILE>               Output file, by default prints to stdout [default: -]
       --timeout <SECONDS>           Timeout for the command to run, in seconds [default: 5]
-      --list-themes                 Print available color themes and exit
+      --list-themes[=<TAGS>]        Print available themes optionally filtered by tags [possible values: dark, light]
       --list-window-styles          Print available window styles and exit
       --list-fonts                  Print configured fonts and exit, any font not listed here cannot be embedded and may not be properly rendered
       --help                        Print help and exit

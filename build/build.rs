@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 // third-party imports
 use voca_rs::case::kebab_case;
 
-const THEME_EXTENSION: &str = ".yaml";
+const THEME_EXTENSION: &str = ".toml";
 const THEME_DIR: &str = "assets/themes";
 const THEME_ALIASES: &str = "assets/themes/.aliases.json";
 

@@ -260,7 +260,7 @@ impl SelectiveColor {
 // ---
 
 #[derive(RustEmbed)]
-#[folder = "src/assets/window-styles/"]
+#[folder = "assets/window-styles/"]
 pub struct Assets;
 
 static DEFAULT: LazyLock<Arc<WindowStyleConfig>> =

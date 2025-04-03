@@ -168,7 +168,7 @@ impl AliasMap {
 // ---
 
 #[derive(RustEmbed)]
-#[folder = "src/assets/themes/"]
+#[folder = "assets/themes/"]
 pub struct Assets;
 
 static ALIAS_MAP: LazyLock<AliasMap> = LazyLock::new(AliasMap::load);

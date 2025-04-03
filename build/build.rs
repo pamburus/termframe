@@ -5,8 +5,8 @@ use std::collections::BTreeMap;
 use voca_rs::case::kebab_case;
 
 const THEME_EXTENSION: &str = ".yaml";
-const THEME_DIR: &str = "src/assets/themes";
-const THEME_ALIASES: &str = "src/assets/themes/.aliases.json";
+const THEME_DIR: &str = "assets/themes";
+const THEME_ALIASES: &str = "assets/themes/.aliases.json";
 
 fn main() {
     update_theme_aliases();

@@ -4,6 +4,7 @@ use std::{
     io,
     io::ErrorKind,
     path::{Component, Path, PathBuf},
+    sync::Arc,
 };
 
 // third-party imports
@@ -11,7 +12,7 @@ use rust_embed::RustEmbed;
 use serde::de::DeserializeOwned;
 use serde_json as json;
 use serde_yml as yaml;
-use strum::{EnumIter, IntoEnumIterator};
+use strum::{Display, EnumIter, IntoEnumIterator};
 use thiserror::Error;
 
 // local imports
@@ -25,7 +26,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 pub enum Error {
     #[error("unknown item {name} in {category}", name=.name.hl(), category=.category.hl())]
     ItemNotFound {
-        name: String,
+        name: Arc<str>,
         category: &'static str,
         suggestions: Suggestions,
     },
@@ -33,22 +34,35 @@ pub enum Error {
     InvalidFilePath { path: PathBuf },
     #[error("file {path} not found", path=.path.hl())]
     FileNotFound { path: PathBuf },
-    #[error(transparent)]
-    Io(#[from] io::Error),
-    #[error(transparent)]
-    Parse(#[from] ParseError),
+    #[error("failed to list items in {category}: {source}", category=.category.hl())]
+    FailedToListItems {
+        category: &'static str,
+        source: io::Error,
+    },
+    #[error("I/O error loading {name} in {category}: {source}", name=.name.hl())]
+    Io {
+        name: Arc<str>,
+        category: &'static str,
+        source: io::Error,
+    },
+    #[error("failed to parse item {name} in {category}: {source}", name=.name.hl())]
+    Parse {
+        name: Arc<str>,
+        category: &'static str,
+        source: ParseError,
+    },
 }
 
 #[derive(Error, Debug)]
 pub enum ParseError {
-    #[error(transparent)]
-    Utf8(#[from] std::str::Utf8Error),
-    #[error(transparent)]
-    Yaml(#[from] yaml::Error),
+    #[error("failed to parse yaml: {0}")]
+    Yaml(#[from] serde_yml::Error),
     #[error(transparent)]
     Toml(#[from] toml::de::Error),
-    #[error(transparent)]
-    Json(#[from] json::Error),
+    #[error("failed to parse json: {0}")]
+    Json(#[from] serde_json::Error),
+    #[error("failed to parse utf-8 string: {0}")]
+    Utf8(#[from] std::str::Utf8Error),
 }
 
 pub trait Categorize {
@@ -87,14 +101,20 @@ pub trait Load {
         for format in Format::iter() {
             let filename = Self::filename(name, format);
             if let Some(file) = Self::Assets::get(&filename) {
-                return Ok(Self::from_buf(file.data.as_ref(), format).map_err(Error::from)?);
+                return Ok(Self::from_buf(file.data.as_ref(), format).map_err(|e| {
+                    Error::Parse {
+                        name: name.into(),
+                        category: Self::category(),
+                        source: e,
+                    }
+                })?);
             }
         }
 
         let suggestions = Suggestions::new(name, Self::embedded_names());
 
         Err(Self::Error::from(Error::ItemNotFound {
-            name: name.to_owned(),
+            name: name.into(),
             category: Self::category(),
             suggestions,
         }))
@@ -145,17 +165,28 @@ pub trait Load {
             };
             match std::fs::read(&path) {
                 Ok(data) => {
-                    return Ok(Self::from_buf(&data, format).map_err(Error::from)?);
+                    return Ok(Self::from_buf(&data, format).map_err(|e| Error::Parse {
+                        name: name.into(),
+                        category: Self::category(),
+                        source: e,
+                    })?);
                 }
                 Err(e) => match e.kind() {
                     ErrorKind::NotFound => continue,
-                    _ => return Err(Error::from(e).into()),
+                    _ => {
+                        return Err(Error::Io {
+                            name: name.into(),
+                            category: Self::category(),
+                            source: e,
+                        }
+                        .into());
+                    }
                 },
             }
         }
 
         Err(Error::ItemNotFound {
-            name: name.to_owned(),
+            name: name.into(),
             category: Self::category(),
             suggestions: Suggestions::none(),
         }
@@ -221,9 +252,17 @@ pub trait Load {
         let path = Self::dir();
         let dir = Path::new(&path);
         Ok(dir
-            .read_dir()?
+            .read_dir()
+            .map_err(|e| Error::FailedToListItems {
+                category: Self::category(),
+                source: e,
+            })?
             .map(|item| {
-                Ok(item?
+                Ok(item
+                    .map_err(|e| Error::FailedToListItems {
+                        category: Self::category(),
+                        source: e,
+                    })?
                     .path()
                     .file_name()
                     .and_then(|n| n.to_str())
@@ -282,7 +321,8 @@ impl From<Origin> for ItemInfo {
 
 // ---
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Display)]
+#[strum(serialize_all = "kebab-case")]
 pub enum Origin {
     Stock,
     Custom,

@@ -1,19 +1,18 @@
 // std imports
 use std::{
     borrow::Cow,
-    io,
+    fmt, io,
     num::{ParseFloatError, ParseIntError, TryFromIntError},
 };
 
 // third-party imports
 use config::ConfigError;
-use itertools::Itertools;
-use nu_ansi_term::Color;
+use owo_colors::OwoColorize;
 use thiserror::Error;
 
 use crate::{
     config::{theme, winstyle},
-    xerr::{Highlight, Suggestions},
+    xerr::{HighlightQuoted, Suggestions},
 };
 
 /// Result is an alias for standard result with bound Error type.
@@ -53,24 +52,30 @@ pub enum Error {
 }
 
 impl Error {
-    fn tips<A>(&self, app: &A) -> Vec<String>
+    fn tips<'a, A>(&'a self, app: &A) -> Tips<'a>
     where
         A: AppInfoProvider,
     {
         match self {
             Error::Theme(theme::Error::ThemeNotFound { suggestions, .. }) => {
-                let tip1 = did_you_mean(suggestions);
-                let tip2 = usage(app, UsageRequest::ListThemes)
+                let did_you_mean = did_you_mean(suggestions);
+                let usage = usage(app, UsageRequest::ListThemes)
                     .map(|usage| format!("run {usage} to list available themes"));
-                tip1.into_iter().chain(tip2).collect()
+                Tips {
+                    did_you_mean,
+                    usage,
+                }
             }
             Error::WindowStyle(winstyle::Error::WindowStyleNotFound { suggestions, .. }) => {
-                let tip1 = did_you_mean(suggestions);
-                let tip2 = usage(app, UsageRequest::ListWindowStyles)
+                let did_you_mean = did_you_mean(suggestions);
+                let usage = usage(app, UsageRequest::ListWindowStyles)
                     .map(|usage| format!("run {usage} to list available window styles"));
-                tip1.into_iter().chain(tip2).collect()
+                Tips {
+                    did_you_mean,
+                    usage,
+                }
             }
-            _ => Vec::new(),
+            _ => Default::default(),
         }
     }
 
@@ -78,10 +83,40 @@ impl Error {
     where
         A: AppInfoProvider,
     {
-        eprintln!("{} {:#}", Color::LightRed.bold().paint(ERR_PREFIX), self);
-        for tip in self.tips(app) {
-            eprintln!("{} {}", Color::Green.bold().paint(TIP_PREFIX), tip);
+        self.log_to(&mut io::stderr(), app).ok();
+    }
+
+    pub fn log_to<A, W>(&self, target: &mut W, app: &A) -> io::Result<()>
+    where
+        A: AppInfoProvider,
+        W: std::io::Write,
+    {
+        writeln!(target, "{} {:#}", ERR_PREFIX.bright_red().bold(), self)?;
+        write!(target, "{}", self.tips(app))?;
+        Ok(())
+    }
+}
+
+#[derive(Debug, Default)]
+struct Tips<'a> {
+    did_you_mean: Option<DidYouMean<'a>>,
+    usage: Option<String>,
+}
+
+impl std::fmt::Display for Tips<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let prefix = TIP_PREFIX.green();
+        let prefix = prefix.bold();
+
+        if let Some(did_you_mean) = &self.did_you_mean {
+            writeln!(f, "{prefix} {did_you_mean}")?;
         }
+
+        if let Some(usage) = &self.usage {
+            writeln!(f, "{prefix} {usage}")?;
+        }
+
+        Ok(())
     }
 }
 
@@ -107,9 +142,8 @@ pub type UsageResponse = (Cow<'static, str>, Cow<'static, str>);
 
 fn usage<A: AppInfoProvider>(app: &A, request: UsageRequest) -> Option<String> {
     let (command, args) = app.usage_suggestion(request)?;
-    let result = Color::Default
-        .bold()
-        .paint(format!("{} {}", app.app_name(), command));
+    let result = format!("{} {}", app.app_name(), command);
+    let result = result.bold();
     if args.is_empty() {
         Some(result.to_string())
     } else {
@@ -117,15 +151,30 @@ fn usage<A: AppInfoProvider>(app: &A, request: UsageRequest) -> Option<String> {
     }
 }
 
-fn did_you_mean(suggestions: &Suggestions) -> Option<String> {
+#[derive(Debug)]
+pub struct DidYouMean<'a> {
+    suggestions: &'a Suggestions,
+}
+
+impl fmt::Display for DidYouMean<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "did you mean ")?;
+        for (i, suggestion) in self.suggestions.iter().enumerate() {
+            if i > 0 {
+                write!(f, " or ")?;
+            }
+            write!(f, "{}", suggestion.hlq())?;
+        }
+        write!(f, "?")
+    }
+}
+
+fn did_you_mean(suggestions: &Suggestions) -> Option<DidYouMean> {
     if suggestions.is_empty() {
         return None;
     }
 
-    Some(format!(
-        "did you mean {}?",
-        suggestions.iter().map(|x| x.hl()).join(" or ")
-    ))
+    Some(DidYouMean { suggestions })
 }
 
 const ERR_PREFIX: &str = "error:";

@@ -21,7 +21,7 @@ use termwiz::{
 // local imports
 use super::{FontFace, FontStyle, FontWeight, Padding, Render, Theme};
 use crate::config::winstyle::{
-    LineCap, WindowButton, WindowButtonIconKind, WindowButtonShape, WindowButtonsPosition,
+    Float, LineCap, WindowButton, WindowButtonIconKind, WindowButtonShape, WindowButtonsPosition,
 };
 
 // re-exports
@@ -446,7 +446,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
     window = window.add(screen);
 
     // frame border
-    let gap = border.width + border.gap.unwrap_or(0.0);
+    let gap = border.width + border.gap.unwrap_or_default();
     window = window
         .add(
             element::Rectangle::new()
@@ -544,7 +544,7 @@ fn make_buttons(opt: &Options, width: f32) -> element::Group {
                     ),
                 ),
                 WindowButtonIconKind::Maximize => {
-                    let r = icon.roundness.unwrap_or(2.0);
+                    let r = icon.roundness.map(Float::f32).unwrap_or(2.0);
                     let x1 = (x - icon.size / 2.0).r2p(fp);
                     let x4 = (x + icon.size / 2.0).r2p(fp);
                     let x2 = (x1 + r).r2p(fp);
@@ -646,30 +646,46 @@ impl Render for SvgRenderer {
 
 // ---
 
-fn r2p<T: RoundToPrecision>(value: T, precision: u8) -> T {
+fn r2p<T: RoundToPrecision>(value: T, precision: u8) -> T::Output {
     value.r2p(precision)
 }
 
 // ---
 
 trait RoundToPrecision {
-    fn r2p(&self, precision: u8) -> Self;
+    type Output;
+
+    fn r2p(&self, precision: u8) -> Self::Output;
 }
 
 impl RoundToPrecision for f32 {
+    type Output = Self;
+
     fn r2p(&self, precision: u8) -> Self {
         let k = 10.0f32.powf(precision as f32);
         (self * k).round() / k
     }
 }
 
+impl RoundToPrecision for Float {
+    type Output = f32;
+
+    fn r2p(&self, precision: u8) -> Self::Output {
+        r2p(<f32>::from(*self), precision)
+    }
+}
+
 impl RoundToPrecision for (f32, f32) {
+    type Output = Self;
+
     fn r2p(&self, precision: u8) -> Self {
         (r2p(self.0, precision), r2p(self.1, precision))
     }
 }
 
 impl RoundToPrecision for (f32, f32, f32, f32) {
+    type Output = Self;
+
     fn r2p(&self, precision: u8) -> Self {
         (
             r2p(self.0, precision),
@@ -681,6 +697,8 @@ impl RoundToPrecision for (f32, f32, f32, f32) {
 }
 
 impl RoundToPrecision for Padding {
+    type Output = Self;
+
     fn r2p(&self, precision: u8) -> Self {
         Padding {
             left: r2p(self.left, precision),

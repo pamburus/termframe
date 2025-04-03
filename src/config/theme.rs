@@ -1,10 +1,18 @@
 // std imports
-use std::{collections::HashMap, io, path::PathBuf, sync::LazyLock};
+use std::{
+    collections::HashMap,
+    io,
+    path::PathBuf,
+    str::FromStr,
+    sync::{Arc, LazyLock},
+};
 
 // third-party imports
 use csscolorparser::Color;
+use enumset::{EnumSet, EnumSetType};
 use rust_embed::RustEmbed;
 use serde::Deserialize;
+use strum::Display;
 use thiserror::Error;
 
 // local imports
@@ -12,26 +20,36 @@ use super::{
     load::{self, Categorize, ErrorCategory, Load},
     mode::Mode,
 };
-use crate::xerr::{Highlight, Suggestions};
+use crate::xerr::{HighlightQuoted, Suggestions};
 
 // ---
 
 /// Error is an error which may occur in the application.
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("unknown theme {}", .name.hl())]
+    #[error("unknown theme {}", .name.hlq())]
     ThemeNotFound {
-        name: String,
+        name: Arc<str>,
         suggestions: Suggestions,
     },
-    #[error("theme file {} not found", .path.hl())]
+    #[error("theme file {} not found", .path.hlq())]
     ThemeFileNotFound { path: PathBuf },
-    #[error("invalid theme file path {}", .path.hl())]
+    #[error("invalid theme file path {}", .path.hlq())]
     InvalidThemeFilePath { path: PathBuf },
-    #[error(transparent)]
-    Io(#[from] io::Error),
-    #[error(transparent)]
-    Parse(#[from] load::ParseError),
+    #[error("invalid tag {value}", value=.value.hlq())]
+    InvalidTag {
+        value: Arc<str>,
+        suggestions: Suggestions,
+    },
+    #[error("failed to list themes: {source}")]
+    FailedToListThemes { source: io::Error },
+    #[error("failed to load theme {name}: {source}", name=.name.hlq())]
+    Io { name: Arc<str>, source: io::Error },
+    #[error("failed to parse theme {name}: {source}", name=.name.hlq())]
+    FailedToParseTheme {
+        name: Arc<str>,
+        source: load::ParseError,
+    },
 }
 
 impl From<load::Error> for Error {
@@ -39,11 +57,12 @@ impl From<load::Error> for Error {
         match err {
             load::Error::ItemNotFound {
                 name, suggestions, ..
-            } => Error::ThemeNotFound { name, suggestions },
-            load::Error::FileNotFound { path } => Error::ThemeFileNotFound { path },
-            load::Error::InvalidFilePath { path } => Error::InvalidThemeFilePath { path },
-            load::Error::Io(err) => Error::Io(err),
-            load::Error::Parse(err) => Error::Parse(err),
+            } => Self::ThemeNotFound { name, suggestions },
+            load::Error::FileNotFound { path } => Self::ThemeFileNotFound { path },
+            load::Error::InvalidFilePath { path } => Self::InvalidThemeFilePath { path },
+            load::Error::FailedToListItems { source, .. } => Self::FailedToListThemes { source },
+            load::Error::Io { name, source, .. } => Self::Io { name, source },
+            load::Error::Parse { name, source, .. } => Self::FailedToParseTheme { name, source },
         }
     }
 }
@@ -59,19 +78,48 @@ impl Categorize for Error {
 
 // ---
 
+#[derive(Debug, Ord, PartialOrd, Hash, Deserialize, EnumSetType, Display)]
+#[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
+pub enum Tag {
+    Dark,
+    Light,
+}
+
+impl FromStr for Tag {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        serde_plain::from_str(s).map_err(|_| Error::InvalidTag {
+            value: s.into(),
+            suggestions: Suggestions::new(s, EnumSet::<Tag>::all().iter().map(|v| v.to_string())),
+        })
+    }
+}
+
+// ---
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct ThemeConfig {
+    #[serde(deserialize_with = "enumset_serde::deserialize")]
+    pub tags: EnumSet<Tag>,
+    pub theme: Theme,
+}
+
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 #[serde(untagged)]
-pub enum ThemeConfig {
+pub enum Theme {
     Fixed(Fixed),
     Adaptive(Adaptive),
 }
 
-impl ThemeConfig {
+impl Theme {
     pub fn resolve(&self, mode: Mode) -> &Colors {
         match self {
-            ThemeConfig::Fixed(fixed) => &fixed.colors,
-            ThemeConfig::Adaptive(dynamic) => match mode {
+            Theme::Fixed(fixed) => &fixed.colors,
+            Theme::Adaptive(dynamic) => match mode {
                 Mode::Dark => &dynamic.modes.dark.colors,
                 Mode::Light => &dynamic.modes.light.colors,
             },
@@ -132,7 +180,23 @@ pub struct Colors {
     pub palette: Palette,
 }
 
-pub type Palette = HashMap<u8, Color>;
+pub type Palette = HashMap<PaletteIndex, Color>;
+
+#[derive(Debug, Deserialize, Clone, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[serde(untagged)]
+pub enum PaletteIndex {
+    U8(u8),
+    String(String),
+}
+
+impl PaletteIndex {
+    pub fn resolve(&self) -> Option<u8> {
+        match self {
+            Self::U8(value) => Some(*value),
+            Self::String(value) => value.parse().ok(),
+        }
+    }
+}
 
 // ---
 

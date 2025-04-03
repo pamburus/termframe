@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/document",
+  "definitions": {
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/tag"
+          }
+        },
+        "theme": {
+          "$ref": "#/definitions/theme"
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "colors": {
+          "$ref": "#/definitions/colors"
+        },
+        "modes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dark": {
+              "$ref": "#/definitions/mode"
+            },
+            "light": {
+              "$ref": "#/definitions/mode"
+            }
+          },
+          "required": ["dark", "light"]
+        }
+      },
+      "oneOf": [{ "required": ["colors"] }, { "required": ["modes"] }]
+    },
+    "tag": {
+      "type": "string",
+      "enum": ["dark", "light"]
+    },
+    "mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "colors": {
+          "$ref": "#/definitions/colors"
+        }
+      },
+      "required": ["colors"]
+    },
+    "colors": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "background": {
+          "$ref": "#/definitions/hex-color"
+        },
+        "foreground": {
+          "$ref": "#/definitions/hex-color"
+        },
+        "bright-foreground": {
+          "$ref": "#/definitions/hex-color"
+        },
+        "palette": {
+          "type": "object",
+          "patternProperties": {
+            "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$": {
+              "$ref": "#/definitions/hex-color"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["background", "foreground"]
+    },
+    "hex-color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    }
+  }
+}

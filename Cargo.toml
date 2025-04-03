@@ -4,7 +4,7 @@ authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
 description = "Terminal output SVG screenshot tool"
 categories = ["command-line-utilities"]
 keywords = ["cli", "terminal", "screenshot", "svg"]
-version = "0.4.4-alpha.1"
+version = "0.5.0-alpha.1"
 edition = "2024"
 license = "MIT"
 build = "build/build.rs"
@@ -28,19 +28,23 @@ csscolorparser = { version = "0.7", features = ["serde"] }
 dark-light = "2"
 dirs = "6"
 dirs-sys = "0.5"
+enumset = "1"
+enumset-ext = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28", features = ["serde", "clap"] }
+enumset-serde = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28" }
 env_logger = "0.11"
 hex = "0.4"
 http = "1"
 itertools = "0.14"
 known-folders = "1"
 log = "0.4"
-nu-ansi-term = "0.50"
 num-traits = "0.2"
+owo-colors = "4"
 portable-pty = "0.9"
 rayon = "1"
 rust-embed = "8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
+serde_plain = "1"
 serde_yml = "0.0"
 shell-escape = "0.1"
 strsim = "0.11"

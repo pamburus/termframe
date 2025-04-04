@@ -108,6 +108,10 @@ pub struct Opt {
     #[arg(long, overrides_with = "title", value_name = "TITLE")]
     pub title: Option<String>,
 
+    /// Build palette using CSS variables for basic ANSI colors.
+    #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.var_palette, overrides_with = "var_palette", value_name = "ENABLED")]
+    pub var_palette: bool,
+
     /// Output file, by default prints to stdout.
     #[arg(
         long,
@@ -180,6 +184,7 @@ impl config::Patch for Opt {
         settings.font.weights.faint = self.faint_font_weight.into();
         settings.rendering.svg.embed_fonts = self.embed_fonts;
         settings.rendering.svg.subset_fonts = self.subset_fonts;
+        settings.rendering.svg.var_palette = self.var_palette;
         settings.rendering.faint_opacity = self.faint_opacity.into();
         settings.rendering.line_height = self.line_height.into();
         settings.rendering.bold_is_bright = self.bold_is_bright;

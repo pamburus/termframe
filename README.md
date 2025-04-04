@@ -138,6 +138,7 @@ Options:
       --window-margin <PIXELS>      Override window margin, in pixels
       --window-style <NAME>         Window style
       --title <TITLE>               Window title
+      --var-palette <ENABLED>       Build palette using CSS variables for basic ANSI colors [default: false] [possible values: true, false]
   -o, --output <FILE>               Output file, by default prints to stdout [default: -]
       --timeout <SECONDS>           Timeout for the command to run, in seconds [default: 5]
       --list-themes[=<TAGS>]        Print available themes optionally filtered by tags [possible values: dark, light]

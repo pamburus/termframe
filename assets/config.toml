@@ -80,6 +80,9 @@ embed-fonts = false
 # Experimental feature, has compatibility issues with some browsers.
 subset-fonts = false
 #
+# Build palette using CSS variables for basic ANSI colors.
+var-palette = false
+#
 # Floating point precision for rendering.
 precision = 3
 #

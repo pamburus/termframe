@@ -1,4 +1,8 @@
 [[rule]]
+include = ["assets/config.toml"]
+schema = { path = "./schema/json/config.schema.json", enabled = true }
+
+[[rule]]
 include = ["assets/themes/*.toml"]
 schema = { path = "./schema/json/theme.schema.json", enabled = true }
 

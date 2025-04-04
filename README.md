@@ -93,7 +93,7 @@ This tool is a non-interactive terminal emulator that executes a single command,
 
 #### Default configuration file
 
-* [config.yaml](assets/config.yaml)
+* [config.toml](assets/config.toml)
 
 ### Environment variables
 

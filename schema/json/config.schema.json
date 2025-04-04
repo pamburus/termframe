@@ -1,0 +1,208 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/document",
+  "definitions": {
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["auto", "dark", "light"]
+        },
+        "terminal": {
+          "$ref": "#/definitions/terminal"
+        },
+        "font": {
+          "$ref": "#/definitions/font"
+        },
+        "padding": {
+          "$ref": "#/definitions/padding"
+        },
+        "theme": {
+          "$ref": "#/definitions/theme"
+        },
+        "window": {
+          "$ref": "#/definitions/window"
+        },
+        "rendering": {
+          "$ref": "#/definitions/rendering"
+        },
+        "fonts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/font-item"
+          }
+        }
+      }
+    },
+    "terminal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      }
+    },
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "family": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "size": {
+          "type": "number"
+        },
+        "weights": {
+          "$ref": "#/definitions/weights"
+        }
+      }
+    },
+    "weights": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "normal": {
+          "$ref": "#/definitions/font-weight"
+        },
+        "bold": {
+          "$ref": "#/definitions/font-weight"
+        },
+        "faint": {
+          "$ref": "#/definitions/font-weight"
+        }
+      }
+    },
+    "font-weight": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "bold",
+        "100",
+        "200",
+        "300",
+        "400",
+        "500",
+        "600",
+        "700",
+        "800",
+        "900"
+      ]
+    },
+    "padding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "horizontal": {
+          "type": "number"
+        },
+        "vertical": {
+          "type": "number"
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dark": {
+          "type": "string"
+        },
+        "light": {
+          "type": "string"
+        }
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "shadow": {
+          "type": "boolean"
+        },
+        "style": {
+          "type": "string"
+        }
+      }
+    },
+    "rendering": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "line-height": {
+          "type": "number"
+        },
+        "bold-is-bright": {
+          "type": "boolean"
+        },
+        "faint-opacity": {
+          "type": "number"
+        },
+        "svg": {
+          "$ref": "#/definitions/svg"
+        }
+      }
+    },
+    "svg": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "embed-fonts": {
+          "type": "boolean"
+        },
+        "subset-fonts": {
+          "type": "boolean"
+        },
+        "precision": {
+          "type": "number"
+        },
+        "stroke": {
+          "type": "number"
+        }
+      }
+    },
+    "font-item": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "family": {
+          "type": "string"
+        },
+        "license": {
+          "$ref": "#/definitions/license"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["family", "license", "files"]
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "link": {
+          "type": "string"
+        }
+      },
+      "required": ["type", "link"]
+    }
+  }
+}

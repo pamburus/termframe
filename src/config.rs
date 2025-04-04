@@ -6,7 +6,7 @@ use std::{
 };
 
 // third-party imports
-use anyhow::Result;
+use anyhow::{Context, Result};
 use config::{Config, File, FileFormat};
 use serde::Deserialize;
 
@@ -18,12 +18,14 @@ use crate::appdirs::AppDirs;
 pub mod load;
 pub mod mode;
 pub mod theme;
+pub mod types;
 pub mod winstyle;
 
 // ---
 
 // re-exports
 pub use load::Load;
+pub use types::Number;
 
 // ---
 
@@ -31,19 +33,13 @@ pub use load::Load;
 #[serde(rename_all = "kebab-case")]
 pub struct Settings {
     pub terminal: Terminal,
-    pub font: Font,
-    pub line_height: f32,
-    pub precision: u8,
-    pub theme: ThemeSetting,
-    pub fonts: Fonts,
-    pub embed_fonts: bool,
-    pub subset_fonts: bool,
-    pub faint_opacity: f32,
-    pub bold_is_bright: bool,
-    pub padding: PaddingOption,
-    pub stroke: Option<f32>,
     pub mode: mode::ModeSetting,
+    pub theme: ThemeSetting,
+    pub font: Font,
+    pub padding: PaddingOption,
     pub window: Window,
+    pub rendering: Rendering,
+    pub fonts: Fonts,
 }
 
 impl Settings {
@@ -51,8 +47,10 @@ impl Settings {
     where
         I: IntoIterator<Item = Source>,
     {
-        let mut builder =
-            Config::builder().add_source(File::from_str(DEFAULT_SETTINGS_RAW, FileFormat::Yaml));
+        let mut builder = Config::builder().add_source(File::from_str(
+            DEFAULT_SETTINGS_RAW,
+            DEFAULT_SETTINGS_FORMAT,
+        ));
 
         for source in sources {
             builder = match source {
@@ -68,7 +66,10 @@ impl Settings {
             };
         }
 
-        Ok(builder.build()?.try_deserialize()?)
+        builder
+            .build()?
+            .try_deserialize()
+            .context("failed to load config")
     }
 }
 
@@ -82,6 +83,26 @@ impl Default for &'static Settings {
     fn default() -> Self {
         &DEFAULT_SETTINGS
     }
+}
+
+// ---
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct Rendering {
+    pub line_height: Number,
+    pub faint_opacity: Number,
+    pub bold_is_bright: bool,
+    pub svg: Svg,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct Svg {
+    pub stroke: Option<Number>,
+    pub precision: u8,
+    pub embed_fonts: bool,
+    pub subset_fonts: bool,
 }
 
 // ---
@@ -147,7 +168,7 @@ pub struct Terminal {
 #[serde(rename_all = "kebab-case")]
 pub struct Font {
     pub family: FontFamilyOption,
-    pub size: f32,
+    pub size: Number,
     pub weights: FontWeights,
 }
 
@@ -231,8 +252,11 @@ impl fmt::Display for FontWeight {
 #[serde(rename_all = "kebab-case")]
 #[serde(untagged)]
 pub enum PaddingOption {
-    Uniform(f32),
-    Symmetric { vertical: f32, horizontal: f32 },
+    Uniform(Number),
+    Symmetric {
+        vertical: Number,
+        horizontal: Number,
+    },
     Asymmetric(Padding),
 }
 
@@ -261,24 +285,25 @@ impl PaddingOption {
 
 impl Default for PaddingOption {
     fn default() -> Self {
-        Self::Uniform(4.0)
+        Self::Uniform(4.0.into())
     }
 }
 
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq, Default)]
 #[serde(rename_all = "kebab-case")]
 pub struct Padding {
-    pub top: f32,
-    pub bottom: f32,
-    pub left: f32,
-    pub right: f32,
+    pub top: Number,
+    pub bottom: Number,
+    pub left: Number,
+    pub right: Number,
 }
 
 // ---
 
-static DEFAULT_SETTINGS_RAW: &str = include_str!("../assets/config.yaml");
+static DEFAULT_SETTINGS_RAW: &str = include_str!("../assets/config.toml");
+const DEFAULT_SETTINGS_FORMAT: FileFormat = FileFormat::Toml;
 static DEFAULT_SETTINGS: LazyLock<Settings> =
-    LazyLock::new(|| Settings::load([Source::string("", FileFormat::Yaml)]).unwrap());
+    LazyLock::new(|| Settings::load([Source::string("", DEFAULT_SETTINGS_FORMAT)]).unwrap());
 
 pub const APP_NAME: &str = "termframe";
 
@@ -396,6 +421,7 @@ pub mod global {
 
 // ---
 
+#[derive(Debug, Clone)]
 pub enum Source {
     File(SourceFile),
     String(String, FileFormat),
@@ -418,6 +444,7 @@ impl From<SourceFile> for Source {
 
 // ---
 
+#[derive(Debug, Clone)]
 pub struct SourceFile {
     filename: PathBuf,
     required: bool,

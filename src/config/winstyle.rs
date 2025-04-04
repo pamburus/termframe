@@ -15,6 +15,7 @@ use thiserror::Error;
 use super::{
     load::{self, Categorize, ErrorCategory, Load},
     mode::Mode,
+    types::Number,
 };
 use crate::xerr::{HighlightQuoted, Suggestions};
 
@@ -135,9 +136,9 @@ pub struct Window {
 #[serde(rename_all = "kebab-case")]
 pub struct WindowBorder {
     pub colors: WindowBorderColors,
-    pub width: Float,
-    pub radius: Float,
-    pub gap: Option<Float>,
+    pub width: Number,
+    pub radius: Number,
+    pub gap: Option<Number>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -151,7 +152,7 @@ pub struct WindowBorderColors {
 #[serde(rename_all = "kebab-case")]
 pub struct WindowHeader {
     pub color: SelectiveColor,
-    pub height: Float,
+    pub height: Number,
     pub border: Option<WindowHeaderBorder>,
 }
 
@@ -159,7 +160,7 @@ pub struct WindowHeader {
 #[serde(rename_all = "kebab-case")]
 pub struct WindowHeaderBorder {
     pub color: SelectiveColor,
-    pub width: Float,
+    pub width: Number,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -173,7 +174,7 @@ pub struct WindowTitle {
 #[serde(rename_all = "kebab-case")]
 pub struct Font {
     pub family: Vec<String>,
-    pub size: Float,
+    pub size: Number,
     pub weight: Option<String>,
 }
 
@@ -182,18 +183,18 @@ pub struct Font {
 pub struct WindowButtons {
     pub position: WindowButtonsPosition,
     pub shape: Option<WindowButtonShape>,
-    pub size: Float,
-    pub roundness: Option<Float>,
+    pub size: Number,
+    pub roundness: Option<Number>,
     pub items: Vec<WindowButton>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowButton {
-    pub offset: Float,
+    pub offset: Number,
     pub fill: Option<SelectiveColor>,
     pub stroke: Option<SelectiveColor>,
-    pub stroke_width: Option<Float>,
+    pub stroke_width: Option<Number>,
     pub icon: Option<WindowButtonIcon>,
 }
 
@@ -215,11 +216,11 @@ pub enum WindowButtonShape {
 #[serde(rename_all = "kebab-case")]
 pub struct WindowButtonIcon {
     pub kind: WindowButtonIconKind,
-    pub size: Float,
+    pub size: Number,
     pub stroke: SelectiveColor,
-    pub stroke_width: Option<Float>,
+    pub stroke_width: Option<Number>,
     pub stroke_linecap: Option<LineCap>,
-    pub roundness: Option<Float>,
+    pub roundness: Option<Number>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -243,9 +244,9 @@ pub enum LineCap {
 pub struct WindowShadow {
     pub enabled: bool,
     pub color: SelectiveColor,
-    pub x: Float,
-    pub y: Float,
-    pub blur: Float,
+    pub x: Number,
+    pub y: Number,
+    pub blur: Number,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -265,106 +266,6 @@ impl SelectiveColor {
                 Mode::Dark => dark,
             },
         }
-    }
-}
-
-#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
-#[serde(untagged)]
-pub enum Float {
-    Int(u16),
-    Float(f32),
-}
-
-impl Float {
-    pub fn f32(self) -> f32 {
-        self.into()
-    }
-}
-
-impl Default for Float {
-    fn default() -> Self {
-        Self::Float(0.0)
-    }
-}
-
-impl From<Float> for f32 {
-    fn from(value: Float) -> Self {
-        match value {
-            Float::Int(i) => i as f32,
-            Float::Float(f) => f,
-        }
-    }
-}
-
-impl std::ops::Add for Float {
-    type Output = f32;
-
-    fn add(self, rhs: Float) -> Self::Output {
-        self + f32::from(rhs)
-    }
-}
-
-impl std::ops::Add<f32> for Float {
-    type Output = f32;
-
-    fn add(self, rhs: f32) -> Self::Output {
-        f32::from(self) + rhs
-    }
-}
-
-impl std::ops::Add<Float> for f32 {
-    type Output = f32;
-
-    fn add(self, rhs: Float) -> Self::Output {
-        self + f32::from(rhs)
-    }
-}
-
-impl std::ops::Sub<f32> for Float {
-    type Output = f32;
-
-    fn sub(self, rhs: f32) -> Self::Output {
-        f32::from(self) - rhs
-    }
-}
-
-impl std::ops::Sub<Float> for f32 {
-    type Output = f32;
-
-    fn sub(self, rhs: Float) -> Self::Output {
-        self - f32::from(rhs)
-    }
-}
-
-impl std::ops::Mul<f32> for Float {
-    type Output = f32;
-
-    fn mul(self, rhs: f32) -> Self::Output {
-        f32::from(self) * rhs
-    }
-}
-
-impl std::ops::Mul<Float> for f32 {
-    type Output = f32;
-
-    fn mul(self, rhs: Float) -> Self::Output {
-        self * f32::from(rhs)
-    }
-}
-
-impl std::ops::Div<f32> for Float {
-    type Output = f32;
-
-    fn div(self, rhs: f32) -> Self::Output {
-        f32::from(self) / rhs
-    }
-}
-
-impl std::ops::Div<Float> for f32 {
-    type Output = f32;
-
-    fn div(self, rhs: Float) -> Self::Output {
-        self / f32::from(rhs)
     }
 }
 

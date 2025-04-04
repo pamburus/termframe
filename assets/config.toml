@@ -90,9 +90,5 @@ files = [
 family = "Fira Code"
 license = { type = "SIL Open Font License 1.1", link = "https://github.com/tonsky/FiraCode/blob/6.2/LICENSE" }
 files = [
-    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Bold.woff2",
-    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Light.woff2",
-    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Medium.woff2",
-    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-Regular.woff2",
-    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-SemiBold.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-VF.woff2",
 ]

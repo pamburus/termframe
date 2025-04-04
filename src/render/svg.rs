@@ -58,7 +58,12 @@ impl SvgRenderer {
         let pad = cfg.padding.resolve().r2p(fp); // padding in pixels
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
 
-        let mut palette = PaletteBuilder::new(bg.clone(), fg.clone(), opt.theme.clone());
+        let mut palette = PaletteBuilder::new(
+            bg.clone(),
+            fg.clone(),
+            opt.theme.clone(),
+            cfg.rendering.svg.var_palette,
+        );
 
         let background = element::Rectangle::new()
             .set("width", "100%")
@@ -301,11 +306,18 @@ impl SvgRenderer {
             screen
         };
 
-        let mut ss = palette.template(class).render()?;
+        let mut ss = Default::default();
+
+        let palette = palette.template(class);
+        if !palette.vars.is_empty() {
+            ss = palette.render()?;
+        }
 
         let faces = collect_font_faces(opt, used_font_faces)?;
         if !faces.is_empty() {
-            ss += "\n";
+            if !ss.is_empty() {
+                ss += "\n";
+            }
             ss += &faces.join("\n");
         }
 
@@ -825,10 +837,11 @@ struct PaletteBuilder {
     has_fg: bool,
     has_br_fg: bool,
     palette: BTreeMap<u8, Color>,
+    var_palette: bool,
 }
 
 impl PaletteBuilder {
-    fn new(bg: Color, fg: Color, theme: Rc<Theme>) -> Self {
+    fn new(bg: Color, fg: Color, theme: Rc<Theme>, var_palette: bool) -> Self {
         Self {
             bg,
             fg,
@@ -837,20 +850,26 @@ impl PaletteBuilder {
             has_fg: false,
             has_br_fg: false,
             palette: BTreeMap::new(),
+            var_palette,
         }
     }
 
     fn bg(&mut self, attr: ColorAttribute) -> ColorStyle {
         match attr {
             ColorAttribute::Default => {
+                if !self.var_palette {
+                    return ColorStyle::Custom(self.bg.clone());
+                }
                 self.has_bg = true;
                 ColorStyleId::DefaultBackground.into()
             }
             ColorAttribute::PaletteIndex(i) => {
                 let bg = self.bg.clone();
-                self.palette
-                    .entry(i)
-                    .or_insert_with(|| self.theme.resolve(attr).unwrap_or(bg));
+                let color = || self.theme.resolve(attr).unwrap_or(bg);
+                if !self.var_palette {
+                    return ColorStyle::Custom(color());
+                }
+                self.palette.entry(i).or_insert_with(color);
                 ColorStyleId::Palette(i).into()
             }
             ColorAttribute::TrueColorWithDefaultFallback(c)
@@ -861,14 +880,19 @@ impl PaletteBuilder {
     fn fg(&mut self, attr: ColorAttribute) -> ColorStyle {
         match attr {
             ColorAttribute::Default => {
+                if !self.var_palette {
+                    return ColorStyle::Custom(self.fg.clone());
+                }
                 self.has_fg = true;
                 ColorStyleId::DefaultForeground.into()
             }
             ColorAttribute::PaletteIndex(i) => {
                 let fg = self.fg.clone();
-                self.palette
-                    .entry(i)
-                    .or_insert_with(|| self.theme.resolve(attr).unwrap_or(fg));
+                let color = || self.theme.resolve(attr).unwrap_or(fg);
+                if !self.var_palette {
+                    return ColorStyle::Custom(color());
+                }
+                self.palette.entry(i).or_insert_with(color);
                 ColorStyleId::Palette(i).into()
             }
             ColorAttribute::TrueColorWithDefaultFallback(c)
@@ -879,6 +903,11 @@ impl PaletteBuilder {
     fn bright_fg(&mut self, attr: ColorAttribute) -> ColorStyle {
         let attr = match attr {
             ColorAttribute::Default => {
+                if !self.var_palette {
+                    return ColorStyle::Custom(
+                        self.theme.bright_fg.as_ref().unwrap_or(&self.fg).clone(),
+                    );
+                }
                 self.has_br_fg = true;
                 return ColorStyleId::BrightForeground.into();
             }

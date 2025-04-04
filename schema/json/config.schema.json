@@ -164,6 +164,9 @@
         "subset-fonts": {
           "type": "boolean"
         },
+        "var-palette": {
+          "type": "boolean"
+        },
         "precision": {
           "type": "number"
         },

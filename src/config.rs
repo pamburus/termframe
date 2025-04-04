@@ -103,6 +103,7 @@ pub struct Svg {
     pub precision: u8,
     pub embed_fonts: bool,
     pub subset_fonts: bool,
+    pub var_palette: bool,
 }
 
 // ---

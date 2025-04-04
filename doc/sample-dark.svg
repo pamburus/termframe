@@ -1,174 +1,174 @@
-<svg height="452" width="652" xmlns="http://www.w3.org/2000/svg">
+<svg height="452" width="666.22" xmlns="http://www.w3.org/2000/svg">
 <g transform="translate(32,16)">
 <filter id="shadow">
 <feGaussianBlur stdDeviation="12"/>
 </filter>
-<rect fill="#000000c0" filter="url(#shadow)" height="388" rx="10" ry="10" width="588" x="4" y="12"/>
-<rect fill="#282c34" height="388" rx="10" ry="10" width="588"/>
+<rect fill="#000000c0" filter="url(#shadow)" height="388" rx="10" ry="10" width="602.22" x="4" y="12"/>
+<rect fill="#282c34" height="388" rx="10" ry="10" width="602.22"/>
 <clipPath id="header">
-<rect height="28" width="588"/>
+<rect height="28" width="602.22"/>
 </clipPath>
-<rect clip-path="url(#header)" fill="#383837" height="56" rx="10" ry="10" width="588"/>
-<line stroke="#000000c0" stroke-width="0.5" x1="0" x2="588" y1="28" y2="28"/><text dominant-baseline="central" fill="#b3b3b3" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" x="294" y="14">termframe sample</text>
+<rect clip-path="url(#header)" fill="#383837" height="56" rx="10" ry="10" width="602.22"/>
+<line stroke="#000000c0" stroke-width="0.5" x1="0" x2="602.22" y1="28" y2="28"/><text dominant-baseline="central" fill="#b3b3b3" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" x="301.11" y="14">termframe sample</text>
 <g>
 <circle cx="14" cy="14" fill="#ff5f56" r="6" stroke="#ff5f56" stroke-width="0.5"/>
 <circle cx="34" cy="14" fill="#ffbd2e" r="6" stroke="#ffbd2e" stroke-width="0.5"/>
 <circle cx="54" cy="14" fill="#28c941" r="6" stroke="#28c941" stroke-width="0.5"/>
 </g>
-<svg class="terminal" font-family="JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace" font-size="12" height="30em" width="49em" y="28">
+<svg class="terminal" font-family="JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace" font-size="12" height="30em" width="50.185em" y="28">
 <svg fill="var(--fg)" x="0.8em" y="0.6em">
 <g>
-<svg height="28.8em" viewBox="0 0 47.4 28.8" width="47.4em">
+<svg height="28.8em" viewBox="0 0 48.585 28.8" width="48.585em">
 <g stroke-width="0.025">
-<path d="M10.2,7.2 H22.8 V8.4 H10.2 Z" fill="var(--fg)" stroke="var(--fg)"/>
-<path d="M0,22.8 H6 V24 H0 Z" fill="var(--c-0)" stroke="var(--c-0)"/>
-<path d="M6,22.8 H10.8 V24 H6 Z" fill="var(--c-1)" stroke="var(--c-1)"/>
-<path d="M10.8,22.8 H16.8 V24 H10.8 Z" fill="var(--c-2)" stroke="var(--c-2)"/>
-<path d="M16.8,22.8 H23.4 V24 H16.8 Z" fill="var(--c-3)" stroke="var(--c-3)"/>
-<path d="M23.4,22.8 H28.8 V24 H23.4 Z" fill="var(--c-4)" stroke="var(--c-4)"/>
-<path d="M28.8,22.8 H36 V24 H28.8 Z" fill="var(--c-5)" stroke="var(--c-5)"/>
-<path d="M36,22.8 H41.4 V24 H36 Z" fill="var(--c-6)" stroke="var(--c-6)"/>
-<path d="M41.4,22.8 H47.4 V24 H41.4 Z" fill="var(--c-7)" stroke="var(--c-7)"/>
-<path d="M0,26.4 H0.6 V27.6 H0 Z" fill="#ff0000" stroke="#ff0000"/>
-<path d="M0.6,26.4 H1.2 V27.6 H0.6 Z" fill="#fc0003" stroke="#fc0003"/>
-<path d="M1.2,26.4 H1.8 V27.6 H1.2 Z" fill="#f80007" stroke="#f80007"/>
-<path d="M1.8,26.4 H2.4 V27.6 H1.8 Z" fill="#f5000a" stroke="#f5000a"/>
-<path d="M2.4,26.4 H3 V27.6 H2.4 Z" fill="#f2000d" stroke="#f2000d"/>
-<path d="M3,26.4 H3.6 V27.6 H3 Z" fill="#ef0010" stroke="#ef0010"/>
-<path d="M3.6,26.4 H4.2 V27.6 H3.6 Z" fill="#eb0014" stroke="#eb0014"/>
-<path d="M4.2,26.4 H4.8 V27.6 H4.2 Z" fill="#e80017" stroke="#e80017"/>
-<path d="M4.8,26.4 H5.4 V27.6 H4.8 Z" fill="#e5001a" stroke="#e5001a"/>
-<path d="M5.4,26.4 H6 V27.6 H5.4 Z" fill="#e2001d" stroke="#e2001d"/>
-<path d="M6,26.4 H6.6 V27.6 H6 Z" fill="#de0021" stroke="#de0021"/>
-<path d="M6.6,26.4 H7.2 V27.6 H6.6 Z" fill="#db0024" stroke="#db0024"/>
-<path d="M7.2,26.4 H7.8 V27.6 H7.2 Z" fill="#d80027" stroke="#d80027"/>
-<path d="M7.8,26.4 H8.4 V27.6 H7.8 Z" fill="#d4002a" stroke="#d4002a"/>
-<path d="M8.4,26.4 H9 V27.6 H8.4 Z" fill="#d1002e" stroke="#d1002e"/>
-<path d="M9,26.4 H9.6 V27.6 H9 Z" fill="#ce0031" stroke="#ce0031"/>
-<path d="M9.6,26.4 H10.2 V27.6 H9.6 Z" fill="#cb0034" stroke="#cb0034"/>
-<path d="M10.2,26.4 H10.8 V27.6 H10.2 Z" fill="#c70038" stroke="#c70038"/>
-<path d="M10.8,26.4 H11.4 V27.6 H10.8 Z" fill="#c4003b" stroke="#c4003b"/>
-<path d="M11.4,26.4 H12 V27.6 H11.4 Z" fill="#c1003e" stroke="#c1003e"/>
-<path d="M12,26.4 H12.6 V27.6 H12 Z" fill="#be0041" stroke="#be0041"/>
-<path d="M12.6,26.4 H13.2 V27.6 H12.6 Z" fill="#ba0045" stroke="#ba0045"/>
-<path d="M13.2,26.4 H13.8 V27.6 H13.2 Z" fill="#b70048" stroke="#b70048"/>
-<path d="M13.8,26.4 H14.4 V27.6 H13.8 Z" fill="#b4004b" stroke="#b4004b"/>
-<path d="M14.4,26.4 H15 V27.6 H14.4 Z" fill="#b1004e" stroke="#b1004e"/>
-<path d="M15,26.4 H15.6 V27.6 H15 Z" fill="#ad0052" stroke="#ad0052"/>
-<path d="M15.6,26.4 H16.2 V27.6 H15.6 Z" fill="#aa0055" stroke="#aa0055"/>
-<path d="M16.2,26.4 H16.8 V27.6 H16.2 Z" fill="#a70058" stroke="#a70058"/>
-<path d="M16.8,26.4 H17.4 V27.6 H16.8 Z" fill="#a3005c" stroke="#a3005c"/>
-<path d="M17.4,26.4 H18 V27.6 H17.4 Z" fill="#a0005f" stroke="#a0005f"/>
-<path d="M18,26.4 H18.6 V27.6 H18 Z" fill="#9d0062" stroke="#9d0062"/>
-<path d="M18.6,26.4 H19.2 V27.6 H18.6 Z" fill="#9a0065" stroke="#9a0065"/>
-<path d="M19.2,26.4 H19.8 V27.6 H19.2 Z" fill="#960069" stroke="#960069"/>
-<path d="M19.8,26.4 H20.4 V27.6 H19.8 Z" fill="#93006c" stroke="#93006c"/>
-<path d="M20.4,26.4 H21 V27.6 H20.4 Z" fill="#90006f" stroke="#90006f"/>
-<path d="M21,26.4 H21.6 V27.6 H21 Z" fill="#8d0072" stroke="#8d0072"/>
-<path d="M21.6,26.4 H22.2 V27.6 H21.6 Z" fill="#890076" stroke="#890076"/>
-<path d="M22.2,26.4 H22.8 V27.6 H22.2 Z" fill="#860079" stroke="#860079"/>
-<path d="M22.8,26.4 H23.4 V27.6 H22.8 Z" fill="#83007c" stroke="#83007c"/>
-<path d="M23.4,26.4 H24 V27.6 H23.4 Z" fill="#800080" stroke="#800080"/>
-<path d="M24,26.4 H24.6 V27.6 H24 Z" fill="#7c0083" stroke="#7c0083"/>
-<path d="M24.6,26.4 H25.2 V27.6 H24.6 Z" fill="#790086" stroke="#790086"/>
-<path d="M25.2,26.4 H25.8 V27.6 H25.2 Z" fill="#760089" stroke="#760089"/>
-<path d="M25.8,26.4 H26.4 V27.6 H25.8 Z" fill="#72008d" stroke="#72008d"/>
-<path d="M26.4,26.4 H27 V27.6 H26.4 Z" fill="#6f0090" stroke="#6f0090"/>
-<path d="M27,26.4 H27.6 V27.6 H27 Z" fill="#6c0093" stroke="#6c0093"/>
-<path d="M27.6,26.4 H28.2 V27.6 H27.6 Z" fill="#690096" stroke="#690096"/>
-<path d="M28.2,26.4 H28.8 V27.6 H28.2 Z" fill="#65009a" stroke="#65009a"/>
-<path d="M28.8,26.4 H29.4 V27.6 H28.8 Z" fill="#62009d" stroke="#62009d"/>
-<path d="M29.4,26.4 H30 V27.6 H29.4 Z" fill="#5f00a0" stroke="#5f00a0"/>
-<path d="M30,26.4 H30.6 V27.6 H30 Z" fill="#5c00a3" stroke="#5c00a3"/>
-<path d="M30.6,26.4 H31.2 V27.6 H30.6 Z" fill="#5800a7" stroke="#5800a7"/>
-<path d="M31.2,26.4 H31.8 V27.6 H31.2 Z" fill="#5500aa" stroke="#5500aa"/>
-<path d="M31.8,26.4 H32.4 V27.6 H31.8 Z" fill="#5200ad" stroke="#5200ad"/>
-<path d="M32.4,26.4 H33 V27.6 H32.4 Z" fill="#4e00b1" stroke="#4e00b1"/>
-<path d="M33,26.4 H33.6 V27.6 H33 Z" fill="#4b00b4" stroke="#4b00b4"/>
-<path d="M33.6,26.4 H34.2 V27.6 H33.6 Z" fill="#4800b7" stroke="#4800b7"/>
-<path d="M34.2,26.4 H34.8 V27.6 H34.2 Z" fill="#4500ba" stroke="#4500ba"/>
-<path d="M34.8,26.4 H35.4 V27.6 H34.8 Z" fill="#4100be" stroke="#4100be"/>
-<path d="M35.4,26.4 H36 V27.6 H35.4 Z" fill="#3e00c1" stroke="#3e00c1"/>
-<path d="M36,26.4 H36.6 V27.6 H36 Z" fill="#3b00c4" stroke="#3b00c4"/>
-<path d="M36.6,26.4 H37.2 V27.6 H36.6 Z" fill="#3800c7" stroke="#3800c7"/>
-<path d="M37.2,26.4 H37.8 V27.6 H37.2 Z" fill="#3400cb" stroke="#3400cb"/>
-<path d="M37.8,26.4 H38.4 V27.6 H37.8 Z" fill="#3100ce" stroke="#3100ce"/>
-<path d="M38.4,26.4 H39 V27.6 H38.4 Z" fill="#2e00d1" stroke="#2e00d1"/>
-<path d="M39,26.4 H39.6 V27.6 H39 Z" fill="#2a00d4" stroke="#2a00d4"/>
-<path d="M39.6,26.4 H40.2 V27.6 H39.6 Z" fill="#2700d8" stroke="#2700d8"/>
-<path d="M40.2,26.4 H40.8 V27.6 H40.2 Z" fill="#2400db" stroke="#2400db"/>
-<path d="M40.8,26.4 H41.4 V27.6 H40.8 Z" fill="#2100de" stroke="#2100de"/>
-<path d="M41.4,26.4 H42 V27.6 H41.4 Z" fill="#1d00e2" stroke="#1d00e2"/>
-<path d="M42,26.4 H42.6 V27.6 H42 Z" fill="#1a00e5" stroke="#1a00e5"/>
-<path d="M42.6,26.4 H43.2 V27.6 H42.6 Z" fill="#1700e8" stroke="#1700e8"/>
-<path d="M43.2,26.4 H43.8 V27.6 H43.2 Z" fill="#1400eb" stroke="#1400eb"/>
-<path d="M43.8,26.4 H44.4 V27.6 H43.8 Z" fill="#1000ef" stroke="#1000ef"/>
-<path d="M44.4,26.4 H45 V27.6 H44.4 Z" fill="#0d00f2" stroke="#0d00f2"/>
-<path d="M45,26.4 H45.6 V27.6 H45 Z" fill="#0a00f5" stroke="#0a00f5"/>
-<path d="M45.6,26.4 H46.2 V27.6 H45.6 Z" fill="#0700f8" stroke="#0700f8"/>
-<path d="M46.2,26.4 H46.8 V27.6 H46.2 Z" fill="#0300fc" stroke="#0300fc"/>
-<path d="M46.8,26.4 H47.4 V27.6 H46.8 Z" fill="#0000ff" stroke="#0000ff"/>
+<path d="M10.455,7.2 H23.37 V8.4 H10.455 Z" fill="var(--fg)" stroke="var(--fg)"/>
+<path d="M0,22.8 H6.15 V24 H0 Z" fill="var(--c-0)" stroke="var(--c-0)"/>
+<path d="M6.15,22.8 H11.07 V24 H6.15 Z" fill="var(--c-1)" stroke="var(--c-1)"/>
+<path d="M11.07,22.8 H17.22 V24 H11.07 Z" fill="var(--c-2)" stroke="var(--c-2)"/>
+<path d="M17.22,22.8 H23.985 V24 H17.22 Z" fill="var(--c-3)" stroke="var(--c-3)"/>
+<path d="M23.985,22.8 H29.52 V24 H23.985 Z" fill="var(--c-4)" stroke="var(--c-4)"/>
+<path d="M29.52,22.8 H36.9 V24 H29.52 Z" fill="var(--c-5)" stroke="var(--c-5)"/>
+<path d="M36.9,22.8 H42.435 V24 H36.9 Z" fill="var(--c-6)" stroke="var(--c-6)"/>
+<path d="M42.435,22.8 H48.585 V24 H42.435 Z" fill="var(--c-7)" stroke="var(--c-7)"/>
+<path d="M0,26.4 H0.615 V27.6 H0 Z" fill="#ff0000" stroke="#ff0000"/>
+<path d="M0.615,26.4 H1.23 V27.6 H0.615 Z" fill="#fc0003" stroke="#fc0003"/>
+<path d="M1.23,26.4 H1.845 V27.6 H1.23 Z" fill="#f80007" stroke="#f80007"/>
+<path d="M1.845,26.4 H2.46 V27.6 H1.845 Z" fill="#f5000a" stroke="#f5000a"/>
+<path d="M2.46,26.4 H3.075 V27.6 H2.46 Z" fill="#f2000d" stroke="#f2000d"/>
+<path d="M3.075,26.4 H3.69 V27.6 H3.075 Z" fill="#ef0010" stroke="#ef0010"/>
+<path d="M3.69,26.4 H4.305 V27.6 H3.69 Z" fill="#eb0014" stroke="#eb0014"/>
+<path d="M4.305,26.4 H4.92 V27.6 H4.305 Z" fill="#e80017" stroke="#e80017"/>
+<path d="M4.92,26.4 H5.535 V27.6 H4.92 Z" fill="#e5001a" stroke="#e5001a"/>
+<path d="M5.535,26.4 H6.15 V27.6 H5.535 Z" fill="#e2001d" stroke="#e2001d"/>
+<path d="M6.15,26.4 H6.765 V27.6 H6.15 Z" fill="#de0021" stroke="#de0021"/>
+<path d="M6.765,26.4 H7.38 V27.6 H6.765 Z" fill="#db0024" stroke="#db0024"/>
+<path d="M7.38,26.4 H7.995 V27.6 H7.38 Z" fill="#d80027" stroke="#d80027"/>
+<path d="M7.995,26.4 H8.61 V27.6 H7.995 Z" fill="#d4002a" stroke="#d4002a"/>
+<path d="M8.61,26.4 H9.225 V27.6 H8.61 Z" fill="#d1002e" stroke="#d1002e"/>
+<path d="M9.225,26.4 H9.84 V27.6 H9.225 Z" fill="#ce0031" stroke="#ce0031"/>
+<path d="M9.84,26.4 H10.455 V27.6 H9.84 Z" fill="#cb0034" stroke="#cb0034"/>
+<path d="M10.455,26.4 H11.07 V27.6 H10.455 Z" fill="#c70038" stroke="#c70038"/>
+<path d="M11.07,26.4 H11.685 V27.6 H11.07 Z" fill="#c4003b" stroke="#c4003b"/>
+<path d="M11.685,26.4 H12.3 V27.6 H11.685 Z" fill="#c1003e" stroke="#c1003e"/>
+<path d="M12.3,26.4 H12.915 V27.6 H12.3 Z" fill="#be0041" stroke="#be0041"/>
+<path d="M12.915,26.4 H13.53 V27.6 H12.915 Z" fill="#ba0045" stroke="#ba0045"/>
+<path d="M13.53,26.4 H14.145 V27.6 H13.53 Z" fill="#b70048" stroke="#b70048"/>
+<path d="M14.145,26.4 H14.76 V27.6 H14.145 Z" fill="#b4004b" stroke="#b4004b"/>
+<path d="M14.76,26.4 H15.375 V27.6 H14.76 Z" fill="#b1004e" stroke="#b1004e"/>
+<path d="M15.375,26.4 H15.99 V27.6 H15.375 Z" fill="#ad0052" stroke="#ad0052"/>
+<path d="M15.99,26.4 H16.605 V27.6 H15.99 Z" fill="#aa0055" stroke="#aa0055"/>
+<path d="M16.605,26.4 H17.22 V27.6 H16.605 Z" fill="#a70058" stroke="#a70058"/>
+<path d="M17.22,26.4 H17.835 V27.6 H17.22 Z" fill="#a3005c" stroke="#a3005c"/>
+<path d="M17.835,26.4 H18.45 V27.6 H17.835 Z" fill="#a0005f" stroke="#a0005f"/>
+<path d="M18.45,26.4 H19.065 V27.6 H18.45 Z" fill="#9d0062" stroke="#9d0062"/>
+<path d="M19.065,26.4 H19.68 V27.6 H19.065 Z" fill="#9a0065" stroke="#9a0065"/>
+<path d="M19.68,26.4 H20.295 V27.6 H19.68 Z" fill="#960069" stroke="#960069"/>
+<path d="M20.295,26.4 H20.91 V27.6 H20.295 Z" fill="#93006c" stroke="#93006c"/>
+<path d="M20.91,26.4 H21.525 V27.6 H20.91 Z" fill="#90006f" stroke="#90006f"/>
+<path d="M21.525,26.4 H22.14 V27.6 H21.525 Z" fill="#8d0072" stroke="#8d0072"/>
+<path d="M22.14,26.4 H22.755 V27.6 H22.14 Z" fill="#890076" stroke="#890076"/>
+<path d="M22.755,26.4 H23.37 V27.6 H22.755 Z" fill="#860079" stroke="#860079"/>
+<path d="M23.37,26.4 H23.985 V27.6 H23.37 Z" fill="#83007c" stroke="#83007c"/>
+<path d="M23.985,26.4 H24.6 V27.6 H23.985 Z" fill="#800080" stroke="#800080"/>
+<path d="M24.6,26.4 H25.215 V27.6 H24.6 Z" fill="#7c0083" stroke="#7c0083"/>
+<path d="M25.215,26.4 H25.83 V27.6 H25.215 Z" fill="#790086" stroke="#790086"/>
+<path d="M25.83,26.4 H26.445 V27.6 H25.83 Z" fill="#760089" stroke="#760089"/>
+<path d="M26.445,26.4 H27.06 V27.6 H26.445 Z" fill="#72008d" stroke="#72008d"/>
+<path d="M27.06,26.4 H27.675 V27.6 H27.06 Z" fill="#6f0090" stroke="#6f0090"/>
+<path d="M27.675,26.4 H28.29 V27.6 H27.675 Z" fill="#6c0093" stroke="#6c0093"/>
+<path d="M28.29,26.4 H28.905 V27.6 H28.29 Z" fill="#690096" stroke="#690096"/>
+<path d="M28.905,26.4 H29.52 V27.6 H28.905 Z" fill="#65009a" stroke="#65009a"/>
+<path d="M29.52,26.4 H30.135 V27.6 H29.52 Z" fill="#62009d" stroke="#62009d"/>
+<path d="M30.135,26.4 H30.75 V27.6 H30.135 Z" fill="#5f00a0" stroke="#5f00a0"/>
+<path d="M30.75,26.4 H31.365 V27.6 H30.75 Z" fill="#5c00a3" stroke="#5c00a3"/>
+<path d="M31.365,26.4 H31.98 V27.6 H31.365 Z" fill="#5800a7" stroke="#5800a7"/>
+<path d="M31.98,26.4 H32.595 V27.6 H31.98 Z" fill="#5500aa" stroke="#5500aa"/>
+<path d="M32.595,26.4 H33.21 V27.6 H32.595 Z" fill="#5200ad" stroke="#5200ad"/>
+<path d="M33.21,26.4 H33.825 V27.6 H33.21 Z" fill="#4e00b1" stroke="#4e00b1"/>
+<path d="M33.825,26.4 H34.44 V27.6 H33.825 Z" fill="#4b00b4" stroke="#4b00b4"/>
+<path d="M34.44,26.4 H35.055 V27.6 H34.44 Z" fill="#4800b7" stroke="#4800b7"/>
+<path d="M35.055,26.4 H35.67 V27.6 H35.055 Z" fill="#4500ba" stroke="#4500ba"/>
+<path d="M35.67,26.4 H36.285 V27.6 H35.67 Z" fill="#4100be" stroke="#4100be"/>
+<path d="M36.285,26.4 H36.9 V27.6 H36.285 Z" fill="#3e00c1" stroke="#3e00c1"/>
+<path d="M36.9,26.4 H37.515 V27.6 H36.9 Z" fill="#3b00c4" stroke="#3b00c4"/>
+<path d="M37.515,26.4 H38.13 V27.6 H37.515 Z" fill="#3800c7" stroke="#3800c7"/>
+<path d="M38.13,26.4 H38.745 V27.6 H38.13 Z" fill="#3400cb" stroke="#3400cb"/>
+<path d="M38.745,26.4 H39.36 V27.6 H38.745 Z" fill="#3100ce" stroke="#3100ce"/>
+<path d="M39.36,26.4 H39.975 V27.6 H39.36 Z" fill="#2e00d1" stroke="#2e00d1"/>
+<path d="M39.975,26.4 H40.59 V27.6 H39.975 Z" fill="#2a00d4" stroke="#2a00d4"/>
+<path d="M40.59,26.4 H41.205 V27.6 H40.59 Z" fill="#2700d8" stroke="#2700d8"/>
+<path d="M41.205,26.4 H41.82 V27.6 H41.205 Z" fill="#2400db" stroke="#2400db"/>
+<path d="M41.82,26.4 H42.435 V27.6 H41.82 Z" fill="#2100de" stroke="#2100de"/>
+<path d="M42.435,26.4 H43.05 V27.6 H42.435 Z" fill="#1d00e2" stroke="#1d00e2"/>
+<path d="M43.05,26.4 H43.665 V27.6 H43.05 Z" fill="#1a00e5" stroke="#1a00e5"/>
+<path d="M43.665,26.4 H44.28 V27.6 H43.665 Z" fill="#1700e8" stroke="#1700e8"/>
+<path d="M44.28,26.4 H44.895 V27.6 H44.28 Z" fill="#1400eb" stroke="#1400eb"/>
+<path d="M44.895,26.4 H45.51 V27.6 H44.895 Z" fill="#1000ef" stroke="#1000ef"/>
+<path d="M45.51,26.4 H46.125 V27.6 H45.51 Z" fill="#0d00f2" stroke="#0d00f2"/>
+<path d="M46.125,26.4 H46.74 V27.6 H46.125 Z" fill="#0a00f5" stroke="#0a00f5"/>
+<path d="M46.74,26.4 H47.355 V27.6 H46.74 Z" fill="#0700f8" stroke="#0700f8"/>
+<path d="M47.355,26.4 H47.97 V27.6 H47.355 Z" fill="#0300fc" stroke="#0300fc"/>
+<path d="M47.97,26.4 H48.585 V27.6 H47.97 Z" fill="#0000ff" stroke="#0000ff"/>
 </g>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="0em">
-<text xml:space="preserve" y="0.96em"><tspan font-weight="bold">Available </tspan><tspan font-weight="bold">Text </tspan><tspan font-weight="bold">Styles:</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="0em">
+<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">Available </tspan><tspan font-weight="bold">Text </tspan><tspan font-weight="bold">Styles:</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="1.2em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Bold: </tspan><tspan font-weight="bold" x="10.2em">This </tspan><tspan font-weight="bold">is </tspan><tspan font-weight="bold">bold </tspan><tspan font-weight="bold">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="1.2em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Bold: </tspan><tspan font-weight="bold" x="10.455em">This </tspan><tspan font-weight="bold">is </tspan><tspan font-weight="bold">bold </tspan><tspan font-weight="bold">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="2.4em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Dim: </tspan><tspan opacity="0.5" x="10.2em">This </tspan><tspan opacity="0.5">is </tspan><tspan opacity="0.5">dim </tspan><tspan opacity="0.5">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="2.4em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Dim: </tspan><tspan opacity="0.5" x="10.455em">This </tspan><tspan opacity="0.5">is </tspan><tspan opacity="0.5">dim </tspan><tspan opacity="0.5">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="3.6em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Italic: </tspan><tspan font-style="italic" x="10.2em">This </tspan><tspan font-style="italic">is </tspan><tspan font-style="italic">italic </tspan><tspan font-style="italic">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="3.6em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Italic: </tspan><tspan font-style="italic" x="10.455em">This </tspan><tspan font-style="italic">is </tspan><tspan font-style="italic">italic </tspan><tspan font-style="italic">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="4.8em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Underline: </tspan><tspan text-decoration="underline" text-decoration-style="solid" x="10.2em">This </tspan><tspan text-decoration="underline" text-decoration-style="solid">is </tspan><tspan text-decoration="underline" text-decoration-style="solid">underlined </tspan><tspan text-decoration="underline" text-decoration-style="solid">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="4.8em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Underline: </tspan><tspan text-decoration="underline" text-decoration-style="solid" x="10.455em">This </tspan><tspan text-decoration="underline" text-decoration-style="solid">is </tspan><tspan text-decoration="underline" text-decoration-style="solid">underlined </tspan><tspan text-decoration="underline" text-decoration-style="solid">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="6em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Strikethrough: </tspan><tspan text-decoration="line-through">This </tspan><tspan text-decoration="line-through">is </tspan><tspan text-decoration="line-through">strikethrough </tspan><tspan text-decoration="line-through">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="6em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Strikethrough: </tspan><tspan text-decoration="line-through">This </tspan><tspan text-decoration="line-through">is </tspan><tspan text-decoration="line-through">strikethrough </tspan><tspan text-decoration="line-through">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="7.2em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Reverse: </tspan><tspan fill="var(--bg)" x="10.2em">This </tspan><tspan fill="var(--bg)">is </tspan><tspan fill="var(--bg)">reversed </tspan><tspan fill="var(--bg)">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="7.2em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Reverse: </tspan><tspan fill="var(--bg)" x="10.455em">This </tspan><tspan fill="var(--bg)">is </tspan><tspan fill="var(--bg)">reversed </tspan><tspan fill="var(--bg)">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="9.6em">
-<text xml:space="preserve" y="0.96em"><tspan font-weight="bold">Basic </tspan><tspan font-weight="bold">Foreground </tspan><tspan font-weight="bold">Colors:</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="9.6em">
+<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">Basic </tspan><tspan font-weight="bold">Foreground </tspan><tspan font-weight="bold">Colors:</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="10.8em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Normal: </tspan><tspan fill="var(--c-0)">Black</tspan><tspan fill="var(--c-1)" x="9.6em">Red</tspan><tspan fill="var(--c-2)" x="12em">Green</tspan><tspan fill="var(--c-3)" x="15.6em">Yellow</tspan><tspan fill="var(--c-4)" x="19.8em">Blue</tspan><tspan fill="var(--c-5)" x="22.8em">Magenta</tspan><tspan fill="var(--c-6)" x="27.6em">Cyan</tspan><tspan fill="var(--c-7)" x="30.6em">White</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="10.8em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Normal: </tspan><tspan fill="var(--c-0)">Black</tspan><tspan fill="var(--c-1)" x="9.84em">Red</tspan><tspan fill="var(--c-2)" x="12.3em">Green</tspan><tspan fill="var(--c-3)" x="15.99em">Yellow</tspan><tspan fill="var(--c-4)" x="20.295em">Blue</tspan><tspan fill="var(--c-5)" x="23.37em">Magenta</tspan><tspan fill="var(--c-6)" x="28.29em">Cyan</tspan><tspan fill="var(--c-7)" x="31.365em">White</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="12em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan>Bright: </tspan><tspan fill="var(--c-8)">Black</tspan><tspan fill="var(--c-9)" x="9.6em">Red</tspan><tspan fill="var(--c-10)" x="12em">Green</tspan><tspan fill="var(--c-11)" x="15.6em">Yellow</tspan><tspan fill="var(--c-12)" x="19.8em">Blue</tspan><tspan fill="var(--c-13)" x="22.8em">Magenta</tspan><tspan fill="var(--c-14)" x="27.6em">Cyan</tspan><tspan fill="var(--c-15)" x="30.6em">White</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="12em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Bright: </tspan><tspan fill="var(--c-8)">Black</tspan><tspan fill="var(--c-9)" x="9.84em">Red</tspan><tspan fill="var(--c-10)" x="12.3em">Green</tspan><tspan fill="var(--c-11)" x="15.99em">Yellow</tspan><tspan fill="var(--c-12)" x="20.295em">Blue</tspan><tspan fill="var(--c-13)" x="23.37em">Magenta</tspan><tspan fill="var(--c-14)" x="28.29em">Cyan</tspan><tspan fill="var(--c-15)" x="31.365em">White</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="14.4em">
-<text xml:space="preserve" y="0.96em"><tspan font-weight="bold">Mixed </tspan><tspan font-weight="bold">Styles </tspan><tspan font-weight="bold">with </tspan><tspan font-weight="bold">Colors:</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="14.4em">
+<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">Mixed </tspan><tspan font-weight="bold">Styles </tspan><tspan font-weight="bold">with </tspan><tspan font-weight="bold">Colors:</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="15.6em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan fill="var(--c-1)" font-weight="bold">Bold </tspan><tspan fill="var(--c-1)" font-weight="bold">red </tspan><tspan fill="var(--c-1)" font-weight="bold">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="15.6em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan fill="var(--c-1)" font-weight="bold">Bold </tspan><tspan fill="var(--c-1)" font-weight="bold">red </tspan><tspan fill="var(--c-1)" font-weight="bold">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="16.8em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan fill="var(--c-2)" font-style="italic">Italic </tspan><tspan fill="var(--c-2)" font-style="italic">green </tspan><tspan fill="var(--c-2)" font-style="italic">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="16.8em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan fill="var(--c-2)" font-style="italic">Italic </tspan><tspan fill="var(--c-2)" font-style="italic">green </tspan><tspan fill="var(--c-2)" font-style="italic">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="18em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">Underlined </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">blue </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="18em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">Underlined </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">blue </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="19.2em">
-<text xml:space="preserve" y="0.96em"><tspan>• </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">Bold </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">underlined </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">magenta </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="19.2em">
+<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">Bold </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">underlined </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">magenta </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="21.6em">
-<text xml:space="preserve" y="0.96em"><tspan font-weight="bold">Basic </tspan><tspan font-weight="bold">Background </tspan><tspan font-weight="bold">Colors:</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="21.6em">
+<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">Basic </tspan><tspan font-weight="bold">Background </tspan><tspan font-weight="bold">Colors:</tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="22.8em">
-<text xml:space="preserve" y="0.96em"><tspan fill="var(--c-231)" x="0.6em">Black </tspan><tspan fill="var(--c-231)">BG </tspan><tspan fill="var(--c-16)" x="6.6em">Red </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="11.4em">Green </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="17.4em">Yellow </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="24em">Blue </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="29.4em">Magenta </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="36.6em">Cyan </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="42em">White </tspan><tspan fill="var(--c-16)">BG </tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="22.8em">
+<text xml:space="preserve" y="0.956em"><tspan fill="var(--c-231)" x="0.615em">Black </tspan><tspan fill="var(--c-231)">BG </tspan><tspan fill="var(--c-16)" x="6.765em">Red </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="11.685em">Green </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="17.835em">Yellow </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="24.6em">Blue </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="30.135em">Magenta </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="37.515em">Cyan </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="43.05em">White </tspan><tspan fill="var(--c-16)">BG </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="47.4em" y="25.2em">
-<text xml:space="preserve" y="0.96em"><tspan font-weight="bold">24-bit </tspan><tspan font-weight="bold">True </tspan><tspan font-weight="bold">Color </tspan><tspan font-weight="bold">Background:</tspan></text>
+<svg height="1.2em" overflow="hidden" width="48.585em" y="25.2em">
+<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">24-bit </tspan><tspan font-weight="bold">True </tspan><tspan font-weight="bold">Color </tspan><tspan font-weight="bold">Background:</tspan></text>
 </svg>
 </g>
 </svg>
 </svg>
-<rect fill="none" height="388" rx="10" ry="10" stroke="#000000" stroke-width="0.5" width="588"/>
-<rect fill="none" height="386" rx="9" ry="9" stroke="#f0f0f080" stroke-width="0.5" width="586" x="1" y="1"/>
+<rect fill="none" height="388" rx="10" ry="10" stroke="#000000" stroke-width="0.5" width="602.22"/>
+<rect fill="none" height="386" rx="9" ry="9" stroke="#f0f0f080" stroke-width="0.5" width="600.22" x="1" y="1"/>
 </g>
 <style>
 .terminal {

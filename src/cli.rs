@@ -29,11 +29,11 @@ pub struct Opt {
     pub bootstrap: BootstrapArgs,
 
     /// Width of the virtual terminal window.
-    #[arg(long, short = 'W', default_value_t = config::global::get().terminal.width, overrides_with = "width", value_name = "COLUMNS")]
+    #[arg(long, short = 'W', default_value_t = cfg().terminal.width, overrides_with = "width", value_name = "COLUMNS")]
     pub width: u16,
 
     /// Height of the virtual terminal window.
-    #[arg(long, short = 'H', default_value_t = config::global::get().terminal.height, overrides_with = "height", value_name = "LINES")]
+    #[arg(long, short = 'H', default_value_t = cfg().terminal.height, overrides_with = "height", value_name = "LINES")]
     pub height: u16,
 
     /// Override padding for the inner text in font size units.
@@ -45,43 +45,43 @@ pub struct Opt {
     pub font_family: Vec<String>,
 
     /// Font size.
-    #[arg(long, default_value_t = config::global::get().font.size, overrides_with = "font_size", value_name = "SIZE")]
+    #[arg(long, default_value_t = cfg().font.size.into(), overrides_with = "font_size", value_name = "SIZE")]
     pub font_size: f32,
 
     /// Normal font weight.
-    #[arg(long, default_value_t = config::global::get().font.weights.normal.into(), overrides_with = "font_weight", value_name = "WEIGHT")]
+    #[arg(long, default_value_t = cfg().font.weights.normal.into(), overrides_with = "font_weight", value_name = "WEIGHT")]
     pub font_weight: FontWeight,
 
     /// Embed fonts, if possible [note: make sure the font license allows this type of redistribution].
-    #[arg(long, num_args = 1, default_value_t = config::global::get().embed_fonts, overrides_with = "embed_fonts", value_name = "ENABLED")]
+    #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.embed_fonts, overrides_with = "embed_fonts", value_name = "ENABLED")]
     pub embed_fonts: bool,
 
     /// Subset fonts by removing unused characters [experimental, known to have compatibility issues].
-    #[arg(long, num_args = 1, default_value_t = config::global::get().subset_fonts, overrides_with = "subset_fonts", value_name = "ENABLED")]
+    #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.subset_fonts, overrides_with = "subset_fonts", value_name = "ENABLED")]
     pub subset_fonts: bool,
 
     /// Use bright colors for bold text.
-    #[arg(long, num_args = 1, default_value_t = config::global::get().bold_is_bright, overrides_with = "bold_is_bright", value_name = "ENABLED")]
+    #[arg(long, num_args = 1, default_value_t = cfg().rendering.bold_is_bright, overrides_with = "bold_is_bright", value_name = "ENABLED")]
     pub bold_is_bright: bool,
 
     /// Bold text font weight.
-    #[arg(long, default_value_t = config::global::get().font.weights.bold.into(), overrides_with = "bold_font_weight", value_name = "WEIGHT")]
+    #[arg(long, default_value_t = cfg().font.weights.bold.into(), overrides_with = "bold_font_weight", value_name = "WEIGHT")]
     pub bold_font_weight: FontWeight,
 
     /// Faint text opacity.
-    #[arg(long, default_value_t = config::global::get().faint_opacity, overrides_with = "faint_opacity", value_name = "0..1")]
+    #[arg(long, default_value_t = cfg().rendering.faint_opacity.into(), overrides_with = "faint_opacity", value_name = "0..1")]
     pub faint_opacity: f32,
 
     /// Faint text font weight.
-    #[arg(long, default_value_t = config::global::get().font.weights.faint.into(), overrides_with = "faint_font_weight", value_name = "WEIGHT")]
+    #[arg(long, default_value_t = cfg().font.weights.faint.into(), overrides_with = "faint_font_weight", value_name = "WEIGHT")]
     pub faint_font_weight: FontWeight,
 
     /// Line height, factor of the font size.
-    #[arg(long, default_value_t = config::global::get().line_height, overrides_with = "line_height", value_name = "FACTOR")]
+    #[arg(long, default_value_t = cfg().rendering.line_height.into(), overrides_with = "line_height", value_name = "FACTOR")]
     pub line_height: f32,
 
     /// Override dark or light mode.
-    #[arg(long, value_enum, default_value_t = config::global::get().mode, overrides_with = "mode")]
+    #[arg(long, value_enum, default_value_t = cfg().mode, overrides_with = "mode")]
     pub mode: config::mode::ModeSetting,
 
     /// Color theme.
@@ -89,11 +89,11 @@ pub struct Opt {
     pub theme: Option<String>,
 
     /// Enable window.
-    #[arg(long, num_args = 1, default_value_t = config::global::get().window.enabled, overrides_with = "window", value_name = "ENABLED")]
+    #[arg(long, num_args = 1, default_value_t = cfg().window.enabled, overrides_with = "window", value_name = "ENABLED")]
     pub window: bool,
 
     /// Enable window shadow.
-    #[arg(long, num_args = 1, default_value_t = config::global::get().window.shadow, overrides_with = "window_shadow", value_name = "ENABLED")]
+    #[arg(long, num_args = 1, default_value_t = cfg().window.shadow, overrides_with = "window_shadow", value_name = "ENABLED")]
     pub window_shadow: bool,
 
     /// Override window margin, in pixels.
@@ -174,20 +174,20 @@ impl config::Patch for Opt {
         if !self.font_family.is_empty() {
             settings.font.family = FontFamilyOption::Multiple(self.font_family.clone());
         }
-        settings.font.size = self.font_size;
+        settings.font.size = self.font_size.into();
         settings.font.weights.normal = self.font_weight.into();
         settings.font.weights.bold = self.bold_font_weight.into();
         settings.font.weights.faint = self.faint_font_weight.into();
-        settings.embed_fonts = self.embed_fonts;
-        settings.subset_fonts = self.subset_fonts;
-        settings.faint_opacity = self.faint_opacity;
-        settings.line_height = self.line_height;
-        settings.bold_is_bright = self.bold_is_bright;
+        settings.rendering.svg.embed_fonts = self.embed_fonts;
+        settings.rendering.svg.subset_fonts = self.subset_fonts;
+        settings.rendering.faint_opacity = self.faint_opacity.into();
+        settings.rendering.line_height = self.line_height.into();
+        settings.rendering.bold_is_bright = self.bold_is_bright;
         if let Some(theme) = &self.theme {
             settings.theme = ThemeSetting::Fixed(theme.clone());
         }
         if let Some(padding) = self.padding {
-            settings.padding = PaddingOption::Uniform(padding);
+            settings.padding = PaddingOption::Uniform(padding.into());
         }
         if let Some(style) = &self.window_style {
             settings.window.style = style.clone();
@@ -195,7 +195,7 @@ impl config::Patch for Opt {
         settings.window.enabled = self.window;
         settings.window.shadow = self.window_shadow;
         if let Some(margin) = self.window_margin {
-            settings.window.margin = Some(PaddingOption::Uniform(margin));
+            settings.window.margin = Some(PaddingOption::Uniform(margin.into()));
         }
         settings.mode = self.mode;
 
@@ -326,4 +326,8 @@ impl fmt::Display for FontWeight {
 
 fn trim(s: &str) -> Result<String, String> {
     Ok(s.trim().to_string())
+}
+
+fn cfg() -> &'static Settings {
+    config::global::get()
 }

@@ -279,12 +279,12 @@ impl App {
 
         log::debug!(
             "prepare font faces: embed-fonts={e} subset-fonts={s}",
-            e = settings.embed_fonts,
-            s = settings.subset_fonts,
+            e = settings.rendering.svg.embed_fonts,
+            s = settings.rendering.svg.subset_fonts,
         );
-        if settings.embed_fonts {
+        if settings.rendering.svg.embed_fonts {
             for (i, (_, file)) in files.iter().enumerate() {
-                let data = if settings.subset_fonts {
+                let data = if settings.rendering.svg.subset_fonts {
                     let chars = used.iter().filter(|x| *x.1 & (1 << i) != 0).map(|x| *x.0);
                     let data = fonts[i].2.subset(chars)?;
                     faces[i].format = Some(FontFormat::Ttf);
@@ -306,7 +306,7 @@ impl App {
 
         Ok(render::FontOptions {
             family: families,
-            size: settings.font.size,
+            size: settings.font.size.into(),
             metrics,
             faces,
             weights: settings.font.weights.convert(),

@@ -20,8 +20,11 @@ use termwiz::{
 
 // local imports
 use super::{FontFace, FontStyle, FontWeight, Padding, Render, Theme};
-use crate::config::winstyle::{
-    Float, LineCap, WindowButton, WindowButtonIconKind, WindowButtonShape, WindowButtonsPosition,
+use crate::config::{
+    types::Number,
+    winstyle::{
+        LineCap, WindowButton, WindowButtonIconKind, WindowButtonShape, WindowButtonsPosition,
+    },
 };
 
 // re-exports
@@ -43,8 +46,8 @@ impl SvgRenderer {
         let bg = opt.bg();
         let fg = opt.fg();
 
-        let fp = cfg.precision; // floating point precision
-        let lh = cfg.line_height.r2p(fp); // line height in em
+        let fp = cfg.rendering.svg.precision; // floating point precision
+        let lh = cfg.rendering.line_height.r2p(fp); // line height in em
         let fw = opt.font.metrics.width.r2p(fp); // font width in em
         let dimensions = surface.dimensions(); // surface dimensions in cells
         let size = (
@@ -73,7 +76,7 @@ impl SvgRenderer {
 
         let resolve_fg = |palette: &mut PaletteBuilder, attrs: &CellAttributes| {
             let color = attrs.foreground();
-            if cfg.bold_is_bright && attrs.intensity() == Intensity::Bold {
+            if cfg.rendering.bold_is_bright && attrs.intensity() == Intensity::Bold {
                 palette.bright_fg(color)
             } else {
                 palette.fg(color)
@@ -100,7 +103,7 @@ impl SvgRenderer {
         });
 
         let mut bg_group = element::Group::new();
-        if let Some(stroke) = opt.settings.stroke {
+        if let Some(stroke) = opt.settings.rendering.svg.stroke {
             bg_group = bg_group.set("stroke-width", stroke.r2p(fp));
         }
 
@@ -117,7 +120,7 @@ impl SvgRenderer {
 
             let color = shape.key;
             let mut path = element::Path::new().set("fill", color.clone()).set("d", d);
-            if opt.settings.stroke.is_some() {
+            if cfg.rendering.svg.stroke.is_some() {
                 path = path.set("stroke", color);
             }
 
@@ -181,8 +184,10 @@ impl SvgRenderer {
                         resolve_fg(&mut palette, &cluster.attrs)
                     };
 
-                    if cluster.attrs.intensity() == Intensity::Half && cfg.faint_opacity < 1.0 {
-                        span = span.set("opacity", cfg.faint_opacity.r2p(fp));
+                    if cluster.attrs.intensity() == Intensity::Half
+                        && cfg.rendering.faint_opacity.f32() < 1.0
+                    {
+                        span = span.set("opacity", cfg.rendering.faint_opacity.r2p(fp));
                     }
 
                     if color != ColorStyleId::DefaultForeground {
@@ -344,7 +349,7 @@ fn container() -> element::SVG {
 
 fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> element::SVG {
     let cfg = &opt.settings;
-    let fp = cfg.precision; // floating point precision
+    let fp = cfg.rendering.svg.precision; // floating point precision
     let margin = cfg
         .window
         .margin
@@ -485,7 +490,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
 
 fn make_buttons(opt: &Options, width: f32) -> element::Group {
     let cfg = &opt.window.buttons;
-    let fp = opt.settings.precision; // floating point precision
+    let fp = opt.settings.rendering.svg.precision; // floating point precision
 
     let (x, factor) = match cfg.position {
         WindowButtonsPosition::Left => (0.0, 1.0),
@@ -544,7 +549,7 @@ fn make_buttons(opt: &Options, width: f32) -> element::Group {
                     ),
                 ),
                 WindowButtonIconKind::Maximize => {
-                    let r = icon.roundness.map(Float::f32).unwrap_or(2.0);
+                    let r = icon.roundness.map(Number::f32).unwrap_or(2.0);
                     let x1 = (x - icon.size / 2.0).r2p(fp);
                     let x4 = (x + icon.size / 2.0).r2p(fp);
                     let x2 = (x1 + r).r2p(fp);
@@ -582,7 +587,7 @@ fn make_buttons(opt: &Options, width: f32) -> element::Group {
 }
 
 fn set_button_style<N: svg::Node>(opt: &Options, cfg: &WindowButton, node: &mut N) {
-    let fp = opt.settings.precision; // floating point precision
+    let fp = opt.settings.rendering.svg.precision; // floating point precision
 
     if let Some(fill) = &cfg.fill {
         node.assign("fill", fill.resolve(opt.mode).to_hex_string());
@@ -667,7 +672,7 @@ impl RoundToPrecision for f32 {
     }
 }
 
-impl RoundToPrecision for Float {
+impl RoundToPrecision for Number {
     type Output = f32;
 
     fn r2p(&self, precision: u8) -> Self::Output {
@@ -701,10 +706,10 @@ impl RoundToPrecision for Padding {
 
     fn r2p(&self, precision: u8) -> Self {
         Padding {
-            left: r2p(self.left, precision),
-            right: r2p(self.right, precision),
-            top: r2p(self.top, precision),
-            bottom: r2p(self.bottom, precision),
+            left: self.left.r2p(precision).into(),
+            right: self.right.r2p(precision).into(),
+            top: self.top.r2p(precision).into(),
+            bottom: self.bottom.r2p(precision).into(),
         }
     }
 }

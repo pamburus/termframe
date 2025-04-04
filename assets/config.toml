@@ -13,8 +13,11 @@ height = 24 # Number of terminal rows.
 dark = "one-double"  # Theme to be used in dark mode.
 light = "one-double" # Theme to be used in light mode.
 
+#
 # Font settings.
+#
 [font]
+#
 # Font family list in order of preference.
 # The first font from the list is used for font metrics calculations and embedding.
 # All fonts are included in the output document in the original order.
@@ -29,45 +32,64 @@ family = [
     "DejaVu Sans Mono",
     "monospace",
 ]
+#
 # Font size in pixels.
 size = 12
+#
 # Font weights per ANSI style.
 weights = { normal = "normal", bold = "bold", faint = "normal" }
 
-# Text padding in em units.
+#
+# Text padding in `em` units.
+#
 [padding]
 horizontal = 0.8 # Horizontal padding.
 vertical = 0.6   # Vertical padding.
 
+#
 # Terminal window settings.
+#
 [window]
 enabled = true  # Enable or disable the terminal window in the output SVG file.
 shadow = true   # Enable or disable the shadow for the terminal window.
 style = "macos" # Terminal window style. For the list of available styles, run `termframe --list-window-styles`.
 
+#
 # Rendering settings.
+#
 [rendering]
+#
 # Line height in em units, relative to the font size.
 line-height = 1.2
+#
 # Use bright colors for bold text.
 bold-is-bright = false
+#
 # Faint/dim text opacity.
 faint-opacity = 0.5
 
+#
 # SVG rendering settings.
+#
 [rendering.svg]
+#
 # Embed fonts in the output SVG file.
 embed-fonts = false
+#
 # Subset fonts to only include the characters used in the output SVG file.
 # Experimental feature, has compatibility issues with some browsers.
 subset-fonts = false
+#
 # Floating point precision for rendering.
 precision = 3
+#
 # Extra stroke over the filled background elements.
 # This is needed to avoid rendering artifacts in some browsers.
 stroke = 0.025
 
+#
 # Font "JetBrains Mono".
+#
 [[fonts]]
 family = "JetBrains Mono"
 license = { type = "SIL Open Font License 1.1", link = "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/OFL.txt" }
@@ -76,7 +98,9 @@ files = [
     "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/variable/JetBrainsMono-Italic%5Bwght%5D.woff2",
 ]
 
+#
 # Font "Source Code Pro".
+#
 [[fonts]]
 family = "Source Code Pro"
 license = { type = "SIL Open Font License 1.1", link = "https://github.com/adobe-fonts/source-code-pro/blob/2.042R-u/1.062R-i/1.026R-vf/LICENSE.md" }
@@ -85,7 +109,9 @@ files = [
     "https://raw.githubusercontent.com/adobe-fonts/source-code-pro/refs/tags/2.042R-u/1.062R-i/1.026R-vf/WOFF2/VF/SourceCodeVF-Italic.ttf.woff2",
 ]
 
+#
 # Font "Fira Code".
+#
 [[fonts]]
 family = "Fira Code"
 license = { type = "SIL Open Font License 1.1", link = "https://github.com/tonsky/FiraCode/blob/6.2/LICENSE" }

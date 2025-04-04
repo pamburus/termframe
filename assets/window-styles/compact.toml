@@ -1,4 +1,4 @@
-#:schema ../../schema/json/window-style.schema.json
+#:schema https://raw.githubusercontent.com/pamburus/termframe/refs/heads/main/schema/json/window-style.schema.json
 
 [window]
 margin = 8

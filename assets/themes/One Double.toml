@@ -1,3 +1,5 @@
+#:schema https://raw.githubusercontent.com/pamburus/termframe/refs/heads/main/schema/json/theme.schema.json
+
 tags = ["dark", "light"]
 
 [theme.modes.dark.colors]

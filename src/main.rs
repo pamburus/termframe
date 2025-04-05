@@ -175,8 +175,6 @@ impl App {
     where
         C: IntoIterator<Item = char>,
     {
-        let mut faces = Vec::new();
-
         let mut width: Option<f32> = None;
         let mut ascender: f32 = 0.0;
         let mut descender: f32 = 0.0;
@@ -187,7 +185,12 @@ impl App {
             .fonts
             .par_iter()
             .filter(|font| families.contains(&font.family))
-            .flat_map(|font| font.files.par_iter().map(move |file| (&font.family, file)))
+            .flat_map(|font| {
+                font.files
+                    .par_iter()
+                    .rev()
+                    .map(move |file| (&font.family, file))
+            })
             .map(|(family, file)| {
                 self.load_font(file)
                     .with_context(|| format!("failed to load font {file}"))
@@ -222,9 +225,10 @@ impl App {
             used.insert(ch, bitmap);
         }
 
+        let mut faces = Vec::new();
         let used = Rc::new(used);
 
-        for (i, (url, family, font)) in fonts.iter_mut().enumerate() {
+        for (i, (url, family, font)) in fonts.iter_mut().enumerate().rev() {
             let mut metrics_match = true;
             if let Some(width) = &mut width {
                 metrics_match = *width == font.width();
@@ -249,6 +253,8 @@ impl App {
 
             faces.push(face);
         }
+
+        faces.reverse();
 
         for (i, (_, family, font)) in fonts.iter_mut().enumerate() {
             log::debug!(

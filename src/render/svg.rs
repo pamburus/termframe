@@ -162,19 +162,16 @@ impl SvgRenderer {
                     continue;
                 }
 
-                for (text, mut range) in subdivide(line, &cluster) {
+                for (text, mut range) in subdivide(line, &cluster, opt) {
                     if text.trim().is_empty() {
                         continue;
                     }
 
                     let mut span = element::TSpan::new(text);
 
-                    let mut font_weight = super::FontWeight::Normal;
-                    let mut font_style = super::FontStyle::Normal;
-
                     let x = range.start;
                     if x != pos {
-                        span = span.set("x", format!("{}em", (x as f32 * fw).r2p(fp)));
+                        span.assign("x", format!("{}em", (x as f32 * fw).r2p(fp)));
                     }
 
                     if line.get_cell(x).map(|cell| cell.width()).unwrap_or(0) > 1 {
@@ -193,47 +190,40 @@ impl SvgRenderer {
                     if cluster.attrs.intensity() == Intensity::Half
                         && cfg.rendering.faint_opacity.f32() < 1.0
                     {
-                        span = span.set("opacity", cfg.rendering.faint_opacity.r2p(fp));
+                        span.assign("opacity", cfg.rendering.faint_opacity.r2p(fp));
                     }
 
                     if color != ColorStyleId::DefaultForeground {
-                        span = span.set("fill", color);
+                        span.assign("fill", color);
                     }
 
-                    match cluster.attrs.intensity() {
-                        Intensity::Normal => {}
-                        Intensity::Bold => {
-                            let weight = opt.font.weights.bold;
-                            if weight != default_weight {
-                                span = span.set("font-weight", svg_weight(weight));
-                                font_weight = weight;
-                            }
-                        }
-                        Intensity::Half => {
-                            let weight = opt.font.weights.faint;
-                            if weight != default_weight {
-                                span = span.set("font-weight", svg_weight(weight));
-                                font_weight = weight;
-                            }
-                        }
+                    let (weight, style) = font_params(&cluster.attrs, opt);
+
+                    if weight != default_weight {
+                        span.assign("font-weight", svg_weight(weight));
                     }
 
-                    if cluster.attrs.italic() {
-                        span = span.set("font-style", "italic");
-                        font_style = super::FontStyle::Italic;
+                    match style {
+                        FontStyle::Normal => {}
+                        FontStyle::Italic => {
+                            span.assign("font-style", "italic");
+                        }
+                        FontStyle::Oblique => {
+                            span.assign("font-style", "oblique");
+                        }
                     }
 
                     if cluster.attrs.underline() != Underline::None {
-                        span = span.set("text-decoration", "underline");
+                        span.assign("text-decoration", "underline");
                     } else if cluster.attrs.strikethrough() {
-                        span = span.set("text-decoration", "line-through");
+                        span.assign("text-decoration", "line-through");
                     }
 
                     if cluster.attrs.underline_color() != ColorAttribute::Default {
                         if let Some(mut color) = opt.theme.resolve(cluster.attrs.underline_color())
                         {
                             color.a = 1.0;
-                            span = span.set("text-decoration-color", color.to_hex_string());
+                            span.assign("text-decoration-color", color.to_hex_string());
                         }
                     }
 
@@ -254,17 +244,14 @@ impl SvgRenderer {
                     let mut text_length_needed = false;
 
                     for ch in text.chars() {
-                        for (i, font) in opt.font.faces.iter().enumerate().rev() {
-                            if match_font_face(font, font_weight, font_style, ch) {
-                                if used_font_faces.insert(i) {
-                                    log::debug!(
-                                        "using font face #{i:02} because it is required at least by character {ch:?} with weight={font_weight:?} style={font_style:?}",
-                                    );
-                                }
-                                if !opt.font.faces[i].metrics_match {
-                                    text_length_needed = true;
-                                }
-                                break;
+                        if let Some(i) = find_matching_font(ch, weight, style, opt) {
+                            if used_font_faces.insert(i) {
+                                log::debug!(
+                                    "using font face #{i:02} because it is required at least by character {ch:?} with weight={weight:?} style={style:?}",
+                                );
+                            }
+                            if !opt.font.faces[i].metrics_match {
+                                text_length_needed = true;
                             }
                         }
                     }
@@ -754,24 +741,67 @@ impl RoundToPrecision for Padding {
 
 // ---
 
-fn subdivide<'a>(line: &'a Line, cluster: &'a CellCluster) -> Subclusters<'a> {
+fn font_params(attrs: &CellAttributes, opt: &Options) -> (FontWeight, FontStyle) {
+    let weight = match attrs.intensity() {
+        Intensity::Normal => opt.font.weights.normal,
+        Intensity::Bold => opt.font.weights.bold,
+        Intensity::Half => opt.font.weights.faint,
+    };
+
+    let style = if attrs.italic() {
+        FontStyle::Italic
+    } else {
+        FontStyle::Normal
+    };
+
+    (weight, style)
+}
+
+fn find_matching_font(
+    ch: char,
+    weight: FontWeight,
+    style: FontStyle,
+    opt: &Options,
+) -> Option<usize> {
+    for (i, font) in opt.font.faces.iter().enumerate().rev() {
+        if match_font_face(font, weight, style, ch) {
+            return Some(i);
+        }
+    }
+
+    None
+}
+
+// ---
+
+fn subdivide<'a>(line: &'a Line, cluster: &'a CellCluster, opt: &'a Options) -> Subclusters<'a> {
+    let (weight, style) = font_params(&cluster.attrs, opt);
+
     Subclusters {
         line,
         cluster,
+        opt,
         chars: cluster.text.char_indices(),
         cell_range: cluster.first_cell_idx..cluster.first_cell_idx,
         text_range: 0..0,
+        weight,
+        style,
         next: None,
+        font: None,
     }
 }
 
 struct Subclusters<'a> {
     line: &'a Line,
     cluster: &'a CellCluster,
+    opt: &'a Options,
     chars: std::str::CharIndices<'a>,
     cell_range: Range<usize>,
     text_range: Range<usize>,
+    weight: FontWeight,
+    style: FontStyle,
     next: Option<CellRef<'a>>,
+    font: Option<usize>,
 }
 
 impl<'a> Subclusters<'a> {
@@ -809,7 +839,28 @@ impl<'a> Iterator for Subclusters<'a> {
                 return self.split();
             };
 
-            if next.width() > 1 {
+            let ch = next.str().chars().next();
+            let font = ch.and_then(|ch| find_matching_font(ch, self.weight, self.style, self.opt));
+            let old_font = std::mem::replace(&mut self.font, font);
+
+            let old_mm = old_font
+                .map(|i| self.opt.font.faces[i].metrics_match)
+                .unwrap_or_default();
+
+            let new_mm = self
+                .font
+                .map(|i| self.opt.font.faces[i].metrics_match)
+                .unwrap_or_default();
+
+            let split = next.width() > 1 || (old_font != self.font && !(old_mm && new_mm));
+
+            log::trace!(
+                "char={ch:?} old-font={old_font:?} new-font={new_font:?} old-mm={old_mm} new-mm={new_mm} width={width} split={split}",
+                new_font = self.font,
+                width = next.width(),
+            );
+
+            if split {
                 if let Some(segment) = self.split() {
                     return Some(segment);
                 }

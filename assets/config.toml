@@ -33,6 +33,7 @@ family = [
     "Monaco",
     "DejaVu Sans Mono",
     "monospace",
+    "Symbols Nerd Font Mono",
 ]
 #
 # Font size in pixels.
@@ -122,4 +123,14 @@ family = "Fira Code"
 license = { type = "SIL Open Font License 1.1", link = "https://github.com/tonsky/FiraCode/blob/6.2/LICENSE" }
 files = [
     "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-VF.woff2",
+]
+
+#
+# Font "Symbols Nerd Font Mono"
+#
+[[fonts]]
+family = "Symbols Nerd Font Mono"
+license = { type = "SIL Open Font License 1.1", link = "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/tags/v3.3.0/LICENSE" }
+files = [
+    "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/gh-pages/assets/fonts/Symbols-2048-em%20Nerd%20Font%20Complete.woff2",
 ]

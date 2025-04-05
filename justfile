@@ -47,7 +47,7 @@ sample-for mode:
         --mode {{mode}} \
         --title "termframe sample" \
         --output doc/sample-{{mode}}.svg \
-        ./scripts/sample.sh {{mode}}
+        ./scripts/sample {{mode}}
 
 [doc('generate color table screenshot')]
 color-table theme mode:

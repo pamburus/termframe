@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+
+WIDTH = 79
+
+# Reset all attributes
+RESET = "\033[0m"
+
+# Text styles
+BOLD = "\033[1m"
+DIM = "\033[2m"
+ITALIC = "\033[3m"         # May not be supported in all terminals.
+UNDERLINE = "\033[4m"      # Standard single underline
+REVERSE = "\033[7m"
+STRIKETHROUGH = "\033[9m"  # Not supported in all terminal emulators.
+
+# Extended underline styles (if supported)
+# Using the extended SGR syntax for underline styles:
+# Single: \033[4m (or \033[4:1m), Double: \033[4:2m, Curly: \033[4:3m, Dotted: \033[4:4m
+DOUBLE_UNDERLINE = "\033[4:2m"
+CURLY_UNDERLINE = "\033[4:3m"
+DOTTED_UNDERLINE = "\033[4:4m"
+
+# Basic palette colors (foreground)
+BLACK = "\033[30m"
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN = "\033[36m"
+WHITE = "\033[37m"
+BRIGHT_BLACK = "\033[90m"
+BRIGHT_RED = "\033[91m"
+BRIGHT_GREEN = "\033[92m"
+BRIGHT_YELLOW = "\033[93m"
+BRIGHT_BLUE = "\033[94m"
+BRIGHT_MAGENTA = "\033[95m"
+BRIGHT_CYAN = "\033[96m"
+BRIGHT_WHITE = "\033[97m"
+
+# Basic background colors
+BG_BLACK = "\033[40m"
+BG_RED = "\033[41m"
+BG_GREEN = "\033[42m"
+BG_YELLOW = "\033[43m"
+BG_BLUE = "\033[44m"
+BG_MAGENTA = "\033[45m"
+BG_CYAN = "\033[46m"
+BG_WHITE = "\033[47m"
+BG_BRIGHT_BLACK = "\033[100m"
+BG_BRIGHT_RED = "\033[101m"
+BG_BRIGHT_GREEN = "\033[102m"
+BG_BRIGHT_YELLOW = "\033[103m"
+BG_BRIGHT_BLUE = "\033[104m"
+BG_BRIGHT_MAGENTA = "\033[105m"
+BG_BRIGHT_CYAN = "\033[106m"
+BG_BRIGHT_WHITE = "\033[107m"
+
+# 256-color palette
+PITCH_BLACK = "\033[38;5;16m"
+SNOW_WHITE = "\033[38;5;231m"
+
+# List of text styles
+print(f"{BOLD}Available Text Styles:{RESET}")
+print(f"• Bold:          {BOLD}This is bold text{RESET}")
+print(f"• Dim:           {DIM}This is dim text{RESET}")
+print(f"• Italic:        {ITALIC}This is italic text{RESET}")
+print(f"• Underline:     {UNDERLINE}This is underlined text{RESET}")
+print(f"• Strikethrough: {STRIKETHROUGH}This is strikethrough text{RESET}")
+print(f"• Reverse:       {REVERSE}This is reversed text{RESET}")
+print()
+
+# Basic Foreground Colors
+print(f"{BOLD}Basic Foreground Colors:{RESET}")
+print("• Normal: ", end="")
+print(f"{BLACK}Black{RESET} ", end="")
+print(f"{RED}Red{RESET} ", end="")
+print(f"{GREEN}Green{RESET} ", end="")
+print(f"{YELLOW}Yellow{RESET} ", end="")
+print(f"{BLUE}Blue{RESET} ", end="")
+print(f"{MAGENTA}Magenta{RESET} ", end="")
+print(f"{CYAN}Cyan{RESET} ", end="")
+print(f"{WHITE}White{RESET}")
+print("• Bright: ", end="")
+print(f"{BRIGHT_BLACK}Black{RESET} ", end="")
+print(f"{BRIGHT_RED}Red{RESET} ", end="")
+print(f"{BRIGHT_GREEN}Green{RESET} ", end="")
+print(f"{BRIGHT_YELLOW}Yellow{RESET} ", end="")
+print(f"{BRIGHT_BLUE}Blue{RESET} ", end="")
+print(f"{BRIGHT_MAGENTA}Magenta{RESET} ", end="")
+print(f"{BRIGHT_CYAN}Cyan{RESET} ", end="")
+print(f"{BRIGHT_WHITE}White{RESET}")
+print()
+
+# Mixing styles with colors
+print(f"{BOLD}Mixed Styles with Colors:{RESET}")
+print(f"• {BOLD}{RED}Bold red text{RESET}")
+print(f"• {ITALIC}{GREEN}Italic green text{RESET}")
+print(f"• {UNDERLINE}{BLUE}Underlined blue text{RESET}")
+print(f"• {BOLD}{UNDERLINE}{MAGENTA}Bold underlined magenta text{RESET}")
+print()
+
+import sys
+
+FG = PITCH_BLACK
+if len(sys.argv) > 1 and sys.argv[1] == "light":
+    FG = SNOW_WHITE
+
+# Basic Background Colors with contrasting text
+print(f"{BOLD}Basic Background Colors:{RESET}")
+print(f"{BG_BLACK}{SNOW_WHITE} Black BG {RESET}", end="")
+print(f"{BG_RED}{FG} Red BG {RESET}", end="")
+print(f"{BG_GREEN}{FG} Green BG {RESET}", end="")
+print(f"{BG_YELLOW}{FG} Yellow BG {RESET}", end="")
+print(f"{BG_BLUE}{FG} Blue BG {RESET}", end="")
+print(f"{BG_MAGENTA}{FG} Magenta BG {RESET}", end="")
+print(f"{BG_CYAN}{FG} Cyan BG {RESET}", end="")
+print(f"{BG_WHITE}{PITCH_BLACK} White BG {RESET}")
+print()
+
+# 24-bit True Color Background Gradient (79 characters wide)
+print(f"{BOLD}24-bit True Color Background:{RESET}")
+# Loop WIDTH times to print exactly WIDTH blocks.
+for i in range(WIDTH):
+    # Calculate red value decreasing from 255 to 0 across the gradient
+    red = int(255 - (255 * i / (WIDTH-1)) + 0.5)
+    # Calculate blue value increasing from 0 to 255 across the gradient
+    blue = int(255 * i / (WIDTH-1) + 0.5)
+    # Print one block (a space with the background color set) without a newline.
+    print(f"\033[48;2;{red};0;{blue}m \033[0m", end="")
+print()

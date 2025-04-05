@@ -87,6 +87,7 @@ pub struct FontFace {
     pub url: String,
     pub format: Option<FontFormat>,
     pub chars: Rc<dyn CharSet>,
+    pub metrics_match: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

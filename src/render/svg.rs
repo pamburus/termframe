@@ -156,6 +156,7 @@ impl SvgRenderer {
                 .set("xml:space", "preserve");
 
             let mut pos = 0;
+
             for cluster in line.cluster(None) {
                 if cluster.text.trim().is_empty() {
                     continue;
@@ -250,6 +251,8 @@ impl SvgRenderer {
                         );
                     }
 
+                    let mut text_length_needed = false;
+
                     for ch in text.chars() {
                         for (i, font) in opt.font.faces.iter().enumerate().rev() {
                             if match_font_face(font, font_weight, font_style, ch) {
@@ -258,13 +261,36 @@ impl SvgRenderer {
                                         "using font face #{i:02} because it is required at least by character {ch:?} with weight={font_weight:?} style={font_style:?}",
                                     );
                                 }
+                                if !opt.font.faces[i].metrics_match {
+                                    text_length_needed = true;
+                                }
                                 break;
                             }
                         }
                     }
 
-                    tl = tl.add(span);
-                    pos = x + range.len();
+                    if text_length_needed {
+                        sl.append(tl);
+                        sl.append(
+                            element::Text::new("")
+                                .set("x", format!("{}em", (x as f32 * fw).r2p(fp)))
+                                .set("y", format!("{}em", tyo))
+                                .set("xml:space", "preserve")
+                                .set(
+                                    "textLength",
+                                    format!("{}em", (range.len() as f32 * fw).r2p(fp)),
+                                )
+                                .add(span),
+                        );
+                        pos = x + range.len();
+                        tl = element::Text::new("")
+                            .set("x", format!("{}em", (pos as f32 * fw).r2p(fp)))
+                            .set("y", format!("{}em", tyo))
+                            .set("xml:space", "preserve");
+                    } else {
+                        tl = tl.add(span);
+                        pos = x + range.len();
+                    }
                 }
             }
 

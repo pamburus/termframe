@@ -225,10 +225,9 @@ impl App {
         let used = Rc::new(used);
 
         for (i, (url, family, font)) in fonts.iter_mut().enumerate() {
+            let mut metrics_match = true;
             if let Some(width) = &mut width {
-                *width = width.max(font.width());
-                ascender = ascender.max(font.ascender());
-                descender = descender.min(font.descender());
+                metrics_match = *width == font.width();
             } else {
                 width = Some(font.width());
                 ascender = font.ascender();
@@ -240,7 +239,7 @@ impl App {
                 (used.get(&ch).copied().unwrap_or(0) & (1 << i) as u64) != 0
             }));
 
-            let face = make_font_face(family, url, font, chars);
+            let face = make_font_face(family, url, font, chars, metrics_match);
 
             log::debug!(
                 "font face #{i:02}: weight={weight:?} style={style:?} url={url:?}",
@@ -426,6 +425,7 @@ fn make_font_face(
     url: &mut String,
     font: &mut font::Font,
     chars: Rc<dyn CharSet>,
+    metrics_match: bool,
 ) -> render::FontFace {
     if let Some(ff) = font.family() {
         if ff != family {
@@ -454,6 +454,7 @@ fn make_font_face(
         format: font.format(),
         url: url.clone(),
         chars,
+        metrics_match,
     }
 }
 

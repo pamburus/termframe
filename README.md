@@ -47,7 +47,7 @@ This tool is a non-interactive terminal emulator that executes a single command,
     scoop install termframe
     ```
 
-* Download latest release from [download page](https://github.com/pamburus/termframe/releases/latest)
+* Download latest release from [download page](https://github.com/pamburus/termframe/releases)
 
 ## Usage
 

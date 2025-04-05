@@ -16,19 +16,19 @@
 <circle cx="54" cy="14" fill="#28c941" r="6" stroke="#28c941" stroke-width="0.5"/>
 </g>
 <svg class="terminal" font-family="JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace" font-size="12" height="30em" width="50.185em" y="28">
-<svg fill="var(--fg)" x="0.8em" y="0.6em">
+<svg fill="#dcdfe4" x="0.8em" y="0.6em">
 <g>
 <svg height="28.8em" viewBox="0 0 48.585 28.8" width="48.585em">
 <g stroke-width="0.025">
-<path d="M10.455,7.2 H23.37 V8.4 H10.455 Z" fill="var(--fg)" stroke="var(--fg)"/>
-<path d="M0,22.8 H6.15 V24 H0 Z" fill="var(--c-0)" stroke="var(--c-0)"/>
-<path d="M6.15,22.8 H11.07 V24 H6.15 Z" fill="var(--c-1)" stroke="var(--c-1)"/>
-<path d="M11.07,22.8 H17.22 V24 H11.07 Z" fill="var(--c-2)" stroke="var(--c-2)"/>
-<path d="M17.22,22.8 H23.985 V24 H17.22 Z" fill="var(--c-3)" stroke="var(--c-3)"/>
-<path d="M23.985,22.8 H29.52 V24 H23.985 Z" fill="var(--c-4)" stroke="var(--c-4)"/>
-<path d="M29.52,22.8 H36.9 V24 H29.52 Z" fill="var(--c-5)" stroke="var(--c-5)"/>
-<path d="M36.9,22.8 H42.435 V24 H36.9 Z" fill="var(--c-6)" stroke="var(--c-6)"/>
-<path d="M42.435,22.8 H48.585 V24 H42.435 Z" fill="var(--c-7)" stroke="var(--c-7)"/>
+<path d="M10.455,7.2 H23.37 V8.4 H10.455 Z" fill="#dcdfe4" stroke="#dcdfe4"/>
+<path d="M0,22.8 H6.15 V24 H0 Z" fill="#3e4451" stroke="#3e4451"/>
+<path d="M6.15,22.8 H11.07 V24 H6.15 Z" fill="#e06c75" stroke="#e06c75"/>
+<path d="M11.07,22.8 H17.22 V24 H11.07 Z" fill="#98c379" stroke="#98c379"/>
+<path d="M17.22,22.8 H23.985 V24 H17.22 Z" fill="#e5c07b" stroke="#e5c07b"/>
+<path d="M23.985,22.8 H29.52 V24 H23.985 Z" fill="#61afef" stroke="#61afef"/>
+<path d="M29.52,22.8 H36.9 V24 H29.52 Z" fill="#c678dd" stroke="#c678dd"/>
+<path d="M36.9,22.8 H42.435 V24 H36.9 Z" fill="#56b6c2" stroke="#56b6c2"/>
+<path d="M42.435,22.8 H48.585 V24 H42.435 Z" fill="#dcdfe4" stroke="#dcdfe4"/>
 <path d="M0,26.4 H0.615 V27.6 H0 Z" fill="#ff0000" stroke="#ff0000"/>
 <path d="M0.615,26.4 H1.23 V27.6 H0.615 Z" fill="#fc0003" stroke="#fc0003"/>
 <path d="M1.23,26.4 H1.845 V27.6 H1.23 Z" fill="#f80007" stroke="#f80007"/>
@@ -111,58 +111,58 @@
 </g>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="0em">
-<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">Available </tspan><tspan font-weight="bold">Text </tspan><tspan font-weight="bold">Styles:</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4" font-weight="bold">Available </tspan><tspan fill="#dcdfe4" font-weight="bold">Text </tspan><tspan fill="#dcdfe4" font-weight="bold">Styles:</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="1.2em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Bold: </tspan><tspan font-weight="bold" x="10.455em">This </tspan><tspan font-weight="bold">is </tspan><tspan font-weight="bold">bold </tspan><tspan font-weight="bold">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#dcdfe4">Bold: </tspan><tspan fill="#dcdfe4" font-weight="bold" x="10.455em">This </tspan><tspan fill="#dcdfe4" font-weight="bold">is </tspan><tspan fill="#dcdfe4" font-weight="bold">bold </tspan><tspan fill="#dcdfe4" font-weight="bold">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="2.4em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Dim: </tspan><tspan opacity="0.5" x="10.455em">This </tspan><tspan opacity="0.5">is </tspan><tspan opacity="0.5">dim </tspan><tspan opacity="0.5">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#dcdfe4">Dim: </tspan><tspan fill="#dcdfe4" opacity="0.5" x="10.455em">This </tspan><tspan fill="#dcdfe4" opacity="0.5">is </tspan><tspan fill="#dcdfe4" opacity="0.5">dim </tspan><tspan fill="#dcdfe4" opacity="0.5">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="3.6em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Italic: </tspan><tspan font-style="italic" x="10.455em">This </tspan><tspan font-style="italic">is </tspan><tspan font-style="italic">italic </tspan><tspan font-style="italic">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#dcdfe4">Italic: </tspan><tspan fill="#dcdfe4" font-style="italic" x="10.455em">This </tspan><tspan fill="#dcdfe4" font-style="italic">is </tspan><tspan fill="#dcdfe4" font-style="italic">italic </tspan><tspan fill="#dcdfe4" font-style="italic">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="4.8em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Underline: </tspan><tspan text-decoration="underline" text-decoration-style="solid" x="10.455em">This </tspan><tspan text-decoration="underline" text-decoration-style="solid">is </tspan><tspan text-decoration="underline" text-decoration-style="solid">underlined </tspan><tspan text-decoration="underline" text-decoration-style="solid">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#dcdfe4">Underline: </tspan><tspan fill="#dcdfe4" text-decoration="underline" text-decoration-style="solid" x="10.455em">This </tspan><tspan fill="#dcdfe4" text-decoration="underline" text-decoration-style="solid">is </tspan><tspan fill="#dcdfe4" text-decoration="underline" text-decoration-style="solid">underlined </tspan><tspan fill="#dcdfe4" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="6em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Strikethrough: </tspan><tspan text-decoration="line-through">This </tspan><tspan text-decoration="line-through">is </tspan><tspan text-decoration="line-through">strikethrough </tspan><tspan text-decoration="line-through">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#dcdfe4">Strikethrough: </tspan><tspan fill="#dcdfe4" text-decoration="line-through">This </tspan><tspan fill="#dcdfe4" text-decoration="line-through">is </tspan><tspan fill="#dcdfe4" text-decoration="line-through">strikethrough </tspan><tspan fill="#dcdfe4" text-decoration="line-through">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="7.2em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Reverse: </tspan><tspan fill="var(--bg)" x="10.455em">This </tspan><tspan fill="var(--bg)">is </tspan><tspan fill="var(--bg)">reversed </tspan><tspan fill="var(--bg)">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#dcdfe4">Reverse: </tspan><tspan fill="#282c34" x="10.455em">This </tspan><tspan fill="#282c34">is </tspan><tspan fill="#282c34">reversed </tspan><tspan fill="#282c34">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="9.6em">
-<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">Basic </tspan><tspan font-weight="bold">Foreground </tspan><tspan font-weight="bold">Colors:</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4" font-weight="bold">Basic </tspan><tspan fill="#dcdfe4" font-weight="bold">Foreground </tspan><tspan fill="#dcdfe4" font-weight="bold">Colors:</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="10.8em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Normal: </tspan><tspan fill="var(--c-0)">Black</tspan><tspan fill="var(--c-1)" x="9.84em">Red</tspan><tspan fill="var(--c-2)" x="12.3em">Green</tspan><tspan fill="var(--c-3)" x="15.99em">Yellow</tspan><tspan fill="var(--c-4)" x="20.295em">Blue</tspan><tspan fill="var(--c-5)" x="23.37em">Magenta</tspan><tspan fill="var(--c-6)" x="28.29em">Cyan</tspan><tspan fill="var(--c-7)" x="31.365em">White</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#dcdfe4">Normal: </tspan><tspan fill="#3e4451">Black</tspan><tspan fill="#e06c75" x="9.84em">Red</tspan><tspan fill="#98c379" x="12.3em">Green</tspan><tspan fill="#e5c07b" x="15.99em">Yellow</tspan><tspan fill="#61afef" x="20.295em">Blue</tspan><tspan fill="#c678dd" x="23.37em">Magenta</tspan><tspan fill="#56b6c2" x="28.29em">Cyan</tspan><tspan fill="#dcdfe4" x="31.365em">White</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="12em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan>Bright: </tspan><tspan fill="var(--c-8)">Black</tspan><tspan fill="var(--c-9)" x="9.84em">Red</tspan><tspan fill="var(--c-10)" x="12.3em">Green</tspan><tspan fill="var(--c-11)" x="15.99em">Yellow</tspan><tspan fill="var(--c-12)" x="20.295em">Blue</tspan><tspan fill="var(--c-13)" x="23.37em">Magenta</tspan><tspan fill="var(--c-14)" x="28.29em">Cyan</tspan><tspan fill="var(--c-15)" x="31.365em">White</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#dcdfe4">Bright: </tspan><tspan fill="#545d6d">Black</tspan><tspan fill="#fd807f" x="9.84em">Red</tspan><tspan fill="#96d58a" x="12.3em">Green</tspan><tspan fill="#edc273" x="15.99em">Yellow</tspan><tspan fill="#84c8ff" x="20.295em">Blue</tspan><tspan fill="#ee82ee" x="23.37em">Magenta</tspan><tspan fill="#3ae1f7" x="28.29em">Cyan</tspan><tspan fill="#f7f9fc" x="31.365em">White</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="14.4em">
-<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">Mixed </tspan><tspan font-weight="bold">Styles </tspan><tspan font-weight="bold">with </tspan><tspan font-weight="bold">Colors:</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4" font-weight="bold">Mixed </tspan><tspan fill="#dcdfe4" font-weight="bold">Styles </tspan><tspan fill="#dcdfe4" font-weight="bold">with </tspan><tspan fill="#dcdfe4" font-weight="bold">Colors:</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="15.6em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan fill="var(--c-1)" font-weight="bold">Bold </tspan><tspan fill="var(--c-1)" font-weight="bold">red </tspan><tspan fill="var(--c-1)" font-weight="bold">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#e06c75" font-weight="bold">Bold </tspan><tspan fill="#e06c75" font-weight="bold">red </tspan><tspan fill="#e06c75" font-weight="bold">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="16.8em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan fill="var(--c-2)" font-style="italic">Italic </tspan><tspan fill="var(--c-2)" font-style="italic">green </tspan><tspan fill="var(--c-2)" font-style="italic">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#98c379" font-style="italic">Italic </tspan><tspan fill="#98c379" font-style="italic">green </tspan><tspan fill="#98c379" font-style="italic">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="18em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">Underlined </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">blue </tspan><tspan fill="var(--c-4)" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#61afef" text-decoration="underline" text-decoration-style="solid">Underlined </tspan><tspan fill="#61afef" text-decoration="underline" text-decoration-style="solid">blue </tspan><tspan fill="#61afef" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="19.2em">
-<text xml:space="preserve" y="0.956em"><tspan>• </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">Bold </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">underlined </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">magenta </tspan><tspan fill="var(--c-5)" font-weight="bold" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4">• </tspan><tspan fill="#c678dd" font-weight="bold" text-decoration="underline" text-decoration-style="solid">Bold </tspan><tspan fill="#c678dd" font-weight="bold" text-decoration="underline" text-decoration-style="solid">underlined </tspan><tspan fill="#c678dd" font-weight="bold" text-decoration="underline" text-decoration-style="solid">magenta </tspan><tspan fill="#c678dd" font-weight="bold" text-decoration="underline" text-decoration-style="solid">text</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="21.6em">
-<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">Basic </tspan><tspan font-weight="bold">Background </tspan><tspan font-weight="bold">Colors:</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4" font-weight="bold">Basic </tspan><tspan fill="#dcdfe4" font-weight="bold">Background </tspan><tspan fill="#dcdfe4" font-weight="bold">Colors:</tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="22.8em">
-<text xml:space="preserve" y="0.956em"><tspan fill="var(--c-231)" x="0.615em">Black </tspan><tspan fill="var(--c-231)">BG </tspan><tspan fill="var(--c-16)" x="6.765em">Red </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="11.685em">Green </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="17.835em">Yellow </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="24.6em">Blue </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="30.135em">Magenta </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="37.515em">Cyan </tspan><tspan fill="var(--c-16)">BG </tspan><tspan fill="var(--c-16)" x="43.05em">White </tspan><tspan fill="var(--c-16)">BG </tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#ffffff" x="0.615em">Black </tspan><tspan fill="#ffffff">BG </tspan><tspan fill="#000000" x="6.765em">Red </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="11.685em">Green </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="17.835em">Yellow </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="24.6em">Blue </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="30.135em">Magenta </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="37.515em">Cyan </tspan><tspan fill="#000000">BG </tspan><tspan fill="#000000" x="43.05em">White </tspan><tspan fill="#000000">BG </tspan></text>
 </svg>
 <svg height="1.2em" overflow="hidden" width="48.585em" y="25.2em">
-<text xml:space="preserve" y="0.956em"><tspan font-weight="bold">24-bit </tspan><tspan font-weight="bold">True </tspan><tspan font-weight="bold">Color </tspan><tspan font-weight="bold">Background:</tspan></text>
+<text xml:space="preserve" y="0.956em"><tspan fill="#dcdfe4" font-weight="bold">24-bit </tspan><tspan fill="#dcdfe4" font-weight="bold">True </tspan><tspan fill="#dcdfe4" font-weight="bold">Color </tspan><tspan fill="#dcdfe4" font-weight="bold">Background:</tspan></text>
 </svg>
 </g>
 </svg>
@@ -171,28 +171,6 @@
 <rect fill="none" height="386" rx="9" ry="9" stroke="#f0f0f080" stroke-width="0.5" width="600.22" x="1" y="1"/>
 </g>
 <style>
-.terminal {
-    --bg: #282c34;
-    --fg: #dcdfe4;
-    --c-0: #3e4451;
-    --c-1: #e06c75;
-    --c-2: #98c379;
-    --c-3: #e5c07b;
-    --c-4: #61afef;
-    --c-5: #c678dd;
-    --c-6: #56b6c2;
-    --c-7: #dcdfe4;
-    --c-8: #545d6d;
-    --c-9: #fd807f;
-    --c-10: #96d58a;
-    --c-11: #edc273;
-    --c-12: #84c8ff;
-    --c-13: #ee82ee;
-    --c-14: #3ae1f7;
-    --c-15: #f7f9fc;
-    --c-16: #000000;
-    --c-231: #ffffff;
-}
 @font-face {
 	font-family: JetBrains Mono;
 	font-weight: 100 800;

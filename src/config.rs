@@ -1,5 +1,6 @@
 // std imports
 use std::{
+    collections::HashMap,
     fmt, include_str,
     path::{Path, PathBuf},
     sync::LazyLock,
@@ -22,6 +23,60 @@ pub mod winstyle;
 pub use load::Load;
 pub use types::Number;
 
+pub const APP_NAME: &str = "termframe";
+
+static DEFAULT_SETTINGS_RAW: &str = include_str!("../assets/config.toml");
+const DEFAULT_SETTINGS_FORMAT: FileFormat = FileFormat::Toml;
+static DEFAULT_SETTINGS: LazyLock<Settings> =
+    LazyLock::new(|| Settings::load([Source::string("", DEFAULT_SETTINGS_FORMAT)]).unwrap());
+
+/// Get the default settings.
+#[allow(dead_code)]
+pub fn default() -> &'static Settings {
+    Default::default()
+}
+
+/// Load settings from the given file.
+pub fn at<I, P>(paths: I) -> Loader
+where
+    I: IntoIterator<Item = P>,
+    P: AsRef<Path>,
+{
+    Loader::new(paths.into_iter().map(|path| path.as_ref().into()).collect())
+}
+
+/// Load settings from the default configuration file per platform.
+#[allow(dead_code)]
+pub fn load() -> Result<Settings> {
+    Loader::new(Vec::new()).load()
+}
+
+/// Get the application platform-specific directories.
+pub fn app_dirs() -> Option<AppDirs> {
+    AppDirs::new(APP_NAME)
+}
+
+pub mod global {
+    use super::*;
+    use std::sync::Mutex;
+
+    static PENDING: Mutex<Option<Settings>> = Mutex::new(None);
+    static RESOLVED: LazyLock<Settings> =
+        LazyLock::new(|| PENDING.lock().unwrap().take().unwrap_or_default());
+
+    /// Call initialize before any calls to get otherwise it will have no effect.
+    pub fn initialize(cfg: Settings) {
+        *PENDING.lock().unwrap() = Some(cfg);
+    }
+
+    /// Get the resolved config.
+    /// If initialized was called before, then a clone of that config will be returned.
+    /// Otherwise, the default config will be returned.
+    pub fn get() -> &'static Settings {
+        &RESOLVED
+    }
+}
+
 /// Settings structure containing various configuration options.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
@@ -32,6 +87,7 @@ pub struct Settings {
     pub font: Font,
     pub padding: PaddingOption,
     pub window: Window,
+    pub env: HashMap<String, String>,
     pub rendering: Rendering,
     pub fonts: Fonts,
 }
@@ -302,34 +358,6 @@ pub struct Padding {
     pub right: Number,
 }
 
-static DEFAULT_SETTINGS_RAW: &str = include_str!("../assets/config.toml");
-const DEFAULT_SETTINGS_FORMAT: FileFormat = FileFormat::Toml;
-static DEFAULT_SETTINGS: LazyLock<Settings> =
-    LazyLock::new(|| Settings::load([Source::string("", DEFAULT_SETTINGS_FORMAT)]).unwrap());
-
-pub const APP_NAME: &str = "termframe";
-
-/// Get the default settings.
-#[allow(dead_code)]
-pub fn default() -> &'static Settings {
-    Default::default()
-}
-
-/// Load settings from the given file.
-pub fn at<I, P>(paths: I) -> Loader
-where
-    I: IntoIterator<Item = P>,
-    P: AsRef<Path>,
-{
-    Loader::new(paths.into_iter().map(|path| path.as_ref().into()).collect())
-}
-
-/// Load settings from the default configuration file per platform.
-#[allow(dead_code)]
-pub fn load() -> Result<Settings> {
-    Loader::new(Vec::new()).load()
-}
-
 /// Loader structure for loading settings.
 pub struct Loader {
     paths: Vec<PathBuf>,
@@ -393,32 +421,6 @@ impl Loader {
     /// Get the configuration path for a directory.
     fn config(dir: &Path) -> PathBuf {
         dir.join("config")
-    }
-}
-
-/// Get the application platform-specific directories.
-pub fn app_dirs() -> Option<AppDirs> {
-    AppDirs::new(APP_NAME)
-}
-
-pub mod global {
-    use super::*;
-    use std::sync::Mutex;
-
-    static PENDING: Mutex<Option<Settings>> = Mutex::new(None);
-    static RESOLVED: LazyLock<Settings> =
-        LazyLock::new(|| PENDING.lock().unwrap().take().unwrap_or_default());
-
-    /// Call initialize before any calls to get otherwise it will have no effect.
-    pub fn initialize(cfg: Settings) {
-        *PENDING.lock().unwrap() = Some(cfg);
-    }
-
-    /// Get the resolved config.
-    /// If initialized was called before, then a clone of that config will be returned.
-    /// Otherwise, the default config will be returned.
-    pub fn get() -> &'static Settings {
-        &RESOLVED
     }
 }
 

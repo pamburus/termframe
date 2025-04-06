@@ -9,6 +9,11 @@ mode = "auto"
 width = 80  # Number of terminal columns.
 height = 24 # Number of terminal rows.
 
+# Environment variables.
+[env]
+TERM = "xterm-256color"
+COLORTERM = "truecolor"
+
 # Color theme.
 # For the list of available themes, run `termframe --list-themes`.
 [theme]

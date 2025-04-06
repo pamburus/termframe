@@ -134,6 +134,7 @@ impl App {
             rows: Some(opt.height),
             background: Some(theme.bg.convert()),
             foreground: Some(theme.fg.convert()),
+            env: settings.env.clone(),
         });
 
         let timeout = Some(std::time::Duration::from_secs(opt.timeout));

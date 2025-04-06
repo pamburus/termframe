@@ -1,4 +1,5 @@
 use std::{
+    collections::HashMap,
     io::{self, BufRead, BufReader, BufWriter},
     mem,
     sync::{
@@ -31,10 +32,12 @@ pub struct Options {
     pub rows: Option<u16>,
     pub background: Option<SrgbaTuple>,
     pub foreground: Option<SrgbaTuple>,
+    pub env: HashMap<String, String>,
 }
 
 /// Represents a terminal with a surface, parser, state, and size.
 pub struct Terminal {
+    env: HashMap<String, String>,
     surface: Surface,
     parser: Parser,
     state: State,
@@ -62,6 +65,7 @@ impl Terminal {
         };
 
         Self {
+            env: options.env,
             surface: Surface::new(cols.into(), rows.into()),
             parser: Parser::new(),
             state: State::new(background, foreground),
@@ -105,8 +109,10 @@ impl Terminal {
 
     /// Runs a command in the terminal with an optional timeout.
     pub fn run(&mut self, mut cmd: CommandBuilder, timeout: Option<Duration>) -> Result<()> {
-        cmd.env("TERM", "xterm-256color");
-        cmd.env("COLORTERM", "truecolor");
+        for (key, value) in &self.env {
+            cmd.env(key, value);
+        }
+
         if cmd.get_cwd().is_none() {
             cmd.cwd(".");
         }

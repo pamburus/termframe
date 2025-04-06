@@ -13,6 +13,16 @@
         "terminal": {
           "$ref": "#/definitions/terminal"
         },
+        "env": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "font": {
           "$ref": "#/definitions/font"
         },

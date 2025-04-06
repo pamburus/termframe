@@ -1,24 +1,20 @@
-// std imports
 use std::{
     borrow::Cow,
     fmt::{self, Write as _},
     path::Path,
 };
 
-// third-party imports
 use owo_colors::{OwoColorize, Style};
 
-// local imports
 pub mod suggest;
 
-// re-exports
 pub use suggest::Suggestions;
 
-// ---
-
+/// A trait for highlighting text.
 pub trait Highlight {
     type Output: fmt::Display;
 
+    /// Highlights the text.
     fn hl(self) -> Self::Output;
 }
 
@@ -41,11 +37,11 @@ impl<'a> Highlight for &'a Path {
     }
 }
 
-// ---
-
+/// A trait for highlighting and quoting text.
 pub trait HighlightQuoted {
     type Output: fmt::Display;
 
+    /// Highlights and quotes the text.
     fn hlq(self) -> Self::Output;
 }
 
@@ -68,8 +64,7 @@ impl<'a> HighlightQuoted for &'a Path {
     }
 }
 
-// ---
-
+/// A wrapper struct for highlighted text.
 pub struct Highlighted<S>(S);
 
 impl<S> fmt::Display for Highlighted<S>
@@ -81,8 +76,7 @@ where
     }
 }
 
-// ---
-
+/// A wrapper struct for quoted text.
 pub struct Quoted<S>(S);
 
 impl<S> fmt::Display for Quoted<S>
@@ -107,8 +101,7 @@ where
     }
 }
 
-// ---
-
+/// A wrapper struct for converted text.
 pub struct Converted<T>(T);
 
 impl<T> fmt::Display for Converted<T>
@@ -131,11 +124,11 @@ where
     }
 }
 
-// ---
-
+/// A trait for converting text for highlighting.
 trait HighlightConvert {
     type Output: fmt::Display;
 
+    /// Converts the text for highlighting.
     fn convert(self) -> Self::Output;
 }
 
@@ -146,8 +139,6 @@ impl<'a> HighlightConvert for &'a Path {
         self.to_string_lossy()
     }
 }
-
-// ---
 
 const HIGHLIGHT: Style = Style::new().yellow();
 

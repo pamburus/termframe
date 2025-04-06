@@ -22,29 +22,40 @@ use super::{
 };
 use crate::xerr::{HighlightQuoted, Suggestions};
 
-// ---
-
 /// Error is an error which may occur in the application.
 #[derive(Error, Debug)]
 pub enum Error {
+    /// Error when the specified theme is not found.
     #[error("unknown theme {}", .name.hlq())]
     ThemeNotFound {
         name: Arc<str>,
         suggestions: Suggestions,
     },
+
+    /// Error when the theme file is not found.
     #[error("theme file {} not found", .path.hlq())]
     ThemeFileNotFound { path: PathBuf },
+
+    /// Error when the theme file path is invalid.
     #[error("invalid theme file path {}", .path.hlq())]
     InvalidThemeFilePath { path: PathBuf },
+
+    /// Error when an invalid tag is encountered.
     #[error("invalid tag {value}", value=.value.hlq())]
     InvalidTag {
         value: Arc<str>,
         suggestions: Suggestions,
     },
+
+    /// Error when listing themes fails.
     #[error("failed to list themes: {source}")]
     FailedToListThemes { source: io::Error },
+
+    /// Error when loading a theme fails.
     #[error("failed to load theme {name}: {source}", name=.name.hlq())]
     Io { name: Arc<str>, source: io::Error },
+
+    /// Error when parsing a theme fails.
     #[error("failed to parse theme {name}: {source}", name=.name.hlq())]
     FailedToParseTheme {
         name: Arc<str>,
@@ -76,8 +87,7 @@ impl Categorize for Error {
     }
 }
 
-// ---
-
+/// Tags that can be associated with a theme.
 #[derive(Debug, Ord, PartialOrd, Hash, Deserialize, EnumSetType, Display)]
 #[strum(serialize_all = "kebab-case")]
 #[serde(rename_all = "kebab-case")]
@@ -97,16 +107,18 @@ impl FromStr for Tag {
     }
 }
 
-// ---
-
+/// Configuration for a theme.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct ThemeConfig {
+    /// Tags associated with the theme.
     #[serde(deserialize_with = "enumset_serde::deserialize")]
     pub tags: EnumSet<Tag>,
+    /// The theme itself.
     pub theme: Theme,
 }
 
+/// A theme which can be either fixed or adaptive.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 #[serde(untagged)]
@@ -116,6 +128,7 @@ pub enum Theme {
 }
 
 impl Theme {
+    /// Resolves the colors for the given mode.
     pub fn resolve(&self, mode: Mode) -> &Colors {
         match self {
             Theme::Fixed(fixed) => &fixed.colors,
@@ -152,18 +165,21 @@ impl Load for ThemeConfig {
     }
 }
 
+/// A fixed theme with a set of colors.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Fixed {
     pub colors: Colors,
 }
 
+/// An adaptive theme with different modes.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Adaptive {
     pub modes: Modes,
 }
 
+/// Different modes for an adaptive theme.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Modes {
@@ -171,6 +187,7 @@ pub struct Modes {
     pub light: Fixed,
 }
 
+/// Colors used in a theme.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Colors {
@@ -182,6 +199,7 @@ pub struct Colors {
 
 pub type Palette = HashMap<PaletteIndex, Color>;
 
+/// Index for a color in the palette.
 #[derive(Debug, Deserialize, Clone, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[serde(untagged)]
 pub enum PaletteIndex {
@@ -190,6 +208,7 @@ pub enum PaletteIndex {
 }
 
 impl PaletteIndex {
+    /// Resolves the palette index to a u8 value if possible.
     pub fn resolve(&self) -> Option<u8> {
         match self {
             Self::U8(value) => Some(*value),
@@ -198,19 +217,20 @@ impl PaletteIndex {
     }
 }
 
-// ---
-
+/// A map for aliasing theme names.
 struct AliasMap {
     a2n: HashMap<String, String>,
     n2a: HashMap<String, String>,
 }
 
 impl AliasMap {
+    /// Loads the alias map from the embedded assets.
     fn load() -> Self {
         let asset = Assets::get(".aliases.json").unwrap();
         Self::new(serde_json::from_slice(&asset.data).unwrap())
     }
 
+    /// Creates a new alias map from the given alias-to-name map.
     fn new(a2n: HashMap<String, String>) -> Self {
         let mut n2a = HashMap::new();
         for (alias, name) in a2n.iter() {
@@ -220,17 +240,18 @@ impl AliasMap {
         Self { a2n, n2a }
     }
 
+    /// Gets the alias for the given name.
     fn alias(&self, name: &str) -> Option<&str> {
         self.n2a.get(name).map(|s| s.as_str())
     }
 
+    /// Gets the name for the given alias.
     fn name(&self, alias: &str) -> Option<&str> {
         self.a2n.get(alias).map(|s| s.as_str())
     }
 }
 
-// ---
-
+/// Embedded assets for themes.
 #[derive(RustEmbed)]
 #[folder = "assets/themes/"]
 pub struct Assets;

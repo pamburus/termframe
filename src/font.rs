@@ -16,8 +16,7 @@ use url::Url;
 // local imports
 use crate::fontformat::FontFormat;
 
-// ---
-
+/// Represents a font file with its location and data.
 #[allow(dead_code)]
 pub struct FontFile {
     location: Location,
@@ -28,6 +27,7 @@ pub type Result<T> = anyhow::Result<T>;
 pub type Fixed = allsorts::tables::Fixed;
 
 impl FontFile {
+    /// Load a font file from a given location.
     #[allow(dead_code)]
     pub fn load(location: Location) -> Result<Self> {
         match location {
@@ -36,15 +36,18 @@ impl FontFile {
         }
     }
 
+    /// Load a font file from a file path.
     pub fn load_file(path: PathBuf) -> Result<Self> {
         let bytes = std::fs::read(&path)?;
         Self::load_bytes(&bytes, Location::File(path))
     }
 
+    /// Load a font file from a URL.
     pub fn load_url(url: Url) -> Result<Self> {
         Self::load_url_with_agent(url, &ureq::Agent::new_with_defaults())
     }
 
+    /// Load a font file from a URL using a specific agent.
     pub fn load_url_with_agent(url: Url, agent: &ureq::Agent) -> Result<Self> {
         match url.scheme() {
             "file" | "" => Self::load_file(url.path().into()),
@@ -55,15 +58,18 @@ impl FontFile {
         }
     }
 
+    /// Load a font file from raw bytes.
     pub fn load_bytes(bytes: &[u8], location: Location) -> Result<Self> {
         let data = ReadScopeOwned::new(ReadScope::new(bytes));
         Ok(Self { location, data })
     }
 
+    /// Get the raw data of the font file.
     pub fn data(&self) -> &[u8] {
         self.data.scope().data()
     }
 
+    /// Determine the format of the font file.
     pub fn format(&self) -> Option<FontFormat> {
         if self.data().len() < 4 {
             return None;
@@ -78,11 +84,13 @@ impl FontFile {
         }
     }
 
+    /// Get the location of the font file.
     #[allow(dead_code)]
     pub fn location(&self) -> &Location {
         &self.location
     }
 
+    /// Get the font object from the font file.
     pub fn font(&self) -> Result<Font> {
         let provider = self.data.scope().read::<FontData>()?.table_provider(0)?;
 
@@ -109,6 +117,7 @@ impl FontFile {
     }
 }
 
+/// Represents the location of a font file, either a file path or a URL.
 #[derive(Debug, Clone)]
 pub enum Location {
     File(PathBuf),
@@ -116,6 +125,7 @@ pub enum Location {
 }
 
 impl Location {
+    /// Automatically determine the location type from a string.
     pub fn auto<S: AsRef<str>>(s: S) -> Self {
         match Url::parse(s.as_ref()) {
             Ok(url) => Self::Url(url),
@@ -123,6 +133,7 @@ impl Location {
         }
     }
 
+    /// Get the URL if the location is a URL.
     pub fn url(&self) -> Option<&Url> {
         match self {
             Self::Url(url) => Some(url),
@@ -158,6 +169,7 @@ impl From<&str> for Location {
     }
 }
 
+/// Represents a font with its various properties and methods.
 #[allow(dead_code)]
 pub struct Font<'a> {
     inner: allsorts::Font<DynamicFontTableProvider<'a>>,
@@ -169,18 +181,22 @@ pub struct Font<'a> {
 }
 
 impl Font<'_> {
+    /// Get the format of the font.
     pub fn format(&self) -> Option<FontFormat> {
         self.format
     }
 
+    /// Get the family name of the font.
     pub fn family(&self) -> Option<&str> {
         self.family.as_deref()
     }
 
+    /// Get the name of the font.
     pub fn name(&self) -> Option<&str> {
         self.name.as_deref()
     }
 
+    /// Get the width of the '0' glyph in the font.
     pub fn width(&mut self) -> f32 {
         let (glyph, _) = self
             .inner
@@ -191,44 +207,54 @@ impl Font<'_> {
             .unwrap_or(1.0)
     }
 
+    /// Get the ascender value of the font.
     pub fn ascender(&self) -> f32 {
         self.inner.hhea_table.ascender as f32 / self.em() as f32
     }
 
+    /// Get the descender value of the font.
     pub fn descender(&self) -> f32 {
         self.inner.hhea_table.descender as f32 / self.em() as f32
     }
 
+    /// Get the line gap value of the font.
     #[allow(dead_code)]
     pub fn line_gap(&self) -> f32 {
         self.inner.hhea_table.line_gap as f32 / self.em() as f32
     }
 
+    /// Get the weight class of the font.
     #[allow(dead_code)]
     pub fn weight(&self) -> u16 {
         self.os2.us_weight_class
     }
 
+    /// Check if the font is italic.
     pub fn italic(&self) -> bool {
         self.head.is_italic()
     }
 
+    /// Check if the font is bold.
     pub fn bold(&self) -> bool {
         self.head.is_bold()
     }
 
+    /// Get the weight axis range of the font.
     pub fn weight_axis(&self) -> Option<(Fixed, Fixed)> {
         self.axis(tag::WGHT)
     }
 
+    /// Check if the font has an italic axis.
     pub fn has_italic_axis(&self) -> bool {
         self.axis(tag::ITAL).is_some()
     }
 
+    /// Check if the font contains a specific character.
     pub fn has_char(&mut self, ch: char) -> bool {
         self.glyph_index(ch).is_some()
     }
 
+    /// Create a subset of the font containing only the specified characters.
     #[allow(dead_code)]
     pub fn subset<C>(&mut self, chars: C) -> Result<Vec<u8>>
     where
@@ -248,10 +274,12 @@ impl Font<'_> {
         Ok(subset(&self.inner.font_table_provider, &glyphs)?)
     }
 
+    /// Get the units per em value of the font.
     fn em(&self) -> u16 {
         self.head.units_per_em
     }
 
+    /// Get the range of a specific axis in the font.
     fn axis(&self, tag: u32) -> Option<(Fixed, Fixed)> {
         self.inner
             .variation_axes()
@@ -261,6 +289,7 @@ impl Font<'_> {
             .map(|rec| (rec.min_value, rec.max_value))
     }
 
+    /// Get the glyph index for a specific character.
     fn glyph_index(&mut self, ch: char) -> Option<u16> {
         let index = self
             .inner

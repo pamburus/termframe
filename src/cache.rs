@@ -17,12 +17,14 @@ type Result<T, E = Error> = std::result::Result<T, E>;
 
 const KEY_HEADERS: &str = "headers";
 
+/// Middleware for caching HTTP responses.
 pub struct CacheMiddleware {
     dir: PathBuf,
     lockers: LockerMap,
 }
 
 impl CacheMiddleware {
+    /// Creates a new `CacheMiddleware` with the specified cache directory.
     pub fn new(dir: &Path) -> Self {
         Self {
             dir: dir.to_owned(),
@@ -30,6 +32,7 @@ impl CacheMiddleware {
         }
     }
 
+    /// Retrieves a cached response if available.
     fn cached(&self, key: &str) -> Option<Response<Body>> {
         let meta = cacache::metadata_sync(&self.dir, key).ok()??;
         let attrs = meta.metadata.as_object()?;
@@ -48,6 +51,7 @@ impl CacheMiddleware {
         response.body(Body::builder().data(data)).ok()
     }
 
+    /// Saves a response to the cache.
     fn save(&self, key: &str, response: &Response<&[u8]>) -> Option<()> {
         let mut headers = Map::new();
         for (key, value) in response.headers() {
@@ -75,6 +79,7 @@ impl CacheMiddleware {
 }
 
 impl Middleware for CacheMiddleware {
+    /// Handles the middleware logic for caching HTTP responses.
     fn handle(
         &self,
         request: Request<SendBody>,
@@ -130,9 +135,11 @@ impl Middleware for CacheMiddleware {
     }
 }
 
+/// A map for managing locks on cache keys.
 struct LockerMap(Mutex<HashMap<String, Arc<Mutex<()>>>>);
 
 impl LockerMap {
+    /// Retrieves a lock for the specified key.
     fn locker(&self, key: String) -> Locker {
         let mut lockers = self.0.lock().unwrap();
         Locker {
@@ -145,6 +152,7 @@ impl LockerMap {
         }
     }
 
+    /// Releases the lock for the specified key.
     fn release(&self, key: &str) {
         let mut sync = self.0.lock().unwrap();
         sync.remove(key);
@@ -152,11 +160,13 @@ impl LockerMap {
 }
 
 impl LockerMap {
+    /// Creates a new `LockerMap`.
     fn new() -> Self {
         Self(Mutex::new(HashMap::new()))
     }
 }
 
+/// A lock guard for a specific cache key.
 struct Locker<'a> {
     map: &'a LockerMap,
     key: String,
@@ -164,6 +174,7 @@ struct Locker<'a> {
 }
 
 impl Drop for Locker<'_> {
+    /// Releases the lock when the guard is dropped.
     fn drop(&mut self) {
         self.map.release(&self.key);
     }

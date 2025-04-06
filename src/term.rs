@@ -24,6 +24,7 @@ use termwiz::{
     surface::{Change, Position, SEQ_ZERO, SequenceNo, Surface},
 };
 
+/// Options for configuring the terminal.
 #[derive(Debug, Default)]
 pub struct Options {
     pub cols: Option<u16>,
@@ -32,6 +33,7 @@ pub struct Options {
     pub foreground: Option<SrgbaTuple>,
 }
 
+/// Represents a terminal with a surface, parser, state, and size.
 pub struct Terminal {
     surface: Surface,
     parser: Parser,
@@ -40,6 +42,7 @@ pub struct Terminal {
 }
 
 impl Terminal {
+    /// Creates a new terminal with the given options.
     pub fn new(options: Options) -> Self {
         let cols = options.cols.unwrap_or(80);
         let rows = options.rows.unwrap_or(24);
@@ -66,18 +69,22 @@ impl Terminal {
         }
     }
 
+    /// Returns a reference to the terminal's surface.
     pub fn surface(&self) -> &Surface {
         &self.surface
     }
 
+    /// Returns the background color of the terminal.
     pub fn background(&self) -> SrgbaTuple {
         self.state.background
     }
 
+    /// Returns the foreground color of the terminal.
     pub fn foreground(&self) -> SrgbaTuple {
         self.state.foreground
     }
 
+    /// Feeds input from the reader to the terminal and writes output to the writer.
     pub fn feed(&mut self, mut reader: impl BufRead, mut writer: impl io::Write) -> Result<()> {
         loop {
             let buffer = reader.fill_buf().context("error reading PTY")?;
@@ -96,6 +103,7 @@ impl Terminal {
         }
     }
 
+    /// Runs a command in the terminal with an optional timeout.
     pub fn run(&mut self, mut cmd: CommandBuilder, timeout: Option<Duration>) -> Result<()> {
         cmd.env("TERM", "xterm-256color");
         cmd.env("COLORTERM", "truecolor");
@@ -137,6 +145,7 @@ impl Terminal {
         Ok(())
     }
 
+    /// Applies an action to the terminal's surface and state, and writes output to the writer.
     fn apply_action(
         surface: &mut Surface,
         st: &mut State,
@@ -421,6 +430,7 @@ impl Terminal {
     }
 }
 
+/// Represents the state of the terminal, including cursor positions and colors.
 #[derive(Debug)]
 struct State {
     positions: Vec<(usize, usize)>,
@@ -429,6 +439,7 @@ struct State {
 }
 
 impl State {
+    /// Creates a new state with the given background and foreground colors.
     fn new(background: SrgbaTuple, foreground: SrgbaTuple) -> Self {
         Self {
             background,
@@ -438,11 +449,13 @@ impl State {
     }
 }
 
+/// A writer that sends data to a separate thread for writing.
 struct ThreadedWriter {
     sender: Sender<WriterMessage>,
 }
 
 impl ThreadedWriter {
+    /// Creates a new threaded writer.
     fn new(mut writer: Box<dyn io::Write + Send>) -> Self {
         let (sender, receiver) = channel::<WriterMessage>();
 
@@ -483,27 +496,32 @@ impl io::Write for ThreadedWriter {
     }
 }
 
+/// Messages that can be sent to the threaded writer.
 enum WriterMessage {
     Data(Vec<u8>),
     Flush,
 }
 
+/// A writer that can be detached and replaced.
 #[derive(Clone)]
 struct DetachableWriter {
     inner: Arc<Mutex<Box<dyn io::Write + Send>>>,
 }
 
 impl DetachableWriter {
+    /// Creates a new detachable writer.
     fn new(writer: Box<dyn io::Write + Send>) -> Self {
         Self {
             inner: Arc::new(Mutex::new(writer)),
         }
     }
 
+    /// Detaches the current writer and replaces it with a sink.
     fn detach(&self) -> Box<dyn io::Write + Send> {
         self.replace(Box::new(io::sink()))
     }
 
+    /// Replaces the current writer with a new one.
     fn replace(&self, writer: Box<dyn io::Write + Send>) -> Box<dyn io::Write + Send> {
         let mut inner = self.inner.lock().unwrap();
         mem::replace(&mut inner, writer)

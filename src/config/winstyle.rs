@@ -29,19 +29,30 @@ pub use super::PaddingOption;
 /// Error is an error which may occur in the application.
 #[derive(Error, Debug)]
 pub enum Error {
+    /// Error when the window style is not found.
     #[error("unknown window style {}", .name.hlq())]
     WindowStyleNotFound {
         name: Arc<str>,
         suggestions: Suggestions,
     },
+
+    /// Error when the window style file is not found.
     #[error("window style file {} not found", .path.hlq())]
     WindowStyleFileNotFound { path: PathBuf },
+
+    /// Error when the window style file path is invalid.
     #[error("invalid window style file path {}", .path.hlq())]
     InvalidWindowStyleFilePath { path: PathBuf },
+
+    /// Error when failing to list window styles.
     #[error("failed to list window styles: {source}")]
     FailedToListWindowStyles { source: io::Error },
+
+    /// Error when failing to load a window style.
     #[error("failed to load window style {name}: {source}", name=.name.hlq())]
     Io { name: Arc<str>, source: io::Error },
+
+    /// Error when failing to parse a window style.
     #[error("failed to parse window style {name}: {source}", name=.name.hlq())]
     FailedToParseWindowStyle {
         name: Arc<str>,
@@ -79,6 +90,7 @@ impl Categorize for Error {
 
 // ---
 
+/// Configuration for window styles.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowStyleConfig {
@@ -86,6 +98,7 @@ pub struct WindowStyleConfig {
 }
 
 impl WindowStyleConfig {
+    /// Returns the default window style configuration.
     pub fn default(&self) -> Arc<Self> {
         DEFAULT.clone()
     }
@@ -120,6 +133,7 @@ impl Default for &WindowStyleConfig {
     }
 }
 
+/// Configuration for a window.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Window {
@@ -132,6 +146,7 @@ pub struct Window {
     pub shadow: WindowShadow,
 }
 
+/// Configuration for a window border.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowBorder {
@@ -141,6 +156,7 @@ pub struct WindowBorder {
     pub gap: Option<Number>,
 }
 
+/// Colors for a window border.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowBorderColors {
@@ -148,6 +164,7 @@ pub struct WindowBorderColors {
     pub inner: SelectiveColor,
 }
 
+/// Configuration for a window header.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowHeader {
@@ -156,6 +173,7 @@ pub struct WindowHeader {
     pub border: Option<WindowHeaderBorder>,
 }
 
+/// Configuration for a window header border.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowHeaderBorder {
@@ -163,6 +181,7 @@ pub struct WindowHeaderBorder {
     pub width: Number,
 }
 
+/// Configuration for a window title.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowTitle {
@@ -170,6 +189,7 @@ pub struct WindowTitle {
     pub font: Font,
 }
 
+/// Configuration for a font.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Font {
@@ -178,6 +198,7 @@ pub struct Font {
     pub weight: Option<String>,
 }
 
+/// Configuration for window buttons.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowButtons {
@@ -188,6 +209,7 @@ pub struct WindowButtons {
     pub items: Vec<WindowButton>,
 }
 
+/// Configuration for a window button.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowButton {
@@ -198,6 +220,7 @@ pub struct WindowButton {
     pub icon: Option<WindowButtonIcon>,
 }
 
+/// Position of window buttons.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum WindowButtonsPosition {
@@ -205,6 +228,7 @@ pub enum WindowButtonsPosition {
     Right,
 }
 
+/// Shape of a window button.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum WindowButtonShape {
@@ -212,6 +236,7 @@ pub enum WindowButtonShape {
     Square,
 }
 
+/// Icon for a window button.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowButtonIcon {
@@ -223,6 +248,7 @@ pub struct WindowButtonIcon {
     pub roundness: Option<Number>,
 }
 
+/// Kind of window button icon.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum WindowButtonIconKind {
@@ -231,6 +257,7 @@ pub enum WindowButtonIconKind {
     Maximize,
 }
 
+/// Line cap style for a window button icon.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum LineCap {
@@ -239,6 +266,7 @@ pub enum LineCap {
     Butt,
 }
 
+/// Configuration for a window shadow.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct WindowShadow {
@@ -249,6 +277,7 @@ pub struct WindowShadow {
     pub blur: Number,
 }
 
+/// Color that can be either uniform or adaptive based on the mode.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 #[serde(untagged)]
@@ -258,6 +287,7 @@ pub enum SelectiveColor {
 }
 
 impl SelectiveColor {
+    /// Resolves the color based on the mode.
     pub fn resolve(&self, mode: Mode) -> &Color {
         match self {
             Self::Uniform(color) => color,
@@ -271,6 +301,7 @@ impl SelectiveColor {
 
 // ---
 
+/// Embeds the assets for window styles.
 #[derive(RustEmbed)]
 #[folder = "assets/window-styles/"]
 pub struct Assets;

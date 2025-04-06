@@ -4,6 +4,7 @@ pub type Point = (i32, i32); // cell boundary coordinates.
 pub type Contour = Vec<Point>;
 pub type Path = Vec<Contour>;
 
+/// Represents a shape with a key and a path.
 pub struct Shape<K> {
     pub key: K,
     pub path: Path,
@@ -34,6 +35,7 @@ where
 
 type Position = (usize, usize); // (x, y) in grid cell coordinates.
 
+/// Represents a binary mask for grid cells.
 struct Mask {
     cols: usize,
     rows: usize,
@@ -41,6 +43,7 @@ struct Mask {
 }
 
 impl Mask {
+    /// Creates a new mask with the given dimensions.
     fn new(cols: usize, rows: usize) -> Self {
         Self {
             cols,
@@ -49,10 +52,12 @@ impl Mask {
         }
     }
 
+    /// Gets the value at the specified coordinates.
     fn get(&self, x: usize, y: usize) -> bool {
         self.data[y * self.cols + x]
     }
 
+    /// Sets the value at the specified coordinates.
     fn set(&mut self, x: usize, y: usize, value: bool) {
         self.data[y * self.cols + x] = value;
     }

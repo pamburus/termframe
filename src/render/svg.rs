@@ -1,4 +1,3 @@
-// std imports
 use std::{
     borrow::Cow,
     cmp::{max, min},
@@ -7,7 +6,6 @@ use std::{
     rc::Rc,
 };
 
-// third-party imports
 use askama::Template;
 use csscolorparser::Color;
 use indexmap::IndexSet;
@@ -19,7 +17,6 @@ use termwiz::{
     surface::{Line, Surface, line::CellRef},
 };
 
-// local imports
 use super::{FontFace, FontStyle, FontWeight, Padding, Render, Theme};
 use crate::config::{
     types::Number,
@@ -28,18 +25,20 @@ use crate::config::{
     },
 };
 
-// re-exports
 pub use super::{Options, Result};
 
+/// A renderer for generating SVG representations of terminal surfaces.
 pub struct SvgRenderer {
     options: Options,
 }
 
 impl SvgRenderer {
+    /// Creates a new `SvgRenderer` with the given options.
     pub fn new(options: Options) -> Self {
         Self { options }
     }
 
+    /// Renders the given terminal surface to the specified target as an SVG.
     pub fn render(&self, surface: &Surface, target: &mut dyn std::io::Write) -> Result<()> {
         let opt = &self.options;
         let cfg = &opt.settings;
@@ -353,6 +352,7 @@ impl SvgRenderer {
     }
 }
 
+/// Builds an SVG path string from a contour.
 fn build_svg_path(d: &mut String, contour: &[(i32, i32)], lh: f32, fw: f32, fp: u8) {
     let fx = |x| (x as f32 * fw).r2p(fp);
     let fy = |y| (y as f32 * lh).r2p(fp);
@@ -378,12 +378,14 @@ fn build_svg_path(d: &mut String, contour: &[(i32, i32)], lh: f32, fw: f32, fp: 
     d.push('Z');
 }
 
+/// Creates a new SVG container element.
 fn container() -> element::SVG {
     let mut container = element::SVG::new();
     container.unassign("xmlns");
     container
 }
 
+/// Creates an SVG representation of a window with the given options.
 fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> element::SVG {
     let cfg = &opt.settings;
     let fp = cfg.rendering.svg.precision; // floating point precision
@@ -525,6 +527,16 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
         .add(window)
 }
 
+/// Creates the window buttons for the SVG representation.
+///
+/// # Arguments
+///
+/// * `opt` - A reference to the `Options` struct containing configuration settings.
+/// * `width` - The width of the window.
+///
+/// # Returns
+///
+/// A `Group` element containing the window buttons.
 fn make_buttons(opt: &Options, width: f32) -> element::Group {
     let cfg = &opt.window.buttons;
     let fp = opt.settings.rendering.svg.precision; // floating point precision
@@ -623,6 +635,13 @@ fn make_buttons(opt: &Options, width: f32) -> element::Group {
     group
 }
 
+/// Sets the style for a window button.
+///
+/// # Arguments
+///
+/// * `opt` - A reference to the `Options` struct containing configuration settings.
+/// * `cfg` - A reference to the `WindowButton` struct containing button settings.
+/// * `node` - A mutable reference to the SVG node to apply the style to.
 fn set_button_style<N: svg::Node>(opt: &Options, cfg: &WindowButton, node: &mut N) {
     let fp = opt.settings.rendering.svg.precision; // floating point precision
 
@@ -641,6 +660,16 @@ fn set_button_style<N: svg::Node>(opt: &Options, cfg: &WindowButton, node: &mut 
     }
 }
 
+/// Collects the font faces used in the SVG representation.
+///
+/// # Arguments
+///
+/// * `opt` - A reference to the `Options` struct containing configuration settings.
+/// * `used_font_faces` - A `HashSet` containing the indices of the used font faces.
+///
+/// # Returns
+///
+/// A `Result` containing a vector of strings representing the font faces.
 fn collect_font_faces(opt: &Options, used_font_faces: HashSet<usize>) -> Result<Vec<String>> {
     let faces = &opt
         .font
@@ -688,15 +717,35 @@ impl Render for SvgRenderer {
 
 // ---
 
+/// Rounds a value to the specified precision.
+///
+/// # Arguments
+///
+/// * `value` - The value to round.
+/// * `precision` - The number of decimal places to round to.
+///
+/// # Returns
+///
+/// The rounded value.
 fn r2p<T: RoundToPrecision>(value: T, precision: u8) -> T::Output {
     value.r2p(precision)
 }
 
 // ---
 
+/// A trait for rounding values to a specified precision.
 trait RoundToPrecision {
     type Output;
 
+    /// Rounds the value to the specified precision.
+    ///
+    /// # Arguments
+    ///
+    /// * `precision` - The number of decimal places to round to.
+    ///
+    /// # Returns
+    ///
+    /// The rounded value.
     fn r2p(&self, precision: u8) -> Self::Output;
 }
 
@@ -753,6 +802,16 @@ impl RoundToPrecision for Padding {
 
 // ---
 
+/// Determines the font weight and style based on cell attributes.
+///
+/// # Arguments
+///
+/// * `attrs` - A reference to the `CellAttributes` struct containing cell attributes.
+/// * `opt` - A reference to the `Options` struct containing configuration settings.
+///
+/// # Returns
+///
+/// A tuple containing the font weight and style.
 fn font_params(attrs: &CellAttributes, opt: &Options) -> (FontWeight, FontStyle) {
     let weight = match attrs.intensity() {
         Intensity::Normal => opt.font.weights.normal,
@@ -769,6 +828,18 @@ fn font_params(attrs: &CellAttributes, opt: &Options) -> (FontWeight, FontStyle)
     (weight, style)
 }
 
+/// Finds a matching font for a given character, weight, and style.
+///
+/// # Arguments
+///
+/// * `ch` - The character to find a matching font for.
+/// * `weight` - The font weight.
+/// * `style` - The font style.
+/// * `opt` - A reference to the `Options` struct containing configuration settings.
+///
+/// # Returns
+///
+/// An `Option` containing the index of the matching font face, or `None` if no match is found.
 fn find_matching_font(
     ch: char,
     weight: FontWeight,
@@ -798,6 +869,17 @@ fn find_matching_font(
 
 // ---
 
+/// Subdivides a cell cluster into subclusters based on font parameters.
+///
+/// # Arguments
+///
+/// * `line` - A reference to the `Line` struct containing the line of cells.
+/// * `cluster` - A reference to the `CellCluster` struct containing the cell cluster.
+/// * `opt` - A reference to the `Options` struct containing configuration settings.
+///
+/// # Returns
+///
+/// A `Subclusters` iterator for iterating over the subclusters.
 fn subdivide<'a>(line: &'a Line, cluster: &'a CellCluster, opt: &'a Options) -> Subclusters<'a> {
     let (weight, style) = font_params(&cluster.attrs, opt);
 
@@ -815,6 +897,7 @@ fn subdivide<'a>(line: &'a Line, cluster: &'a CellCluster, opt: &'a Options) -> 
     }
 }
 
+/// An iterator for iterating over subclusters of a cell cluster.
 struct Subclusters<'a> {
     line: &'a Line,
     cluster: &'a CellCluster,
@@ -829,6 +912,11 @@ struct Subclusters<'a> {
 }
 
 impl<'a> Subclusters<'a> {
+    /// Splits the current subcluster and returns the text and cell range.
+    ///
+    /// # Returns
+    ///
+    /// An `Option` containing a tuple with the text and cell range of the subcluster.
     fn split(&mut self) -> Option<(&'a str, Range<usize>)> {
         if self.text_range.is_empty() {
             return None;
@@ -843,16 +931,23 @@ impl<'a> Subclusters<'a> {
         Some(segment)
     }
 
+    /// Retrieves the next cell in the line.
+    ///
+    /// # Returns
+    ///
+    /// An `Option` containing a reference to the next cell.
     fn next_cell(&mut self) -> Option<CellRef<'a>> {
         self.chars
             .next()
             .and_then(|(i, _)| self.line.get_cell(self.cluster.byte_to_cell_idx(i)))
     }
 }
-
 impl<'a> Iterator for Subclusters<'a> {
     type Item = (&'a str, Range<usize>);
 
+    /// Advances the iterator and returns the next subcluster.
+    ///
+    /// Returns `None` when iteration is finished.
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             if self.next.is_none() {
@@ -904,6 +999,9 @@ impl<'a> Iterator for Subclusters<'a> {
 // ---
 
 trait Intersection {
+    /// Computes the intersection of two ranges.
+    ///
+    /// Returns `None` if the ranges do not overlap.
     fn intersection(&self, other: &Self) -> Option<Self>
     where
         Self: Sized;
@@ -942,6 +1040,14 @@ struct PaletteBuilder {
 }
 
 impl PaletteBuilder {
+    /// Creates a new `PaletteBuilder`.
+    ///
+    /// # Arguments
+    ///
+    /// * `bg` - The background color.
+    /// * `fg` - The foreground color.
+    /// * `theme` - The theme to use.
+    /// * `var_palette` - Whether to use a variable palette.
     fn new(bg: Color, fg: Color, theme: Rc<Theme>, var_palette: bool) -> Self {
         Self {
             bg,
@@ -955,6 +1061,15 @@ impl PaletteBuilder {
         }
     }
 
+    /// Resolves the background color style and adds it to the palette.
+    ///
+    /// # Arguments
+    ///
+    /// * `attr` - The color attribute.
+    ///
+    /// # Returns
+    ///
+    /// The resolved background color style.
     fn bg(&mut self, attr: ColorAttribute) -> ColorStyle {
         match attr {
             ColorAttribute::Default => {
@@ -978,6 +1093,15 @@ impl PaletteBuilder {
         }
     }
 
+    /// Resolves the foreground color style and adds it to the palette.
+    ///
+    /// # Arguments
+    ///
+    /// * `attr` - The color attribute.
+    ///
+    /// # Returns
+    ///
+    /// The resolved foreground color style.
     fn fg(&mut self, attr: ColorAttribute) -> ColorStyle {
         match attr {
             ColorAttribute::Default => {
@@ -1001,6 +1125,15 @@ impl PaletteBuilder {
         }
     }
 
+    /// Resolves the bright foreground color style and adds it to the palette.
+    ///
+    /// # Arguments
+    ///
+    /// * `attr` - The color attribute.
+    ///
+    /// # Returns
+    ///
+    /// The resolved bright foreground color style.
     fn bright_fg(&mut self, attr: ColorAttribute) -> ColorStyle {
         let attr = match attr {
             ColorAttribute::Default => {
@@ -1018,6 +1151,15 @@ impl PaletteBuilder {
         self.fg(attr)
     }
 
+    /// Generates a CSS template for the theme containing built palette colors.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the theme.
+    ///
+    /// # Returns
+    ///
+    /// The generated CSS template.
     fn template(&self, name: &str) -> styles::Theme {
         let mut vars = Vec::new();
         if self.has_bg {
@@ -1055,6 +1197,15 @@ impl PaletteBuilder {
         }
     }
 
+    /// Creates a custom color style.
+    ///
+    /// # Arguments
+    ///
+    /// * `c` - The color tuple.
+    ///
+    /// # Returns
+    ///
+    /// The custom color style.
     fn custom(c: SrgbaTuple) -> ColorStyle {
         ColorStyle::Custom(Color::new(c.0, c.1, c.2, c.3))
     }
@@ -1069,6 +1220,11 @@ enum ColorStyle {
 }
 
 impl ColorStyle {
+    /// Renders the color style as a string.
+    ///
+    /// # Returns
+    ///
+    /// The rendered color style.
     fn render(&self) -> Cow<'static, str> {
         match self {
             ColorStyle::Themed(id) => format!("var({id})").into(),
@@ -1115,6 +1271,11 @@ enum ColorStyleId {
 }
 
 impl ColorStyleId {
+    /// Returns the name of the color style ID.
+    ///
+    /// # Returns
+    ///
+    /// The name of the color style ID.
     fn name(&self) -> Cow<'static, str> {
         match self {
             ColorStyleId::DefaultBackground => "--bg".into(),
@@ -1133,6 +1294,18 @@ impl std::fmt::Display for ColorStyleId {
 
 // ---
 
+/// Matches a font face based on weight, style, and character.
+///
+/// # Arguments
+///
+/// * `face` - The font face to match.
+/// * `weight` - The font weight.
+/// * `style` - The font style.
+/// * `ch` - The character to match.
+///
+/// # Returns
+///
+/// `true` if the font face matches, `false` otherwise.
 fn match_font_face(
     face: &FontFace,
     weight: Option<FontWeight>,
@@ -1167,6 +1340,15 @@ fn match_font_face(
     face.chars.has_char(ch)
 }
 
+/// Converts a font weight to an SVG-compatible string.
+///
+/// # Arguments
+///
+/// * `weight` - The font weight.
+///
+/// # Returns
+///
+/// The SVG-compatible string representation of the font weight.
 fn svg_weight(weight: FontWeight) -> String {
     match weight {
         FontWeight::Normal => "normal".into(),

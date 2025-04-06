@@ -18,33 +18,43 @@ use thiserror::Error;
 // local imports
 use crate::xerr::{Highlight, Suggestions};
 
-// ---
-
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
+/// Custom error type for handling various errors in the application.
 #[derive(Error, Debug)]
 pub enum Error {
+    /// Error for unknown item.
     #[error("unknown item {name} in {category}", name=.name.hl(), category=.category.hl())]
     ItemNotFound {
         name: Arc<str>,
         category: &'static str,
         suggestions: Suggestions,
     },
+
+    /// Error for invalid file path.
     #[error("invalid file path {path}", path=.path.hl())]
     InvalidFilePath { path: PathBuf },
+
+    /// Error for file not found.
     #[error("file {path} not found", path=.path.hl())]
     FileNotFound { path: PathBuf },
+
+    /// Error for failing to list items in a category.
     #[error("failed to list items in {category}: {source}", category=.category.hl())]
     FailedToListItems {
         category: &'static str,
         source: io::Error,
     },
+
+    /// Error for I/O operations.
     #[error("I/O error loading {name} in {category}: {source}", name=.name.hl())]
     Io {
         name: Arc<str>,
         category: &'static str,
         source: io::Error,
     },
+
+    /// Error for parsing items.
     #[error("failed to parse item {name} in {category}: {source}", name=.name.hl())]
     Parse {
         name: Arc<str>,
@@ -53,33 +63,43 @@ pub enum Error {
     },
 }
 
+/// Custom error type for handling parsing errors.
 #[derive(Error, Debug)]
 pub enum ParseError {
+    /// Error for parsing YAML.
     #[error("failed to parse yaml: {0}")]
     Yaml(#[from] serde_yml::Error),
+
+    /// Error for parsing TOML.
     #[error(transparent)]
     Toml(#[from] toml::de::Error),
+
+    /// Error for parsing JSON.
     #[error("failed to parse json: {0}")]
     Json(#[from] serde_json::Error),
+
+    /// Error for parsing UTF-8 strings.
     #[error("failed to parse utf-8 string: {0}")]
     Utf8(#[from] std::str::Utf8Error),
 }
 
+/// Trait for categorizing errors.
 pub trait Categorize {
     fn category(&self) -> ErrorCategory;
 }
 
+/// Enum for error categories.
 pub enum ErrorCategory {
     ItemNotFound,
     Other,
 }
 
-// ---
-
+/// Trait for loading assets.
 pub trait Load {
     type Assets: RustEmbed;
     type Error: From<Error> + Categorize;
 
+    /// Load an asset by name.
     fn load(name: &str) -> Result<Self, Self::Error>
     where
         Self: DeserializeOwned + Sized,
@@ -93,6 +113,7 @@ pub trait Load {
         }
     }
 
+    /// Load an embedded asset by name.
     fn embedded(name: &str) -> Result<Self, Self::Error>
     where
         Self: DeserializeOwned,
@@ -120,6 +141,7 @@ pub trait Load {
         }))
     }
 
+    /// List all available assets.
     fn list() -> Result<HashMap<String, ItemInfo>, Self::Error> {
         let mut result = HashMap::new();
 
@@ -136,6 +158,7 @@ pub trait Load {
         Ok(result)
     }
 
+    /// Deserialize an asset from a byte buffer.
     fn from_buf(data: &[u8], format: Format) -> Result<Self, ParseError>
     where
         Self: DeserializeOwned + Sized,
@@ -148,6 +171,7 @@ pub trait Load {
         }
     }
 
+    /// Load an asset from a directory.
     fn load_from(dir: &Path, name: &str) -> Result<Self, Self::Error>
     where
         Self: DeserializeOwned + Sized,
@@ -193,6 +217,7 @@ pub trait Load {
         .into())
     }
 
+    /// Load an asset from a hybrid path or name.
     fn load_hybrid(theme_or_path: &str) -> Result<Self, Self::Error>
     where
         Self: DeserializeOwned + Sized,
@@ -212,6 +237,7 @@ pub trait Load {
         }
     }
 
+    /// Generate a filename for an asset.
     fn filename(name: &str, format: Format) -> String {
         if Self::strip_extension(name, format).is_some() {
             return name.to_string();
@@ -220,6 +246,7 @@ pub trait Load {
         format!("{}.{}", name, format.extension())
     }
 
+    /// Get the directory for custom assets.
     fn dir() -> PathBuf {
         super::app_dirs()
             .map(|app_dirs| app_dirs.config_dir.join(Self::dir_name()))
@@ -230,14 +257,17 @@ pub trait Load {
     fn dir_name() -> &'static str;
     fn is_not_found_error(err: &Self::Error) -> bool;
 
+    /// Resolve an alias for an embedded asset name.
     fn resolve_embedded_name_alias(name_or_alias: &str) -> &str {
         name_or_alias
     }
 
+    /// Get the preferred alias for an embedded asset name.
     fn preferred_embedded_name_alias(name: &str) -> &str {
         name
     }
 
+    /// Get the names of all embedded assets.
     fn embedded_names() -> impl IntoIterator<Item = String> {
         Self::Assets::iter().filter_map(|a| {
             if a.starts_with('.') {
@@ -248,6 +278,7 @@ pub trait Load {
         })
     }
 
+    /// Get the names of all custom assets.
     fn custom_names() -> Result<impl IntoIterator<Item = Result<String>>> {
         let path = Self::dir();
         let dir = Path::new(&path);
@@ -271,12 +302,14 @@ pub trait Load {
             .filter_map(|x| x.transpose()))
     }
 
+    /// Strip the extension from a filename.
     fn strip_extension(filename: &str, format: Format) -> Option<&str> {
         filename
             .strip_suffix(format.extension())
             .and_then(|r| r.strip_suffix("."))
     }
 
+    /// Strip any known extension from a filename.
     fn strip_known_extension(filename: &str) -> Option<&str> {
         for format in Format::iter() {
             if let Some(name) = Self::strip_extension(filename, format) {
@@ -287,8 +320,7 @@ pub trait Load {
     }
 }
 
-// ---
-
+/// Enum for supported file formats.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, EnumIter)]
 pub enum Format {
     Yaml,
@@ -297,6 +329,7 @@ pub enum Format {
 }
 
 impl Format {
+    /// Get the file extension for the format.
     pub fn extension(&self) -> &str {
         match self {
             Self::Yaml => "yaml",
@@ -306,8 +339,7 @@ impl Format {
     }
 }
 
-// ---
-
+/// Struct for storing item information.
 #[derive(Debug, Clone)]
 pub struct ItemInfo {
     pub origin: Origin,
@@ -319,8 +351,7 @@ impl From<Origin> for ItemInfo {
     }
 }
 
-// ---
-
+/// Enum for the origin of an item.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Display)]
 #[strum(serialize_all = "kebab-case")]
 pub enum Origin {

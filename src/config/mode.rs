@@ -5,6 +5,7 @@ use std::fmt;
 use clap::ValueEnum;
 use serde::Deserialize;
 
+/// Represents the mode of the application.
 #[derive(Debug, Clone, Copy, Deserialize, ValueEnum)]
 #[serde(rename_all = "kebab-case")]
 pub enum Mode {
@@ -13,6 +14,15 @@ pub enum Mode {
 }
 
 impl From<ModeSetting> for Mode {
+    /// Converts a `ModeSetting` to a `Mode`.
+    ///
+    /// # Arguments
+    ///
+    /// * `mode_setting` - The `ModeSetting` to convert.
+    ///
+    /// # Returns
+    ///
+    /// A `Mode` corresponding to the given `ModeSetting`.
     fn from(mode_setting: ModeSetting) -> Self {
         match mode_setting {
             ModeSetting::Dark => Mode::Dark,
@@ -39,6 +49,7 @@ impl From<ModeSetting> for Mode {
     }
 }
 
+/// Represents the mode setting of the application.
 #[derive(Debug, Clone, Copy, Deserialize, ValueEnum)]
 #[serde(rename_all = "kebab-case")]
 pub enum ModeSetting {
@@ -48,6 +59,15 @@ pub enum ModeSetting {
 }
 
 impl fmt::Display for ModeSetting {
+    /// Formats the `ModeSetting` for display.
+    ///
+    /// # Arguments
+    ///
+    /// * `f` - The formatter to write to.
+    ///
+    /// # Returns
+    ///
+    /// A `fmt::Result` indicating success or failure.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ModeSetting::Auto => write!(f, "auto"),
@@ -60,6 +80,15 @@ impl fmt::Display for ModeSetting {
 impl TryFrom<&str> for ModeSetting {
     type Error = String;
 
+    /// Attempts to convert a string slice to a `ModeSetting`.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The string slice to convert.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the `ModeSetting` if successful, or an error message if not.
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
             "auto" => Ok(ModeSetting::Auto),

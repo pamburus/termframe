@@ -4,6 +4,7 @@ use std::{fmt, io};
 // third-party imports
 use owo_colors::OwoColorize;
 
+/// A helper for formatting lists of assets.
 pub struct Formatter<O> {
     width: Option<usize>,
     output: O,
@@ -13,6 +14,13 @@ impl<O> Formatter<O>
 where
     O: io::Write,
 {
+    /// Creates a new `Formatter` with the given output.
+    ///
+    /// If the output is a terminal, it attempts to determine the terminal width.
+    ///
+    /// # Arguments
+    ///
+    /// * `output` - The output to write to.
     pub fn new(output: O) -> Self
     where
         O: io::IsTerminal,
@@ -26,11 +34,28 @@ where
         Self { output, width }
     }
 
+    /// Creates a new `Formatter` with the given output and width.
+    ///
+    /// # Arguments
+    ///
+    /// * `output` - The output to write to.
+    /// * `width` - The optional width for formatting.
     #[allow(dead_code)]
     pub fn with_width(output: O, width: Option<usize>) -> Self {
         Self { output, width }
     }
 
+    /// Formats a grouped list of items and writes to the output.
+    ///
+    /// If the width is set, it formats the items into columns. Otherwise, it writes the items in a raw list format.
+    ///
+    /// # Arguments
+    ///
+    /// * `groups` - An iterator over groups, where each group is a tuple of a displayable group name and an iterator over items.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `io::Result` with an error if writing to the output fails.
     pub fn format_grouped_list<G, V, GI, I>(&mut self, groups: GI) -> io::Result<()>
     where
         GI: IntoIterator<Item = (G, I)>,
@@ -75,6 +100,15 @@ where
         Ok(())
     }
 
+    /// Formats a raw list of items and writes to the output.
+    ///
+    /// # Arguments
+    ///
+    /// * `items` - An iterator over items to be written.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `io::Result` with an error if writing to the output fails.
     fn format_raw_list<I, V>(&mut self, items: I) -> io::Result<()>
     where
         I: IntoIterator<Item = V>,

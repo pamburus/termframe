@@ -21,37 +21,65 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 /// Error is an error which may occur in the application.
 #[derive(Error, Debug)]
 pub enum Error {
+    /// I/O error
     #[error(transparent)]
     Io(#[from] io::Error),
+
+    /// Configuration loading error
     #[error("failed to load configuration: {0}")]
     Config(#[from] ConfigError),
+
+    /// Infallible error
     #[error(transparent)]
     Infallible(#[from] std::convert::Infallible),
+
+    /// Theme error
     #[error(transparent)]
     Theme(#[from] theme::Error),
+
+    /// Window style error
     #[error(transparent)]
     WindowStyle(#[from] winstyle::Error),
+
+    /// UTF-8 parsing error
     #[error("failed to parse utf-8 string: {0}")]
     Utf8(#[from] std::str::Utf8Error),
+
+    /// UTF-8 construction error from bytes
     #[error("failed to construct utf-8 string from bytes: {0}")]
     FromUtf8(#[from] std::string::FromUtf8Error),
+
+    /// YAML parsing error
     #[error("failed to parse yaml: {0}")]
     Yaml(#[from] serde_yml::Error),
+
+    /// TOML parsing error
     #[error("failed to parse toml: {0}")]
     Toml(#[from] toml::de::Error),
+
+    /// JSON parsing error
     #[error("failed to parse json: {0}")]
     JsonParse(#[from] serde_json::Error),
+
+    /// Integer conversion error
     #[error(transparent)]
     TryFromInt(#[from] TryFromIntError),
+
+    /// Float parsing error
     #[error(transparent)]
     ParseFloat(#[from] ParseFloatError),
+
+    /// Integer parsing error
     #[error(transparent)]
     ParseInt(#[from] ParseIntError),
+
+    /// Other errors
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }
 
 impl Error {
+    /// Provides tips based on the error type.
     fn tips<'a, A>(&'a self, app: &A) -> Tips<'a>
     where
         A: AppInfoProvider,
@@ -79,6 +107,7 @@ impl Error {
         }
     }
 
+    /// Logs the error to stderr.
     pub fn log<A>(&self, app: &A)
     where
         A: AppInfoProvider,
@@ -86,6 +115,7 @@ impl Error {
         self.log_to(&mut io::stderr(), app).ok();
     }
 
+    /// Logs the error to a specified target.
     pub fn log_to<A, W>(&self, target: &mut W, app: &A) -> io::Result<()>
     where
         A: AppInfoProvider,
@@ -97,6 +127,7 @@ impl Error {
     }
 }
 
+/// Tips struct containing suggestions and usage information.
 #[derive(Debug, Default)]
 struct Tips<'a> {
     did_you_mean: Option<DidYouMean<'a>>,
@@ -120,7 +151,9 @@ impl std::fmt::Display for Tips<'_> {
     }
 }
 
+/// Trait for providing application information.
 pub trait AppInfoProvider {
+    /// Returns the application name.
     fn app_name(&self) -> Cow<'static, str> {
         std::env::args()
             .nth(0)
@@ -128,18 +161,22 @@ pub trait AppInfoProvider {
             .unwrap_or("<app>".into())
     }
 
+    /// Provides usage suggestions based on the request.
     fn usage_suggestion(&self, _request: UsageRequest) -> Option<UsageResponse> {
         None
     }
 }
 
+/// Enum representing usage request types.
 pub enum UsageRequest {
     ListThemes,
     ListWindowStyles,
 }
 
+/// Type alias for usage response.
 pub type UsageResponse = (Cow<'static, str>, Cow<'static, str>);
 
+/// Generates usage information based on the request.
 fn usage<A: AppInfoProvider>(app: &A, request: UsageRequest) -> Option<String> {
     let (command, args) = app.usage_suggestion(request)?;
     let result = format!("{} {}", app.app_name(), command);
@@ -151,6 +188,7 @@ fn usage<A: AppInfoProvider>(app: &A, request: UsageRequest) -> Option<String> {
     }
 }
 
+/// Struct representing "Did You Mean" suggestions.
 #[derive(Debug)]
 pub struct DidYouMean<'a> {
     suggestions: &'a Suggestions,
@@ -169,6 +207,7 @@ impl fmt::Display for DidYouMean<'_> {
     }
 }
 
+/// Generates "Did You Mean" suggestions.
 fn did_you_mean(suggestions: &Suggestions) -> Option<DidYouMean> {
     if suggestions.is_empty() {
         return None;

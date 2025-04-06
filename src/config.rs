@@ -13,22 +13,16 @@ use serde::Deserialize;
 // local imports
 use crate::appdirs::AppDirs;
 
-// ---
-
 pub mod load;
 pub mod mode;
 pub mod theme;
 pub mod types;
 pub mod winstyle;
 
-// ---
-
-// re-exports
 pub use load::Load;
 pub use types::Number;
 
-// ---
-
+/// Settings structure containing various configuration options.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Settings {
@@ -43,6 +37,7 @@ pub struct Settings {
 }
 
 impl Settings {
+    /// Load settings from the provided sources.
     pub fn load<I>(sources: I) -> Result<Self>
     where
         I: IntoIterator<Item = Source>,
@@ -85,8 +80,7 @@ impl Default for &'static Settings {
     }
 }
 
-// ---
-
+/// Rendering settings structure.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Rendering {
@@ -96,6 +90,7 @@ pub struct Rendering {
     pub svg: Svg,
 }
 
+/// SVG settings structure.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Svg {
@@ -106,8 +101,7 @@ pub struct Svg {
     pub var_palette: bool,
 }
 
-// ---
-
+/// Window settings structure.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Window {
@@ -117,8 +111,7 @@ pub struct Window {
     pub margin: Option<PaddingOption>,
 }
 
-// ---
-
+/// Theme setting enumeration.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 #[serde(untagged)]
@@ -128,6 +121,7 @@ pub enum ThemeSetting {
 }
 
 impl ThemeSetting {
+    /// Resolve the theme based on the mode.
     pub fn resolve(&self, mode: mode::Mode) -> &str {
         match self {
             Self::Fixed(theme) => theme,
@@ -139,10 +133,9 @@ impl ThemeSetting {
     }
 }
 
-// ---
-
 pub type Fonts = Vec<FontFace>;
 
+/// Font face structure.
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub struct FontFace {
@@ -151,6 +144,7 @@ pub struct FontFace {
     pub fallback: Option<FontFaceFallback>,
 }
 
+/// Font face fallback structure.
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub struct FontFaceFallback {
@@ -158,6 +152,7 @@ pub struct FontFaceFallback {
     pub files: Vec<String>,
 }
 
+/// Terminal settings structure.
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Terminal {
@@ -165,6 +160,7 @@ pub struct Terminal {
     pub height: u16,
 }
 
+/// Font settings structure.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Font {
@@ -173,6 +169,7 @@ pub struct Font {
     pub weights: FontWeights,
 }
 
+/// Font family option enumeration.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 #[serde(untagged)]
@@ -182,6 +179,7 @@ pub enum FontFamilyOption {
 }
 
 impl FontFamilyOption {
+    /// Get the primary font family.
     pub fn primary(&self) -> &str {
         match self {
             Self::Single(family) => family,
@@ -189,6 +187,7 @@ impl FontFamilyOption {
         }
     }
 
+    /// Resolve the font family option to a vector of strings.
     pub fn resolve(&self) -> Vec<String> {
         match self {
             Self::Single(family) => vec![family.clone()],
@@ -196,6 +195,7 @@ impl FontFamilyOption {
         }
     }
 
+    /// Check if the font family option contains a specific family.
     pub fn contains(&self, family: &str) -> bool {
         match self {
             Self::Single(f) => f == family,
@@ -204,6 +204,7 @@ impl FontFamilyOption {
     }
 }
 
+/// Font weights structure.
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct FontWeights {
@@ -222,6 +223,7 @@ impl Default for FontWeights {
     }
 }
 
+/// Font weight enumeration.
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum FontWeight {
@@ -247,8 +249,7 @@ impl fmt::Display for FontWeight {
     }
 }
 
-// ---
-
+/// Padding option enumeration.
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 #[serde(untagged)]
@@ -262,6 +263,7 @@ pub enum PaddingOption {
 }
 
 impl PaddingOption {
+    /// Resolve the padding option to a padding structure.
     pub fn resolve(&self) -> Padding {
         match self {
             Self::Uniform(value) => Padding {
@@ -290,6 +292,7 @@ impl Default for PaddingOption {
     }
 }
 
+/// Padding structure.
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq, Default)]
 #[serde(rename_all = "kebab-case")]
 pub struct Padding {
@@ -298,8 +301,6 @@ pub struct Padding {
     pub left: Number,
     pub right: Number,
 }
-
-// ---
 
 static DEFAULT_SETTINGS_RAW: &str = include_str!("../assets/config.toml");
 const DEFAULT_SETTINGS_FORMAT: FileFormat = FileFormat::Toml;
@@ -329,8 +330,7 @@ pub fn load() -> Result<Settings> {
     Loader::new(Vec::new()).load()
 }
 
-// ---
-
+/// Loader structure for loading settings.
 pub struct Loader {
     paths: Vec<PathBuf>,
     no_default: bool,
@@ -346,11 +346,13 @@ impl Loader {
         }
     }
 
+    /// Set whether to use the default settings.
     pub fn no_default(mut self, val: bool) -> Self {
         self.no_default = val;
         self
     }
 
+    /// Load the settings.
     pub fn load(self) -> Result<Settings> {
         if self.no_default {
             Settings::load(self.custom())
@@ -359,6 +361,7 @@ impl Loader {
         }
     }
 
+    /// Get system configuration sources.
     fn system(&self) -> impl Iterator<Item = Source> {
         self.dirs
             .as_ref()
@@ -368,6 +371,7 @@ impl Loader {
             .map(|dir| SourceFile::new(Self::config(&dir)).required(false).into())
     }
 
+    /// Get user configuration sources.
     fn user(&self) -> impl Iterator<Item = Source> {
         self.dirs
             .as_ref()
@@ -379,25 +383,23 @@ impl Loader {
             .into_iter()
     }
 
+    /// Get custom configuration sources.
     fn custom(&self) -> impl Iterator<Item = Source> {
         self.paths
             .iter()
             .map(|path| SourceFile::new(path).required(true).into())
     }
 
+    /// Get the configuration path for a directory.
     fn config(dir: &Path) -> PathBuf {
         dir.join("config")
     }
 }
 
-// ---
-
 /// Get the application platform-specific directories.
 pub fn app_dirs() -> Option<AppDirs> {
     AppDirs::new(APP_NAME)
 }
-
-// ---
 
 pub mod global {
     use super::*;
@@ -420,8 +422,7 @@ pub mod global {
     }
 }
 
-// ---
-
+/// Source enumeration for configuration sources.
 #[derive(Debug, Clone)]
 pub enum Source {
     File(SourceFile),
@@ -429,6 +430,7 @@ pub enum Source {
 }
 
 impl Source {
+    /// Create a new string source.
     pub fn string<S>(value: S, format: FileFormat) -> Self
     where
         S: Into<String>,
@@ -443,8 +445,7 @@ impl From<SourceFile> for Source {
     }
 }
 
-// ---
-
+/// Source file structure for configuration files.
 #[derive(Debug, Clone)]
 pub struct SourceFile {
     filename: PathBuf,
@@ -452,6 +453,7 @@ pub struct SourceFile {
 }
 
 impl SourceFile {
+    /// Create a new source file.
     pub fn new<P>(filename: P) -> Self
     where
         P: AsRef<Path>,
@@ -462,13 +464,13 @@ impl SourceFile {
         }
     }
 
+    /// Set whether the source file is required.
     pub fn required(self, required: bool) -> Self {
         Self { required, ..self }
     }
 }
 
-// ---
-
+/// Trait for patching settings.
 pub trait Patch {
     fn patch(&self, settings: Settings) -> Settings;
 }

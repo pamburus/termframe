@@ -17,14 +17,22 @@ use crate::config::{
 
 // ---
 
+/// Represents an adaptive theme that can switch between light and dark modes.
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub struct AdaptiveTheme {
+    /// The light theme.
     pub light: Rc<Theme>,
+    /// The dark theme.
     pub dark: Rc<Theme>,
 }
 
 impl AdaptiveTheme {
+    /// Creates an `AdaptiveTheme` from the given configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `cfg` - A reference to the theme configuration.
     #[allow(dead_code)]
     pub fn from_config(cfg: &ThemeConfig) -> Self {
         match &cfg.theme {
@@ -43,6 +51,15 @@ impl AdaptiveTheme {
         }
     }
 
+    /// Resolves the theme based on the given mode.
+    ///
+    /// # Arguments
+    ///
+    /// * `mode` - The mode to resolve the theme for.
+    ///
+    /// # Returns
+    ///
+    /// The resolved theme.
     #[allow(dead_code)]
     pub fn resolve(self, mode: Mode) -> Rc<Theme> {
         match mode {
@@ -53,6 +70,7 @@ impl AdaptiveTheme {
 }
 
 impl Default for AdaptiveTheme {
+    /// Provides a default `AdaptiveTheme` with predefined light and dark themes.
     fn default() -> Self {
         let bg = Color::from_rgba8(0x28, 0x2c, 0x30, 0xff);
         let fg = Color::from_rgba8(0xac, 0xb2, 0xbe, 0xff);
@@ -114,15 +132,29 @@ impl Default for AdaptiveTheme {
     }
 }
 
+/// Represents a theme with background, foreground, and palette colors.
 #[derive(Debug, Clone)]
 pub struct Theme {
+    /// Background color.
     pub bg: Color,
+    /// Foreground color.
     pub fg: Color,
+    /// Optional bright foreground color.
     pub bright_fg: Option<Color>,
+    /// Color palette.
     pub palette: Palette,
 }
 
 impl Theme {
+    /// Creates a `Theme` from the given configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `cfg` - A reference to the color configuration.
+    ///
+    /// # Returns
+    ///
+    /// The created theme.
     pub fn from_config(cfg: &config::theme::Colors) -> Self {
         let bg = cfg.background.clone();
         let fg = cfg.foreground.clone();
@@ -136,6 +168,15 @@ impl Theme {
         }
     }
 
+    /// Resolves a color attribute to a specific color.
+    ///
+    /// # Arguments
+    ///
+    /// * `attr` - The color attribute to resolve.
+    ///
+    /// # Returns
+    ///
+    /// The resolved color, or `None` if the attribute is `Default`.
     pub fn resolve(&self, attr: ColorAttribute) -> Option<Color> {
         match attr {
             ColorAttribute::Default => None,
@@ -150,6 +191,7 @@ impl Theme {
 
 // ---
 
+/// Represents a color palette with 256 colors.
 #[derive(Debug, Clone)]
 pub struct Palette([Color; 256]);
 
@@ -170,10 +212,28 @@ impl DerefMut for Palette {
 }
 
 impl Palette {
+    /// Creates a new `Palette` with the given colors.
+    ///
+    /// # Arguments
+    ///
+    /// * `colors` - An array of 256 colors.
+    ///
+    /// # Returns
+    ///
+    /// The created palette.
     pub fn new(colors: [Color; 256]) -> Self {
         Self(colors)
     }
 
+    /// Creates a `Palette` from the given configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `cfg` - A reference to the palette configuration.
+    ///
+    /// # Returns
+    ///
+    /// The created palette.
     pub fn from_config(cfg: &config::theme::Palette) -> Self {
         let mut colors = Self::make_default().0;
         for (i, c) in cfg.iter() {
@@ -184,6 +244,11 @@ impl Palette {
         Self::new(colors)
     }
 
+    /// Creates a default `Palette` with predefined colors.
+    ///
+    /// # Returns
+    ///
+    /// The created default palette.
     fn make_default() -> Self {
         let colors = std::array::from_fn(|i| {
             let i = i as u8;
@@ -219,12 +284,14 @@ impl Palette {
 }
 
 impl Default for Palette {
+    /// Provides a default `Palette` with predefined colors.
     fn default() -> Self {
         Self::make_default()
     }
 }
 
 impl Default for &Palette {
+    /// Provides a default reference to a `Palette` with predefined colors.
     fn default() -> Self {
         static DEFAULT: LazyLock<Palette> = LazyLock::new(Palette::make_default);
         &DEFAULT

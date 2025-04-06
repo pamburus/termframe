@@ -19,11 +19,14 @@ mod tracing;
 // re-exports
 pub type Result<T> = anyhow::Result<T>;
 
+/// Trait for rendering objects onto a surface.
 pub trait Render {
+    /// Render the object onto the given surface and write the output to the target.
     #[allow(dead_code)]
     fn render(&self, surface: &Surface, target: &mut dyn io::Write) -> Result<()>;
 }
 
+/// Options for configuring the rendering `environment.
 #[derive(Debug, Clone)]
 pub struct Options {
     pub settings: Rc<Settings>,
@@ -37,15 +40,18 @@ pub struct Options {
 }
 
 impl Options {
+    /// Get the background color, falling back to the theme's background color if not set.
     pub fn bg(&self) -> &Color {
         self.background.as_ref().unwrap_or(&self.theme.bg)
     }
 
+    /// Get the foreground color, falling back to the theme's foreground color if not set.
     pub fn fg(&self) -> &Color {
         self.foreground.as_ref().unwrap_or(&self.theme.fg)
     }
 }
 
+/// Options for configuring font properties.
 #[derive(Debug, Clone)]
 pub struct FontOptions {
     pub family: Vec<String>,
@@ -55,6 +61,7 @@ pub struct FontOptions {
     pub weights: FontWeights,
 }
 
+/// Metrics for font dimensions.
 #[derive(Debug, Clone)]
 pub struct FontMetrics {
     pub width: f32,
@@ -62,6 +69,7 @@ pub struct FontMetrics {
     pub descender: f32,
 }
 
+/// Weights for different font styles.
 #[derive(Debug, Clone)]
 pub struct FontWeights {
     pub normal: FontWeight,
@@ -79,6 +87,7 @@ impl Default for FontWeights {
     }
 }
 
+/// Representation of a font face.
 #[derive(Debug, Clone)]
 pub struct FontFace {
     pub family: String,
@@ -90,6 +99,7 @@ pub struct FontFace {
     pub metrics_match: bool,
 }
 
+/// Enum representing different font styles.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[allow(dead_code)]
 pub enum FontStyle {
@@ -98,6 +108,7 @@ pub enum FontStyle {
     Oblique,
 }
 
+/// Enum representing different font weights.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[allow(dead_code)]
 pub enum FontWeight {
@@ -108,6 +119,7 @@ pub enum FontWeight {
 }
 
 impl FontWeight {
+    /// Get the range of the font weight.
     pub fn range(&self) -> (u16, u16) {
         match self {
             Self::Normal => (400, 400),
@@ -118,9 +130,9 @@ impl FontWeight {
     }
 }
 
-// ---
-
+/// Trait for character sets.
 pub trait CharSet: std::fmt::Debug {
+    /// Check if the character set contains the given character.
     fn has_char(&self, ch: char) -> bool;
 }
 
@@ -130,8 +142,7 @@ impl CharSet for HashSet<char> {
     }
 }
 
-// ---
-
+/// Wrapper for a function that checks if a character is in a set.
 pub struct CharSetFn<F>(F);
 
 impl<F> std::fmt::Debug for CharSetFn<F>
@@ -153,6 +164,7 @@ where
 }
 
 impl<F> CharSetFn<F> {
+    /// Create a new CharSetFn from a function.
     pub fn new(f: F) -> Self {
         Self(f)
     }

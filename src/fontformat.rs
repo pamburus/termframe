@@ -1,12 +1,25 @@
+/// Enum representing different font formats.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FontFormat {
+    /// TrueType font format.
     Ttf,
+    /// OpenType font format.
     Otf,
+    /// Web Open Font Format.
     Woff,
+    /// Web Open Font Format 2.
     Woff2,
 }
 
 impl FontFormat {
+    /// Returns the MIME type associated with the font format.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let format = FontFormat::Ttf;
+    /// assert_eq!(format.mime(), "font/ttf");
+    /// ```
     pub fn mime(&self) -> &'static str {
         match self {
             Self::Ttf => "font/ttf",
@@ -16,6 +29,14 @@ impl FontFormat {
         }
     }
 
+    /// Returns the CSS font format string associated with the font format.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let format = FontFormat::Ttf;
+    /// assert_eq!(format.css(), "truetype");
+    /// ```
     pub fn css(&self) -> &'static str {
         match self {
             Self::Ttf => "truetype",

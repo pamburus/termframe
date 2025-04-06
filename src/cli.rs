@@ -13,8 +13,6 @@ use enumset_ext::convert::str::EnumSet;
 // local imports
 use crate::config::{self, FontFamilyOption, PaddingOption, Settings, ThemeSetting};
 
-// ---
-
 const STYLES: Styles = Styles::styled()
     .header(AnsiColor::Green.on_default().bold())
     .usage(AnsiColor::Green.on_default().bold())
@@ -170,6 +168,15 @@ pub struct Opt {
 }
 
 impl config::Patch for Opt {
+    /// Applies the options from the command line arguments to the given settings.
+    ///
+    /// # Arguments
+    ///
+    /// * `settings` - The current settings to be patched.
+    ///
+    /// # Returns
+    ///
+    /// The patched settings.
     fn patch(&self, settings: Settings) -> Settings {
         let mut settings = settings;
 
@@ -208,8 +215,6 @@ impl config::Patch for Opt {
     }
 }
 
-// ---
-
 #[derive(Args)]
 pub struct BootstrapArgs {
     /// Configuration file path.
@@ -226,10 +231,20 @@ pub struct BootstrapOpt {
 }
 
 impl BootstrapOpt {
+    /// Parses the command line arguments and returns a `BootstrapOpt` instance.
+    ///
+    /// # Returns
+    ///
+    /// A `BootstrapOpt` instance containing the parsed arguments.
     pub fn parse() -> Self {
         Self::parse_from(Self::args())
     }
 
+    /// Retrieves the command line arguments.
+    ///
+    /// # Returns
+    ///
+    /// A vector of strings representing the command line arguments.
     pub fn args() -> Vec<String> {
         let mut args = wild::args();
         let Some(first) = args.next() else {
@@ -271,12 +286,9 @@ impl BootstrapOpt {
     }
 }
 
-// --
-
 pub type ThemeTagSet = EnumSet<config::theme::Tag>;
 
-// ---
-
+/// Font weight option.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FontWeight {
     Normal,
@@ -307,6 +319,15 @@ impl From<FontWeight> for config::FontWeight {
 impl std::str::FromStr for FontWeight {
     type Err = String;
 
+    /// Parses a string into a `FontWeight`.
+    ///
+    /// # Arguments
+    ///
+    /// * `s` - The string to parse.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the parsed `FontWeight` or an error message.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "normal" => Ok(Self::Normal),
@@ -320,6 +341,15 @@ impl std::str::FromStr for FontWeight {
 }
 
 impl fmt::Display for FontWeight {
+    /// Formats the `FontWeight` for display.
+    ///
+    /// # Arguments
+    ///
+    /// * `f` - The formatter.
+    ///
+    /// # Returns
+    ///
+    /// A `fmt::Result`.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Normal => write!(f, "normal"),
@@ -329,10 +359,24 @@ impl fmt::Display for FontWeight {
     }
 }
 
+/// Trims whitespace from a string.
+///
+/// # Arguments
+///
+/// * `s` - The string to trim.
+///
+/// # Returns
+///
+/// A `Result` containing the trimmed string or an error message.
 fn trim(s: &str) -> Result<String, String> {
     Ok(s.trim().to_string())
 }
 
+/// Retrieves the global settings.
+///
+/// # Returns
+///
+/// A reference to the global `Settings`.
 fn cfg() -> &'static Settings {
     config::global::get()
 }

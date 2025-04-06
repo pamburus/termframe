@@ -46,6 +46,7 @@ mod term;
 mod theme;
 mod xerr;
 
+/// Entry point of the application
 fn main() {
     let app = App::new();
 
@@ -55,9 +56,11 @@ fn main() {
     }
 }
 
+/// Provides application-specific information
 struct AppInfo;
 
 impl AppInfoProvider for AppInfo {
+    /// Suggests usage information based on the request
     fn usage_suggestion(&self, request: UsageRequest) -> Option<UsageResponse> {
         match request {
             UsageRequest::ListThemes => Some(("--list-themes".into(), "".into())),
@@ -66,11 +69,13 @@ impl AppInfoProvider for AppInfo {
     }
 }
 
+/// Represents the application
 struct App {
     ua: Option<ureq::Agent>,
 }
 
 impl App {
+    /// Creates a new instance of the application
     fn new() -> Self {
         let mut ua = None;
         if let Some(dirs) = app_dirs() {
@@ -85,6 +90,7 @@ impl App {
         Self { ua }
     }
 
+    /// Runs the application
     fn run(&self) -> Result<()> {
         let settings = bootstrap()?;
 
@@ -171,6 +177,7 @@ impl App {
         Ok(())
     }
 
+    /// Creates font options based on the settings and characters
     fn make_font_options<C>(&self, settings: &Settings, chars: C) -> Result<render::FontOptions>
     where
         C: IntoIterator<Item = char>,
@@ -324,6 +331,7 @@ impl App {
         })
     }
 
+    /// Loads a font file from a given path or URL
     fn load_font<S: AsRef<str>>(&self, file: S) -> Result<FontFile> {
         let file = file.as_ref();
         let location = font::Location::from(file);
@@ -341,22 +349,26 @@ impl App {
     }
 }
 
+/// Prints the manual page
 fn print_man_page() -> Result<()> {
     let man = clap_mangen::Man::new(cli::Opt::command());
     man.render(&mut stdout())?;
     Ok(())
 }
 
+/// Prints shell completions for the specified shell
 fn print_shell_completions(shell: clap_complete::Shell) {
     let mut cmd = cli::Opt::command();
     let name = cmd.get_name().to_string();
     clap_complete::generate(shell, &mut cmd, name, &mut stdout());
 }
 
+/// Lists available window styles
 fn list_window_styles() -> Result<()> {
     list_assets(WindowStyleConfig::list()?)
 }
 
+/// Lists available fonts
 fn list_fonts(settings: &Settings) -> Result<()> {
     for font in &settings.fonts {
         println!("{}", font.family);
@@ -364,6 +376,7 @@ fn list_fonts(settings: &Settings) -> Result<()> {
     Ok(())
 }
 
+/// Lists available themes based on the provided tags
 fn list_themes(tags: Option<cli::ThemeTagSet>) -> Result<()> {
     let items = ThemeConfig::list()?;
     let mut formatter = help::Formatter::new(stdout());
@@ -389,6 +402,7 @@ fn list_themes(tags: Option<cli::ThemeTagSet>) -> Result<()> {
     Ok(())
 }
 
+/// Lists assets based on the provided items
 fn list_assets(items: impl IntoIterator<Item = (String, ItemInfo)>) -> Result<()> {
     let mut formatter = help::Formatter::new(stdout());
 
@@ -403,6 +417,7 @@ fn list_assets(items: impl IntoIterator<Item = (String, ItemInfo)>) -> Result<()
     Ok(())
 }
 
+/// Bootstraps the application settings
 fn bootstrap() -> Result<Settings> {
     if std::env::var(TERMFRAME_DEBUG_LOG).is_ok() {
         logger::Builder::from_env(TERMFRAME_DEBUG_LOG)
@@ -432,6 +447,7 @@ fn bootstrap() -> Result<Settings> {
     Ok(settings)
 }
 
+/// Creates a font face based on the provided parameters
 fn make_font_face(
     family: &str,
     url: &mut String,
@@ -477,8 +493,7 @@ const DEFAULT_FONT_METRICS: render::FontMetrics = render::FontMetrics {
     descender: -0.3,
 };
 
-// ---
-
+/// Trait for converting between types
 trait Convert<T> {
     fn convert(&self) -> T;
 }
@@ -516,8 +531,7 @@ impl Convert<Color> for SrgbaTuple {
     }
 }
 
-// ---
-
+/// Converts a command and its arguments into a title string
 fn command_to_title(
     command: Option<impl AsRef<str>>,
     args: impl IntoIterator<Item = impl AsRef<str>>,

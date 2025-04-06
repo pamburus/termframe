@@ -63,3 +63,11 @@ color-table theme mode:
         --title "{{theme}} ({{mode}})" \
         --output doc/color-table-{{kebabcase(theme)}}-{{kebabcase(mode)}}.svg \
         ./scripts/color-table.sh
+
+[doc('collect code coverage')]
+coverage: contrib-coverage
+	build/ci/coverage.sh
+
+[private]
+contrib-coverage:
+	contrib/bin/setup.sh coverage

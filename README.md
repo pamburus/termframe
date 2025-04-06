@@ -1,4 +1,4 @@
-# 📸 termframe [![Build Status][ci-img]][ci] [![Release][release-img]][release]
+# 📸 termframe [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Release][release-img]][release]
 
 Terminal output SVG screenshot tool.
 
@@ -152,5 +152,7 @@ Options:
 
 [ci-img]: https://github.com/pamburus/termframe/actions/workflows/ci.yml/badge.svg
 [ci]: https://github.com/pamburus/termframe/actions/workflows/ci.yml
+[cov-img]: https://codecov.io/gh/pamburus/termframe/graph/badge.svg?token=HI21W7NJEE
+[cov]: https://codecov.io/gh/pamburus/termframe
 [release-img]: https://img.shields.io/github/v/release/pamburus/termframe?sort=semver
 [release]: https://github.com/pamburus/termframe/releases/latest

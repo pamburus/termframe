@@ -53,6 +53,31 @@ jobs:
       - name: Run executable
         run: cargo run --locked
 
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install latest toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Generate code coverage
+        run: |
+          contrib/bin/setup.sh coverage
+          build/ci/coverage.sh
+
+      - name: Upload coverage to codecov.io
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   test-nix:
     runs-on: ubuntu-latest
 

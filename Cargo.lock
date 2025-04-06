@@ -2822,7 +2822,7 @@ dependencies = [
 
 [[package]]
 name = "termframe"
-version = "0.5.1-alpha.1"
+version = "0.5.1-alpha.2"
 dependencies = [
  "allsorts",
  "anyhow",
@@ -2844,6 +2844,7 @@ dependencies = [
  "env_logger",
  "hex",
  "http",
+ "indexmap",
  "itertools 0.14.0",
  "known-folders",
  "log",

@@ -216,12 +216,18 @@ impl App {
         let mut used: HashMap<char, u64> = HashMap::new();
 
         for ch in chars {
+            if used.contains_key(&ch) {
+                continue;
+            }
+
             let mut bitmap: u64 = 0;
             for (i, (_, _, font)) in fonts.iter_mut().enumerate() {
                 if font.has_char(ch) {
                     bitmap |= 1 << i;
                 }
             }
+
+            log::debug!("provided by fonts {bitmap:08x?}: char {ch:<2} {ch:?}");
             used.insert(ch, bitmap);
         }
 

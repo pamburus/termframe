@@ -10,6 +10,7 @@ use std::{
 // third-party imports
 use askama::Template;
 use csscolorparser::Color;
+use indexmap::IndexSet;
 use svg::{Document, Node, node::element};
 use termwiz::{
     cell::{CellAttributes, Intensity, Underline},
@@ -140,6 +141,8 @@ impl SvgRenderer {
                 .add(bg_group),
         );
 
+        let mut unresolved = IndexSet::new();
+
         for (row, line) in lines.iter().enumerate() {
             if line.is_whitespace() {
                 continue;
@@ -245,6 +248,9 @@ impl SvgRenderer {
 
                     for ch in text.chars() {
                         if let Some(i) = find_matching_font(ch, weight, style, opt) {
+                            log::trace!(
+                                "character {ch:>8?} with weight={weight:>8?} style={style:>8?}: requires font #{i:02}"
+                            );
                             if used_font_faces.insert(i) {
                                 log::debug!(
                                     "using font face #{i:02} because it is required at least by character {ch:?} with weight={weight:?} style={style:?}",
@@ -253,6 +259,8 @@ impl SvgRenderer {
                             if !opt.font.faces[i].metrics_match {
                                 text_length_needed = true;
                             }
+                        } else {
+                            unresolved.insert(ch);
                         }
                     }
 
@@ -283,6 +291,10 @@ impl SvgRenderer {
 
             sl = sl.add(tl);
             group = group.add(sl);
+        }
+
+        for ch in unresolved {
+            log::warn!("font not found for character {ch:2} ({ch:?})");
         }
 
         let content = container()
@@ -764,7 +776,19 @@ fn find_matching_font(
     opt: &Options,
 ) -> Option<usize> {
     for (i, font) in opt.font.faces.iter().enumerate().rev() {
-        if match_font_face(font, weight, style, ch) {
+        if match_font_face(font, Some(weight), Some(style), ch) {
+            return Some(i);
+        }
+    }
+
+    for (i, font) in opt.font.faces.iter().enumerate().rev() {
+        if match_font_face(font, None, Some(style), ch) {
+            return Some(i);
+        }
+    }
+
+    for (i, font) in opt.font.faces.iter().enumerate().rev() {
+        if match_font_face(font, None, None, ch) {
             return Some(i);
         }
     }
@@ -1109,25 +1133,34 @@ impl std::fmt::Display for ColorStyleId {
 
 // ---
 
-fn match_font_face(face: &FontFace, weight: FontWeight, style: FontStyle, ch: char) -> bool {
-    let target: (u16, u16) = match weight {
-        FontWeight::Normal => (400, 400),
-        FontWeight::Bold => (600, 600),
-        FontWeight::Fixed(w) => (w, w),
-        FontWeight::Variable(min, max) => (min, max),
-    };
-    let target = RangeInclusive::new(target.0, target.1);
+fn match_font_face(
+    face: &FontFace,
+    weight: Option<FontWeight>,
+    style: Option<FontStyle>,
+    ch: char,
+) -> bool {
+    if let Some(weight) = weight {
+        let target: (u16, u16) = match weight {
+            FontWeight::Normal => (400, 400),
+            FontWeight::Bold => (600, 600),
+            FontWeight::Fixed(w) => (w, w),
+            FontWeight::Variable(min, max) => (min, max),
+        };
+        let target = RangeInclusive::new(target.0, target.1);
 
-    let range = face.weight.range();
-    let range = RangeInclusive::new(range.0, range.1);
+        let range = face.weight.range();
+        let range = RangeInclusive::new(range.0, range.1);
 
-    if range.intersection(&target).is_none() {
-        return false;
+        if range.intersection(&target).is_none() {
+            return false;
+        }
     }
 
-    if let Some(face_style) = &face.style {
-        if *face_style != style {
-            return false;
+    if let Some(style) = style {
+        if let Some(face_style) = &face.style {
+            if *face_style != style {
+                return false;
+            }
         }
     }
 

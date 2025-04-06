@@ -126,11 +126,24 @@ files = [
 ]
 
 #
-# Font "Symbols Nerd Font Mono"
+# Font "Symbols Nerd Font Mono".
 #
 [[fonts]]
 family = "Symbols Nerd Font Mono"
 license = { type = "SIL Open Font License 1.1", link = "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/tags/v3.3.0/LICENSE" }
 files = [
-    "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/refs/heads/gh-pages/assets/fonts/Symbols-2048-em%20Nerd%20Font%20Complete.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s01.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s02.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s03.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s04.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s05.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s06.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s07.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s08.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s09.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s10.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s11.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s12.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s13.woff2",
+    "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s14.woff2",
 ]

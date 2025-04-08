@@ -14,6 +14,18 @@ This tool is a non-interactive terminal emulator that executes a single command,
     </picture>
 </p>
 
+## Key features
+
+* Comprehensive ANSI style support:
+  * Bold, dimmed (faint), italic, underlined, and strikethrough text.
+  * Text with reversed background/foreground colors.
+  * Full range of colors: basic 16 palette, 256 xterm palette, and 24-bit truecolor.
+* Optional font embedding for enhanced customization.
+* Dark and light mode compatibility.
+* Extensive theme collection from [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
+* Support for custom themes, refer to [configuration files](#configuration-files).
+* Customizable [window styles](assets/window-styles/macos.toml), see [configuration files](#configuration-files).
+
 ## Installation
 
 ### macOS
@@ -107,48 +119,13 @@ This tool is a non-interactive terminal emulator that executes a single command,
 
 ## Complete set of options and flags
 
-```text
-Terminal output SVG screenshot tool
-
-Usage: termframe [OPTIONS] [COMMAND] [ARGS]...
-
-Arguments:
-  [COMMAND]  Command to run
-  [ARGS]...  Arguments provided to the command
-
-Options:
-      --config <FILE>               Configuration file path [env: TERMFRAME_CONFIG=]
-  -W, --width <COLUMNS>             Width of the virtual terminal window [default: 80]
-  -H, --height <LINES>              Height of the virtual terminal window [default: 24]
-      --padding <EM>                Override padding for the inner text in font size units
-      --font-family <NAME>...       Font family, multiple comma separated values can be provided
-      --font-size <SIZE>            Font size [default: 12]
-      --font-weight <WEIGHT>        Normal font weight [default: normal]
-      --embed-fonts <ENABLED>       Embed fonts, if possible [note: make sure the font license allows this type of redistribution] [default: false] [possible values: true, false]
-      --subset-fonts <ENABLED>      Subset fonts by removing unused characters [experimental, known to have compatibility issues] [default: false] [possible values: true, false]
-      --bold-is-bright <ENABLED>    Use bright colors for bold text [default: false] [possible values: true, false]
-      --bold-font-weight <WEIGHT>   Bold text font weight [default: bold]
-      --faint-opacity <0..1>        Faint text opacity [default: 0.5]
-      --faint-font-weight <WEIGHT>  Faint text font weight [default: normal]
-      --line-height <FACTOR>        Line height, factor of the font size [default: 1.2]
-      --mode <MODE>                 Override dark or light mode [default: auto] [possible values: auto, dark, light]
-      --theme <THEME>               Color theme
-      --window <ENABLED>            Enable window [default: true] [possible values: true, false]
-      --window-shadow <ENABLED>     Enable window shadow [default: true] [possible values: true, false]
-      --window-margin <PIXELS>      Override window margin, in pixels
-      --window-style <NAME>         Window style
-      --title <TITLE>               Window title
-      --var-palette <ENABLED>       Build palette using CSS variables for basic ANSI colors [default: false] [possible values: true, false]
-  -o, --output <FILE>               Output file, by default prints to stdout [default: -]
-      --timeout <SECONDS>           Timeout for the command to run, in seconds [default: 5]
-      --list-themes[=<TAGS>]        Print available themes optionally filtered by tags [possible values: dark, light]
-      --list-window-styles          Print available window styles and exit
-      --list-fonts                  Print configured fonts and exit, any font not listed here cannot be embedded and may not be properly rendered
-      --help                        Print help and exit
-      --shell-completions <SHELL>   Print shell auto-completion script and exit [possible values: bash, elvish, fish, powershell, zsh]
-      --man-page                    Print man page and exit
-  -V, --version                     Print version
-```
+<p align="center">
+    <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="doc/help-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="doc/help-light.svg" />
+    <img alt="screenshot" src="doc/help-dark.svg" />
+    </picture>
+</p>
 
 [ci-img]: https://github.com/pamburus/termframe/actions/workflows/ci.yml/badge.svg
 [ci]: https://github.com/pamburus/termframe/actions/workflows/ci.yml

@@ -4,16 +4,6 @@ Terminal output SVG screenshot tool.
 
 This tool is a non-interactive terminal emulator that executes a single command, renders its output in an internal virtual session, and exports a screenshot as an SVG file.
 
-## Sample
-
-<p align="center">
-    <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="doc/sample-dark.svg" />
-    <source media="(prefers-color-scheme: light)" srcset="doc/sample-light.svg" />
-    <img alt="screenshot" src="doc/sample-dark.svg" />
-    </picture>
-</p>
-
 ## Key features
 
 * Comprehensive ANSI style support:
@@ -25,6 +15,16 @@ This tool is a non-interactive terminal emulator that executes a single command,
 * Extensive theme collection from [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
 * Support for custom themes, refer to [configuration files](#configuration-files).
 * Customizable [window styles](assets/window-styles/macos.toml), see [configuration files](#configuration-files).
+
+## Sample
+
+<p align="center">
+    <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="doc/sample-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="doc/sample-light.svg" />
+    <img alt="screenshot" src="doc/sample-dark.svg" />
+    </picture>
+</p>
 
 ## Installation
 

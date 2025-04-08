@@ -30,9 +30,17 @@ install-man-pages:
     cargo run --release --locked -- --config - --man-page >~/share/man/man1/termframe.1
     @echo $(tput bold)$(tput setaf 3)note:$(tput sgr0) ensure $(tput setaf 2)~/share/man$(tput sgr0) is added to $(tput setaf 2)MANPATH$(tput sgr0) environment variable
 
-[doc('generate help page')]
-help:
-    cargo run -- --help
+[doc('generate help page screenshots')]
+help: (help-for "dark") (help-for "light")
+
+[private]
+help-for mode: (build "--locked")
+    target/debug/termframe \
+        --title 'termframe --help' \
+        --mode {{mode}} \
+        -o doc/help-{{mode}}.svg \
+        -W 104 -H 51 \
+        -- ./target/debug/termframe --config - --help
 
 [doc('generate sample screenshots')]
 sample: (sample-for "dark") (sample-for "light")

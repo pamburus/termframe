@@ -44,6 +44,12 @@ This tool is a non-interactive terminal emulator that executes a single command,
     curl -sSfL -o /usr/local/bin/termframe https://github.com/pamburus/termframe/releases/latest/download/termframe-linux-x86_64-musl.tar.gz | tar xz
     ```
 
+* Download and extract using `curl` and `tar` on Linux (arm64)
+
+    ```sh
+    curl -sSfL -o /usr/local/bin/termframe https://github.com/pamburus/termframe/releases/latest/download/termframe-linux-arm64-musl.tar.gz | tar xz
+    ```
+
 * Install using [cargo](https://www.rust-lang.org/tools/install)
 
     ```sh

@@ -29,12 +29,12 @@ pub use super::{Options, Result};
 
 /// A renderer for generating SVG representations of terminal surfaces.
 pub struct SvgRenderer {
-    options: Options,
+    options: Rc<Options>,
 }
 
 impl SvgRenderer {
     /// Creates a new `SvgRenderer` with the given options.
-    pub fn new(options: Options) -> Self {
+    pub fn new(options: Rc<Options>) -> Self {
         Self { options }
     }
 

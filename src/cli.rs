@@ -1,5 +1,5 @@
 // std imports
-use std::fmt;
+use std::{fmt, path::PathBuf};
 
 // third-party imports
 use clap::{
@@ -118,7 +118,11 @@ pub struct Opt {
         overrides_with = "output",
         value_name = "FILE"
     )]
-    pub output: String,
+    pub output: PathBuf,
+
+    /// Output format, if not specified then automatically detected from the extension if possible.
+    #[arg(long, overrides_with = "output_format", value_name = "FORMAT")]
+    pub output_format: Option<OutputFormat>,
 
     /// Timeout for the command to run, in seconds.
     #[arg(
@@ -357,6 +361,12 @@ impl fmt::Display for FontWeight {
             Self::Fixed(weight) => write!(f, "{}", weight),
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
+pub enum OutputFormat {
+    Svg,
+    Png,
 }
 
 /// Trims whitespace from a string.

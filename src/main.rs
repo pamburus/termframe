@@ -2,7 +2,9 @@
 use std::{
     borrow::Cow,
     collections::HashMap,
+    ffi::OsStr,
     io::{self, IsTerminal, stdout},
+    path::Path,
     process,
     rc::Rc,
 };
@@ -11,6 +13,7 @@ use std::{
 use anyhow::Context;
 use base64::prelude::*;
 use clap::{CommandFactory, Parser};
+use cli::OutputFormat;
 use csscolorparser::Color;
 use enumset_ext::EnumSetExt;
 use env_logger::{self as logger};
@@ -27,7 +30,7 @@ use config::{
 use error::{AppInfoProvider, Result, UsageRequest, UsageResponse};
 use font::FontFile;
 use fontformat::FontFormat;
-use render::{CharSet, CharSetFn, svg::SvgRenderer};
+use render::{CharSet, CharSetFn, Render, png::PngRenderer, svg::SvgRenderer};
 use term::Terminal;
 use termwiz::color::SrgbaTuple;
 use theme::{AdaptiveTheme, Theme};
@@ -153,7 +156,7 @@ impl App {
 
         let content = terminal.surface().screen_chars_to_string();
 
-        let options = render::Options {
+        let options = Rc::new(render::Options {
             settings: settings.clone(),
             font: self.make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
             theme,
@@ -164,15 +167,28 @@ impl App {
             mode,
             background: Some(terminal.background().convert()),
             foreground: Some(terminal.foreground().convert()),
-        };
+        });
 
-        let mut output: Box<dyn io::Write> = if opt.output != "-" {
+        let format = opt.output_format.unwrap_or_else(|| {
+            if opt.output == Path::new("-") {
+                OutputFormat::Svg
+            } else if opt.output.extension() == Some(OsStr::new("png")) {
+                OutputFormat::Png
+            } else {
+                OutputFormat::Svg
+            }
+        });
+
+        let mut output: Box<dyn io::Write> = if opt.output != Path::new("-") {
             Box::new(std::fs::File::create(opt.output)?)
         } else {
             Box::new(stdout())
         };
 
-        let renderer = SvgRenderer::new(options);
+        let renderer: &mut dyn Render = match format {
+            OutputFormat::Svg => &mut SvgRenderer::new(options),
+            OutputFormat::Png => &mut PngRenderer::new(options),
+        };
         renderer.render(terminal.surface(), &mut output)?;
 
         Ok(())

@@ -14,6 +14,7 @@ voca_rs = "1"
 serde_json = { version = "1" }
 
 [dependencies]
+
 allsorts = "0.15"
 anyhow = "1"
 askama = "0.13"
@@ -32,6 +33,7 @@ enumset = "1"
 enumset-ext = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28", features = ["serde", "clap"] }
 enumset-serde = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28" }
 env_logger = "0.11"
+fontdb = "0.23"
 hex = "0.4"
 http = "1"
 indexmap = "2"
@@ -42,6 +44,7 @@ num-traits = "0.2"
 owo-colors = "4"
 portable-pty = "0.9"
 rayon = "1"
+resvg = "0.45"
 rust-embed = "8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
@@ -54,11 +57,14 @@ svg = "0.18"
 term_size = "0.3"
 termwiz = "0.23"
 thiserror = "2"
+tiny-skia = "0.11"
 toml = "0.8"
 ureq = "3"
 url = "2"
+usvg = "0.45"
 voca_rs = "1"
 wild = "2"
+
 
 [patch.crates-io]
 pathfinder_simd = { git = "https://github.com/servo/pathfinder.git", rev = "8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd" }

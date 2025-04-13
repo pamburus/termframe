@@ -64,6 +64,7 @@ url = "2"
 usvg = "0.45"
 voca_rs = "1"
 wild = "2"
+woff2 = { package = "woff2-patched", version = "0.4" }
 
 
 [patch.crates-io]

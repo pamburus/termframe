@@ -1,6 +1,6 @@
 use std::{rc::Rc, sync::Arc};
 
-use allsorts::woff2;
+use fontdb::{Language, Source, Style};
 use termwiz::surface::Surface;
 use tiny_skia::{Pixmap, Transform};
 
@@ -29,17 +29,55 @@ impl PngRenderer {
 
         self.svg.render(surface, &mut buf)?;
 
-        let mut fontdb = fontdb::Database::new();
-        fontdb.load_system_fonts();
-        // for font in &self.options.font.faces {
-        //     let mut response = ureq::get(&font.url).call()?;
-        //     fontdb.load_font_data(response.body_mut().read_to_vec()?);
-        // }
+        let mut fonts = fontdb::Database::new();
+        for font in &self.options.font.faces {
+            let mut response = ureq::get(&font.url).call()?;
+            let mut font_data = response.body_mut().read_to_vec()?;
+            if font.url.ends_with(".woff2") {
+                font_data = woff2::convert_woff2_to_ttf(&mut font_data.as_slice())?;
+            }
+            let source = Source::Binary(Arc::new(font_data));
+            let ids = fonts.load_font_source(source.clone());
+
+            if ids.len() == 0 {
+                log::warn!("failed to load font {}", &font.family);
+                continue;
+            }
+            if ids.len() > 1 {
+                log::warn!(
+                    "multiple fonts found ({}) in a single file {}",
+                    ids.len(),
+                    &font.url,
+                );
+            }
+
+            for weight in (font.weight.range().0..=font.weight.range().1).step_by(100) {
+                log::info!(
+                    "add font face info family={:?} weight={weight}",
+                    &font.family
+                );
+                fonts.push_face_info(fontdb::FaceInfo {
+                    id: ids[0],
+                    source: source.clone(),
+                    index: 0,
+                    families: vec![(font.family.clone(), Language::English_UnitedStates)],
+                    post_script_name: font.family.clone(),
+                    style: match font.style {
+                        None | Some(super::FontStyle::Normal) => Style::Normal,
+                        Some(super::FontStyle::Italic) => Style::Italic,
+                        Some(super::FontStyle::Oblique) => Style::Oblique,
+                    },
+                    weight: fontdb::Weight(weight),
+                    stretch: fontdb::Stretch::Normal,
+                    monospaced: true,
+                });
+            }
+        }
 
         let scale = 4.0;
         let opt = usvg::Options {
             dpi: 192.0,
-            fontdb: Arc::new(fontdb),
+            fontdb: Arc::new(fonts),
             ..Default::default()
         };
         let rtree = usvg::Tree::from_data(&buf, &opt)?;

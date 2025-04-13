@@ -27,6 +27,7 @@ family = [
     "Helvetica Neue",
     "Arial",
     "sans-serif",
+    "Inter",
 ]
 size = 13
 weight = "bold"

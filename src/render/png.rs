@@ -61,7 +61,7 @@ impl PngRenderer {
                     source: source.clone(),
                     index: 0,
                     families: vec![(font.family.clone(), Language::English_UnitedStates)],
-                    post_script_name: font.family.clone(),
+                    post_script_name: font.postscript_name.clone(),
                     style: match font.style {
                         None | Some(super::FontStyle::Normal) => Style::Normal,
                         Some(super::FontStyle::Italic) => Style::Italic,
@@ -69,7 +69,7 @@ impl PngRenderer {
                     },
                     weight: fontdb::Weight(weight),
                     stretch: fontdb::Stretch::Normal,
-                    monospaced: true,
+                    monospaced: font.monospaced,
                 });
             }
         }

@@ -98,6 +98,7 @@ impl FontFile {
         let name_table = ReadScope::new(name_data.as_ref()).read::<NameTable>()?;
         let name = name_table.string_for_id(1);
         let family = name_table.string_for_id(16);
+        let postscript_name = name_table.string_for_id(6);
 
         let inner = allsorts::Font::new(provider)?;
         let Some(head) = inner.head_table()? else {
@@ -113,6 +114,7 @@ impl FontFile {
             format: self.format(),
             name,
             family,
+            postscript_name,
         })
     }
 }
@@ -178,6 +180,7 @@ pub struct Font<'a> {
     format: Option<FontFormat>,
     name: Option<String>,
     family: Option<String>,
+    postscript_name: Option<String>,
 }
 
 impl Font<'_> {
@@ -272,6 +275,16 @@ impl Font<'_> {
         let glyphs = glyphs.into_iter().collect::<Vec<_>>();
 
         Ok(subset(&self.inner.font_table_provider, &glyphs)?)
+    }
+
+    /// Check if the font is monospaced.
+    pub fn monospaced(&self) -> bool {
+        self.os2.panose[3] == 9
+    }
+
+    // Get the PostScript name of the font.
+    pub fn postscript_name(&self) -> Option<&str> {
+        self.postscript_name.as_deref()
     }
 
     /// Get the units per em value of the font.

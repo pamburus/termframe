@@ -500,6 +500,8 @@ fn make_font_face(
         url: url.clone(),
         chars,
         metrics_match,
+        monospaced: font.monospaced(),
+        postscript_name: font.postscript_name().unwrap_or(&family).to_owned(),
     }
 }
 

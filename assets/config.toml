@@ -152,3 +152,26 @@ files = [
     "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s13.woff2",
     "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s14.woff2",
 ]
+
+#
+# Font "Inter"
+#
+[[fonts]]
+family = "Inter"
+license = { type = "SIL Open Font License 1.1", link = "https://raw.githubusercontent.com/rsms/inter/refs/heads/master/LICENSE.txt" }
+files = [
+    "https://fonts.gstatic.com/s/inter/v18/UcCm3FwrK3iLTcvnUwkT9mI1F55MKw.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCm3FwrK3iLTcvnUwAT9mI1F55MKw.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCm3FwrK3iLTcvnUwgT9mI1F55MKw.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCm3FwrK3iLTcvnUwcT9mI1F55MKw.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCm3FwrK3iLTcvnUwsT9mI1F55MKw.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCm3FwrK3iLTcvnUwoT9mI1F55MKw.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCm3FwrK3iLTcvnUwQT9mI1F54.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvvYwYZ8UA3J58.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvmYwYZ8UA3J58.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvuYwYZ8UA3J58.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvhYwYZ8UA3J58.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvtYwYZ8UA3J58.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcvsYwYZ8UA3J58.woff2",
+    "https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcviYwYZ8UA3.woff2",
+]

@@ -98,6 +98,8 @@ pub struct FontFace {
     pub format: Option<FontFormat>,
     pub chars: Rc<dyn CharSet>,
     pub metrics_match: bool,
+    pub postscript_name: String,
+    pub monospaced: bool,
 }
 
 /// Enum representing different font styles.

@@ -24,8 +24,10 @@ use rayon::prelude::*;
 // local imports
 use cache::CacheMiddleware;
 use config::{
-    Load, Patch, Settings, app_dirs, load::ItemInfo, theme::ThemeConfig,
-    winstyle::WindowStyleConfig,
+    Load, Patch, Settings, app_dirs,
+    load::ItemInfo,
+    theme::ThemeConfig,
+    winstyle::{self, WindowStyleConfig},
 };
 use error::{AppInfoProvider, Result, UsageRequest, UsageResponse};
 use font::FontFile;
@@ -158,7 +160,11 @@ impl App {
 
         let options = Rc::new(render::Options {
             settings: settings.clone(),
-            font: self.make_font_options(&settings, content.chars().filter(|c| *c != '\n'))?,
+            font: self.make_font_options(
+                &settings,
+                &window,
+                content.chars().filter(|c| *c != '\n'),
+            )?,
             theme,
             window,
             title: opt
@@ -195,7 +201,12 @@ impl App {
     }
 
     /// Creates font options based on the settings and characters
-    fn make_font_options<C>(&self, settings: &Settings, chars: C) -> Result<render::FontOptions>
+    fn make_font_options<C>(
+        &self,
+        settings: &Settings,
+        window: &winstyle::Window,
+        chars: C,
+    ) -> Result<render::FontOptions>
     where
         C: IntoIterator<Item = char>,
     {
@@ -203,7 +214,8 @@ impl App {
         let mut ascender: f32 = 0.0;
         let mut descender: f32 = 0.0;
 
-        let families = settings.font.family.resolve();
+        let mut families = settings.font.family.resolve();
+        families.extend_from_slice(&window.title.font.family);
 
         let mut files = settings
             .fonts

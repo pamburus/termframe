@@ -30,7 +30,7 @@ impl PngRenderer {
         self.svg.render(surface, &mut buf)?;
 
         let mut fonts = fontdb::Database::new();
-        for font in &self.options.font.faces {
+        for (i, font) in self.options.font.faces.iter().enumerate() {
             let mut response = ureq::get(&font.url).call()?;
             let mut font_data = response.body_mut().read_to_vec()?;
             if font.url.ends_with(".woff2") {
@@ -52,9 +52,11 @@ impl PngRenderer {
             }
 
             for weight in (font.weight.range().0..=font.weight.range().1).step_by(100) {
-                log::info!(
-                    "add font face info family={:?} weight={weight}",
-                    &font.family
+                log::debug!(
+                    "add font face info #{i:02} family={:?} weight={weight} style={:?} file={}",
+                    &font.family,
+                    &font.style,
+                    &font.url,
                 );
                 fonts.push_face_info(fontdb::FaceInfo {
                     id: ids[0],

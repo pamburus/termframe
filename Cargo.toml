@@ -66,7 +66,8 @@ voca_rs = "1"
 wild = "2"
 woff2 = { package = "woff2-patched", version = "0.4" }
 
-
 [patch.crates-io]
 pathfinder_simd = { git = "https://github.com/servo/pathfinder.git", rev = "8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd" }
 svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }
+usvg = { git = "https://github.com/pamburus/resvg.git", rev = "8bc70ca1d7340c1c35efbec775d6b16f72df9bc6" }
+resvg = { git = "https://github.com/pamburus/resvg.git", rev = "8bc70ca1d7340c1c35efbec775d6b16f72df9bc6" }

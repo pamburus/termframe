@@ -2514,8 +2514,7 @@ checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 [[package]]
 name = "resvg"
 version = "0.45.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd43d1c474e9dadf09a8fdf22d713ba668b499b5117b9b9079500224e26b5b29"
+source = "git+https://github.com/pamburus/resvg.git?rev=8bc70ca1d7340c1c35efbec775d6b16f72df9bc6#8bc70ca1d7340c1c35efbec775d6b16f72df9bc6"
 dependencies = [
  "gif",
  "image-webp",
@@ -3586,8 +3585,7 @@ dependencies = [
 [[package]]
 name = "usvg"
 version = "0.45.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ac8e0e3e4696253dc06167990b3fe9a2668ab66270adf949a464db4088cb354"
+source = "git+https://github.com/pamburus/resvg.git?rev=8bc70ca1d7340c1c35efbec775d6b16f72df9bc6#8bc70ca1d7340c1c35efbec775d6b16f72df9bc6"
 dependencies = [
  "base64 0.22.1",
  "data-url",

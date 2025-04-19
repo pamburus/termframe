@@ -1,9 +1,9 @@
 // std imports
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 
 // third-party imports
 use allsorts::{
-    binary::read::{ReadScope, ReadScopeOwned},
+    binary::read::ReadScope,
     font::MatchingPresentation,
     font_data::{DynamicFontTableProvider, FontData},
     subset::subset,
@@ -20,7 +20,7 @@ use crate::fontformat::FontFormat;
 #[allow(dead_code)]
 pub struct FontFile {
     location: Location,
-    data: ReadScopeOwned,
+    data: Arc<[u8]>,
 }
 
 pub type Result<T> = anyhow::Result<T>;
@@ -39,7 +39,7 @@ impl FontFile {
     /// Load a font file from a file path.
     pub fn load_file(path: PathBuf) -> Result<Self> {
         let bytes = std::fs::read(&path)?;
-        Self::load_bytes(&bytes, Location::File(path))
+        Self::load_bytes(bytes.into(), Location::File(path))
     }
 
     /// Load a font file from a URL.
@@ -53,20 +53,22 @@ impl FontFile {
             "file" | "" => Self::load_file(url.path().into()),
             _ => {
                 let bytes = agent.get(url.as_ref()).call()?.body_mut().read_to_vec()?;
-                Self::load_bytes(&bytes, Location::Url(url))
+                Self::load_bytes(bytes.into(), Location::Url(url))
             }
         }
     }
 
     /// Load a font file from raw bytes.
-    pub fn load_bytes(bytes: &[u8], location: Location) -> Result<Self> {
-        let data = ReadScopeOwned::new(ReadScope::new(bytes));
-        Ok(Self { location, data })
+    pub fn load_bytes(bytes: Arc<[u8]>, location: Location) -> Result<Self> {
+        Ok(Self {
+            location,
+            data: bytes,
+        })
     }
 
     /// Get the raw data of the font file.
     pub fn data(&self) -> &[u8] {
-        self.data.scope().data()
+        &self.data
     }
 
     /// Determine the format of the font file.
@@ -92,7 +94,7 @@ impl FontFile {
 
     /// Get the font object from the font file.
     pub fn font(&self) -> Result<Font> {
-        let provider = self.data.scope().read::<FontData>()?.table_provider(0)?;
+        let provider = self.scope().read::<FontData>()?.table_provider(0)?;
 
         let name_data = provider.read_table_data(tag::NAME)?;
         let name_table = ReadScope::new(name_data.as_ref()).read::<NameTable>()?;
@@ -116,6 +118,10 @@ impl FontFile {
             family,
             postscript_name,
         })
+    }
+
+    fn scope(&self) -> ReadScope {
+        ReadScope::new(&self.data)
     }
 }
 

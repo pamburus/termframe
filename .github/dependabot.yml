@@ -473,6 +473,23 @@ updates:
         update-types:
           - "major"
           - "minor"
+      zbus-sec:
+        applies-to: security-updates
+        patterns:
+          - "zbus"
+          - "zbus_*"
+          - "zvariant"
+          - "zvariant_*"
+      zbus-ver:
+        applies-to: version-updates
+        patterns:
+          - "zbus"
+          - "zbus_*"
+          - "zvariant"
+          - "zvariant_*"
+        update-types:
+          - "major"
+          - "minor"
       zerofrom-sec:
         applies-to: security-updates
         patterns:

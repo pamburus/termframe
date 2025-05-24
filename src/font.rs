@@ -1,5 +1,5 @@
 // std imports
-use std::path::PathBuf;
+use std::{path::PathBuf, time};
 
 // third-party imports
 use allsorts::{
@@ -11,10 +11,15 @@ use allsorts::{
     tag,
 };
 use anyhow::anyhow;
+use exponential_backoff::Backoff;
 use url::Url;
 
 // local imports
 use crate::fontformat::FontFormat;
+
+const MAX_ATTEMPTS: u32 = 12;
+const MIN_DELAY: time::Duration = time::Duration::from_secs(1);
+const MAX_DELAY: time::Duration = time::Duration::from_secs(15);
 
 /// Represents a font file with its location and data.
 #[allow(dead_code)]
@@ -52,8 +57,24 @@ impl FontFile {
         match url.scheme() {
             "file" | "" => Self::load_file(url.path().into()),
             _ => {
-                let bytes = agent.get(url.as_ref()).call()?.body_mut().read_to_vec()?;
-                Self::load_bytes(&bytes, Location::Url(url))
+                let attempt = || agent.get(url.as_ref()).call()?.body_mut().read_to_vec();
+
+                let mut result = Err(ureq::Error::Other(
+                    anyhow!("backoff loop malfunction").into(),
+                ));
+
+                for delay in &Backoff::new(MAX_ATTEMPTS).timeout_range(MIN_DELAY, MAX_DELAY) {
+                    result = attempt();
+                    match &result {
+                        Ok(_) => break,
+                        Err(_) => match delay {
+                            Some(delay) => std::thread::sleep(delay),
+                            None => break,
+                        },
+                    }
+                }
+
+                Self::load_bytes(&result?, Location::Url(url))
             }
         }
     }

@@ -19,7 +19,6 @@ use portable_pty::CommandBuilder;
 use rayon::prelude::*;
 
 // local imports
-use cache::CacheMiddleware;
 use config::{
     Load, Patch, Settings, app_dirs, load::ItemInfo, theme::ThemeConfig,
     winstyle::WindowStyleConfig,
@@ -34,7 +33,6 @@ use theme::{AdaptiveTheme, Theme};
 
 // private modules
 mod appdirs;
-mod cache;
 mod cli;
 mod config;
 mod error;
@@ -44,6 +42,7 @@ mod help;
 mod render;
 mod term;
 mod theme;
+mod ureqmw;
 mod xerr;
 
 /// Entry point of the application
@@ -81,7 +80,7 @@ impl App {
         if let Some(dirs) = app_dirs() {
             ua = Some(
                 ureq::Agent::config_builder()
-                    .middleware(CacheMiddleware::new(&dirs.cache_dir))
+                    .middleware(ureqmw::cache::new(&dirs.cache_dir))
                     .build()
                     .into(),
             );

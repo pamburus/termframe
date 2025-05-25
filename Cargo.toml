@@ -4,7 +4,7 @@ authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
 description = "Terminal output SVG screenshot tool"
 categories = ["command-line-utilities"]
 keywords = ["cli", "terminal", "screenshot", "svg"]
-version = "0.5.2"
+version = "0.5.3-alpha.1"
 edition = "2024"
 license = "MIT"
 build = "build/build.rs"
@@ -32,6 +32,7 @@ enumset = "1"
 enumset-ext = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28", features = ["serde", "clap"] }
 enumset-serde = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28" }
 env_logger = "0.11"
+exponential-backoff = "0"
 hex = "0.4"
 http = "1"
 indexmap = "2"

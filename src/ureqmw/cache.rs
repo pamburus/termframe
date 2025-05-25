@@ -17,6 +17,10 @@ type Result<T, E = Error> = std::result::Result<T, E>;
 
 const KEY_HEADERS: &str = "headers";
 
+pub fn new(dir: &Path) -> CacheMiddleware {
+    CacheMiddleware::new(dir)
+}
+
 /// Middleware for caching HTTP responses.
 pub struct CacheMiddleware {
     dir: PathBuf,

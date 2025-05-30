@@ -228,7 +228,7 @@ mod tests {
 
     #[test]
     fn test_log() {
-        let err = Error::Io(std::io::Error::new(std::io::ErrorKind::Other, "test"));
+        let err = Error::Io(std::io::Error::other("test"));
         let mut buf = Vec::new();
         err.log_to(&mut buf, &TestAppInfo).unwrap();
         assert_eq!(

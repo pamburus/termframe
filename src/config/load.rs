@@ -1,6 +1,7 @@
 // std imports
 use std::{
     collections::HashMap,
+    convert::From,
     io,
     io::ErrorKind,
     path::{Component, Path, PathBuf},
@@ -72,7 +73,7 @@ pub enum ParseError {
 
     /// Error for parsing TOML.
     #[error(transparent)]
-    Toml(#[from] toml::de::Error),
+    Toml(#[from] Arc<toml::de::Error>),
 
     /// Error for parsing JSON.
     #[error("failed to parse json: {0}")]
@@ -81,6 +82,12 @@ pub enum ParseError {
     /// Error for parsing UTF-8 strings.
     #[error("failed to parse utf-8 string: {0}")]
     Utf8(#[from] std::str::Utf8Error),
+}
+
+impl From<toml::de::Error> for ParseError {
+    fn from(err: toml::de::Error) -> Self {
+        ParseError::Toml(Arc::new(err))
+    }
 }
 
 /// Trait for categorizing errors.

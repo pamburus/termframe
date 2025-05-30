@@ -18,9 +18,8 @@ use url::Url;
 use crate::fontformat::FontFormat;
 
 // retry loop backoff configuration
-static BACKOFF: LazyLock<Backoff> = LazyLock::new(|| {
-    Backoff::new(8).timeout_range(Duration::from_secs(1), Duration::from_secs(15))
-});
+static BACKOFF: LazyLock<Backoff> =
+    LazyLock::new(|| Backoff::new(8, Duration::from_secs(1), Some(Duration::from_secs(15))));
 
 /// Represents a font file with its location and data.
 #[allow(dead_code)]

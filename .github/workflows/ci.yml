@@ -45,13 +45,13 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v18.0.0
 
       - name: Build
-        run: cargo build --locked --verbose --benches --workspace
+        run: cargo +stable build --locked --verbose --benches --workspace
 
       - name: Run tests
-        run: cargo test --locked --verbose --workspace
+        run: cargo +stable test --locked --verbose --workspace
 
       - name: Run executable
-        run: cargo run --locked
+        run: cargo +stable run --locked
 
   coverage:
     runs-on: ubuntu-latest

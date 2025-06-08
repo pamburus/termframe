@@ -225,7 +225,7 @@ impl SvgRenderer {
                         if let Some(mut color) = opt.theme.resolve(cluster.attrs.underline_color())
                         {
                             color.a = 1.0;
-                            span.assign("text-decoration-color", color.to_hex_string());
+                            span.assign("text-decoration-color", color.to_css_hex());
                         }
                     }
 
@@ -416,7 +416,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                     .set("height", height)
                     .set("x", (shadow.x).r2p(fp))
                     .set("y", (shadow.y).r2p(fp))
-                    .set("fill", shadow.color.resolve(opt.mode).to_hex_string())
+                    .set("fill", shadow.color.resolve(opt.mode).to_css_hex())
                     .set("rx", border.radius.r2p(fp))
                     .set("ry", border.radius.r2p(fp))
                     .set("filter", "url(#shadow)"),
@@ -426,7 +426,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
     // background
     window = window.add(
         element::Rectangle::new()
-            .set("fill", opt.bg().to_hex_string())
+            .set("fill", opt.bg().to_css_hex())
             .set("rx", border.radius.r2p(fp))
             .set("ry", border.radius.r2p(fp))
             .set("width", width)
@@ -445,7 +445,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
         )
         .add(
             element::Rectangle::new()
-                .set("fill", header.color.resolve(opt.mode).to_hex_string())
+                .set("fill", header.color.resolve(opt.mode).to_css_hex())
                 .set("rx", border.radius.r2p(fp))
                 .set("ry", border.radius.r2p(fp))
                 .set("width", width)
@@ -459,7 +459,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("x2", width)
                 .set("y1", header.height.r2p(fp))
                 .set("y2", header.height.r2p(fp))
-                .set("stroke", border.color.resolve(opt.mode).to_hex_string())
+                .set("stroke", border.color.resolve(opt.mode).to_css_hex())
                 .set("stroke-width", border.width.r2p(fp)),
         );
     }
@@ -472,7 +472,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
         let mut title = element::Text::new(title)
             .set("x", (width / 2.0).r2p(fp))
             .set("y", (hh2).r2p(fp))
-            .set("fill", cfg.color.resolve(opt.mode).to_hex_string())
+            .set("fill", cfg.color.resolve(opt.mode).to_css_hex())
             .set("font-size", cfg.font.size.r2p(fp))
             .set("font-family", cfg.font.family.join(", "))
             .set("text-anchor", "middle")
@@ -497,10 +497,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("width", (width + 0.0).r2p(fp))
                 .set("height", (height + 0.0).r2p(fp))
                 .set("fill", "none")
-                .set(
-                    "stroke",
-                    border.colors.outer.resolve(opt.mode).to_hex_string(),
-                )
+                .set("stroke", border.colors.outer.resolve(opt.mode).to_css_hex())
                 .set("stroke-width", border.width.r2p(fp))
                 .set("rx", (border.radius + 0.0).r2p(fp))
                 .set("ry", (border.radius + 0.0).r2p(fp)),
@@ -512,10 +509,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("x", gap.r2p(fp))
                 .set("y", gap.r2p(fp))
                 .set("fill", "none")
-                .set(
-                    "stroke",
-                    border.colors.inner.resolve(opt.mode).to_hex_string(),
-                )
+                .set("stroke", border.colors.inner.resolve(opt.mode).to_css_hex())
                 .set("stroke-width", border.width.r2p(fp))
                 .set("rx", (border.radius - gap).r2p(fp))
                 .set("ry", (border.radius - gap).r2p(fp)),
@@ -613,7 +607,7 @@ fn make_buttons(opt: &Options, width: f32) -> element::Group {
             };
 
             path.assign("fill", "none");
-            path.assign("stroke", icon.stroke.resolve(opt.mode).to_hex_string());
+            path.assign("stroke", icon.stroke.resolve(opt.mode).to_css_hex());
             if let Some(stroke_width) = icon.stroke_width {
                 path.assign("stroke-width", stroke_width.r2p(fp));
             }
@@ -646,13 +640,13 @@ fn set_button_style<N: svg::Node>(opt: &Options, cfg: &WindowButton, node: &mut 
     let fp = opt.settings.rendering.svg.precision; // floating point precision
 
     if let Some(fill) = &cfg.fill {
-        node.assign("fill", fill.resolve(opt.mode).to_hex_string());
+        node.assign("fill", fill.resolve(opt.mode).to_css_hex());
     } else {
         node.assign("fill", "none");
     }
 
     if let Some(stroke) = &cfg.stroke {
-        node.assign("stroke", stroke.resolve(opt.mode).to_hex_string());
+        node.assign("stroke", stroke.resolve(opt.mode).to_css_hex());
     }
 
     if let Some(stroke_width) = cfg.stroke_width {
@@ -1165,13 +1159,13 @@ impl PaletteBuilder {
         if self.has_bg {
             vars.push((
                 ColorStyleId::DefaultBackground.name().into(),
-                self.bg.to_hex_string(),
+                self.bg.to_css_hex(),
             ));
         }
         if self.has_fg {
             vars.push((
                 ColorStyleId::DefaultForeground.name().into(),
-                self.fg.to_hex_string(),
+                self.fg.to_css_hex(),
             ));
         }
         if self.has_br_fg {
@@ -1181,14 +1175,11 @@ impl PaletteBuilder {
                     .bright_fg
                     .as_ref()
                     .unwrap_or(&self.fg)
-                    .to_hex_string(),
+                    .to_css_hex(),
             ));
         }
         for (i, color) in &self.palette {
-            vars.push((
-                ColorStyleId::Palette(*i).name().into(),
-                color.to_hex_string(),
-            ));
+            vars.push((ColorStyleId::Palette(*i).name().into(), color.to_css_hex()));
         }
 
         styles::Theme {
@@ -1228,7 +1219,7 @@ impl ColorStyle {
     fn render(&self) -> Cow<'static, str> {
         match self {
             ColorStyle::Themed(id) => format!("var({id})").into(),
-            ColorStyle::Custom(color) => color.to_hex_string().into(),
+            ColorStyle::Custom(color) => color.to_css_hex().into(),
         }
     }
 }

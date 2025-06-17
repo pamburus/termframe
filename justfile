@@ -1,4 +1,5 @@
 fonts := "JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace"
+tmp-themes-dir := ".tmp/themes"
 
 [doc('build')]
 build *ARGS:
@@ -23,6 +24,15 @@ clippy *ARGS:
 [doc('update dependencies')]
 update *ARGS:
     cargo update {{ ARGS }}
+
+[doc('update themes')]
+update-themes *ARGS:
+    rm -fr "{{tmp-themes-dir}}"
+    git clone -n --depth=1 --filter=tree:0 git@github.com:mbadolato/iTerm2-Color-Schemes.git "{{tmp-themes-dir}}"
+    cd "{{tmp-themes-dir}}" && git sparse-checkout set --no-cone /termframe && git checkout
+    mv "{{tmp-themes-dir}}"/termframe/* assets/themes/
+    rm -fr "{{tmp-themes-dir}}"
+    cargo build
 
 [doc('install man pages')]
 install-man-pages:

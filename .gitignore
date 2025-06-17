@@ -1,4 +1,5 @@
 /.vscode
+/.tmp
 /target
 /output.svg
 /*.ansi

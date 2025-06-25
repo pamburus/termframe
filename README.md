@@ -26,6 +26,8 @@ This tool is a non-interactive terminal emulator that executes a single command,
     </picture>
 </p>
 
+PNG images: [sample-dark.png](https://github.com/user-attachments/assets/5fe3fcf6-446a-49cf-a447-0120a04bd8f3) and [sample-light.png](https://github.com/user-attachments/assets/85b080b0-59b4-45ae-9ba2-7eebe0d4d09c)
+
 ## Installation
 
 ### macOS

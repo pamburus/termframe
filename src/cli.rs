@@ -334,7 +334,7 @@ impl std::str::FromStr for FontWeight {
             "bold" => Ok(Self::Bold),
             s => match s.parse() {
                 Ok(weight) => Ok(Self::Fixed(weight)),
-                Err(_) => Err(format!("Invalid font weight: {}", s)),
+                Err(_) => Err(format!("Invalid font weight: {s}")),
             },
         }
     }
@@ -354,7 +354,7 @@ impl fmt::Display for FontWeight {
         match self {
             Self::Normal => write!(f, "normal"),
             Self::Bold => write!(f, "bold"),
-            Self::Fixed(weight) => write!(f, "{}", weight),
+            Self::Fixed(weight) => write!(f, "{weight}"),
         }
     }
 }

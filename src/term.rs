@@ -322,8 +322,8 @@ impl Terminal {
                         let col = OneBased::from_zero_based(surface.cursor_position().0 as u32);
                         let line = OneBased::from_zero_based(surface.cursor_position().1 as u32);
                         let report = CSI::Cursor(Cursor::ActivePositionReport { line, col });
-                        log::debug!("ActivePositionReport {:?}", report);
-                        write!(writer, "{}", report).ok();
+                        log::debug!("ActivePositionReport {report:?}");
+                        write!(writer, "{report}").ok();
                         writer.flush().ok();
                         SEQ_ZERO
                     }
@@ -378,8 +378,8 @@ impl Terminal {
                                         which_color,
                                         vec![ColorOrQuery::Color(*target)],
                                     );
-                                    log::debug!("Color Query response {:?}", response);
-                                    write!(writer, "{}", response).ok();
+                                    log::debug!("Color Query response {response:?}");
+                                    write!(writer, "{response}").ok();
                                     writer.flush().ok();
                                 }
                                 ColorOrQuery::Color(c) => {

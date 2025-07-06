@@ -25,7 +25,7 @@ fn update_theme_aliases() {
             let alias = kebab_case(&name.replace("+", " plus "));
             if alias != name {
                 if let Some(other) = aliases.insert(alias.to_owned(), name.to_owned()) {
-                    panic!("Conflicting aliases for {} and {}: {}", other, name, alias);
+                    panic!("Conflicting aliases for {other} and {name}: {alias}");
                 }
             }
         }

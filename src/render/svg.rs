@@ -150,11 +150,11 @@ impl SvgRenderer {
             let mut sl = container()
                 .set("y", format!("{}em", (row as f32 * lh).r2p(fp)))
                 .set("width", format!("{}em", size.0))
-                .set("height", format!("{}em", lh))
+                .set("height", format!("{lh}em"))
                 .set("overflow", "hidden");
 
             let mut tl = element::Text::new("")
-                .set("y", format!("{}em", tyo))
+                .set("y", format!("{tyo}em"))
                 .set("xml:space", "preserve");
 
             let mut pos = 0;
@@ -268,7 +268,7 @@ impl SvgRenderer {
                         sl.append(
                             element::Text::new("")
                                 .set("x", format!("{}em", (x as f32 * fw).r2p(fp)))
-                                .set("y", format!("{}em", tyo))
+                                .set("y", format!("{tyo}em"))
                                 .set("xml:space", "preserve")
                                 .set(
                                     "textLength",
@@ -279,7 +279,7 @@ impl SvgRenderer {
                         pos = x + range.len();
                         tl = element::Text::new("")
                             .set("x", format!("{}em", (pos as f32 * fw).r2p(fp)))
-                            .set("y", format!("{}em", tyo))
+                            .set("y", format!("{tyo}em"))
                             .set("xml:space", "preserve");
                     } else {
                         tl = tl.add(span);
@@ -309,8 +309,8 @@ impl SvgRenderer {
 
         let class = "terminal";
         let mut screen = element::SVG::new()
-            .set("width", format!("{}em", width))
-            .set("height", format!("{}em", height))
+            .set("width", format!("{width}em"))
+            .set("height", format!("{height}em"))
             .set("font-size", opt.font.size.r2p(fp))
             .set("font-family", font_family_list);
         if !cfg.window.enabled {
@@ -1272,7 +1272,7 @@ impl ColorStyleId {
             ColorStyleId::DefaultBackground => "--bg".into(),
             ColorStyleId::DefaultForeground => "--fg".into(),
             ColorStyleId::BrightForeground => "--br-fg".into(),
-            ColorStyleId::Palette(i) => format!("--c-{}", i).into(),
+            ColorStyleId::Palette(i) => format!("--c-{i}").into(),
         }
     }
 }

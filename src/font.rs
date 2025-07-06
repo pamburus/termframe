@@ -174,7 +174,7 @@ impl std::fmt::Display for Location {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::File(path) => write!(f, "{}", path.display()),
-            Self::Url(url) => write!(f, "{}", url),
+            Self::Url(url) => write!(f, "{url}"),
         }
     }
 }

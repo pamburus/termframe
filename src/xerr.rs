@@ -86,7 +86,7 @@ where
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         write!(&mut buf, "{}", self.0)?;
-        write!(f, "{:?}", buf)
+        write!(f, "{buf:?}")
     }
 }
 

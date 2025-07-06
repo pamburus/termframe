@@ -30,8 +30,8 @@ impl std::fmt::Display for Number {
     /// Formats the `Number` for display.
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Number::Int(i) => write!(f, "{}", i),
-            Number::Float(fl) => write!(f, "{}", fl),
+            Number::Int(value) => write!(f, "{value}"),
+            Number::Float(value) => write!(f, "{value}"),
         }
     }
 }

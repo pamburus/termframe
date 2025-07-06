@@ -184,7 +184,7 @@ fn usage<A: AppInfoProvider>(app: &A, request: UsageRequest) -> Option<String> {
     if args.is_empty() {
         Some(result.to_string())
     } else {
-        Some(format!("{} {}", result, args))
+        Some(format!("{result} {args}"))
     }
 }
 

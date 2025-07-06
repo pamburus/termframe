@@ -300,7 +300,7 @@ impl fmt::Display for FontWeight {
         match self {
             Self::Normal => write!(f, "normal"),
             Self::Bold => write!(f, "bold"),
-            Self::Fixed(weight) => write!(f, "{}", weight),
+            Self::Fixed(weight) => write!(f, "{weight}"),
         }
     }
 }

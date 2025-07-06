@@ -94,7 +94,7 @@ impl TryFrom<&str> for ModeSetting {
             "auto" => Ok(ModeSetting::Auto),
             "dark" => Ok(ModeSetting::Dark),
             "light" => Ok(ModeSetting::Light),
-            _ => Err(format!("Invalid mode: {}", value)),
+            _ => Err(format!("Invalid mode: {value}")),
         }
     }
 }

@@ -30,7 +30,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run Clippy
-        run: cargo clippy --locked --all-features
+        run: cargo clippy --locked --all-targets --all-features
 
       - name: Install latest nightly
         uses: dtolnay/rust-toolchain@v1

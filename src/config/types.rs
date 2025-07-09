@@ -1,5 +1,5 @@
 // std imports
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, Mul, MulAssign, Sub};
 
 // third-party imports
 use serde::Deserialize;
@@ -131,5 +131,12 @@ impl Div<Number> for f32 {
     /// Divides an `f32` by a `Number` and returns the result as an `f32`.
     fn div(self, rhs: Number) -> Self::Output {
         self / f32::from(rhs)
+    }
+}
+
+impl MulAssign<f32> for Number {
+    /// Multiplies the current `Number` by an `f32` and updates its value.
+    fn mul_assign(&mut self, rhs: f32) {
+        *self = Self::Float(*self * rhs);
     }
 }

@@ -48,6 +48,7 @@ impl SvgRenderer {
 
         let fp = cfg.rendering.svg.precision; // floating point precision
         let lh = cfg.rendering.line_height.r2p(fp); // line height in em
+        let lh_p = (lh * opt.font.size).r2p(fp); // line height in pixels
         let fw = opt.font.metrics.width.r2p(fp); // font width in em
         let dimensions = surface.dimensions(); // surface dimensions in cells
         let size = (
@@ -55,7 +56,12 @@ impl SvgRenderer {
             (dimensions.0 as f32 * fw).r2p(fp),
             (dimensions.1 as f32 * lh).r2p(fp),
         );
-        let pad = cfg.padding.resolve().r2p(fp); // padding in pixels
+        let size_p = (
+            // terminal surface size in pixels
+            (size.0 * opt.font.size).r2p(fp),
+            (size.1 * opt.font.size).r2p(fp),
+        );
+        let pad = (cfg.padding.resolve() * opt.font.size).r2p(fp); // padding in pixels
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
 
         let mut palette = PaletteBuilder::new(
@@ -135,8 +141,8 @@ impl SvgRenderer {
         group = group.add(
             container()
                 .set("viewBox", format!("0 0 {w} {h}", w = size.0, h = size.1))
-                .set("width", format!("{}em", size.0))
-                .set("height", format!("{}em", size.1))
+                .set("width", format!("{}", size_p.0))
+                .set("height", format!("{}", size_p.1))
                 .add(bg_group),
         );
 
@@ -148,9 +154,9 @@ impl SvgRenderer {
             }
 
             let mut sl = container()
-                .set("y", format!("{}em", (row as f32 * lh).r2p(fp)))
-                .set("width", format!("{}em", size.0))
-                .set("height", format!("{lh}em"))
+                .set("y", format!("{}", (row as f32 * lh_p).r2p(fp)))
+                .set("width", format!("{}", size_p.0))
+                .set("height", format!("{lh_p}"))
                 .set("overflow", "hidden");
 
             let mut tl = element::Text::new("")
@@ -297,20 +303,20 @@ impl SvgRenderer {
         }
 
         let content = container()
-            .set("x", format!("{}em", pad.left))
-            .set("y", format!("{}em", pad.top))
+            .set("x", format!("{}", pad.left))
+            .set("y", format!("{}", pad.top))
             .set("fill", palette.fg(ColorAttribute::Default))
             .add(group);
 
-        let width = (size.0 + pad.left + pad.right).r2p(fp);
-        let height = (size.1 + pad.top + pad.bottom).r2p(fp);
+        let width = (size_p.0 + pad.left + pad.right).r2p(fp);
+        let height = (size_p.1 + pad.top + pad.bottom).r2p(fp);
 
         let font_family_list = opt.font.family.join(", ");
 
         let class = "terminal";
         let mut screen = element::SVG::new()
-            .set("width", format!("{width}em"))
-            .set("height", format!("{height}em"))
+            .set("width", format!("{width}"))
+            .set("height", format!("{height}"))
             .set("font-size", opt.font.size.r2p(fp))
             .set("font-family", font_family_list);
         if !cfg.window.enabled {
@@ -319,9 +325,6 @@ impl SvgRenderer {
         screen = screen.add(content).set("class", class);
 
         let mut doc = if cfg.window.enabled {
-            let width = (opt.font.size * width).r2p(fp);
-            let height = (opt.font.size * height).r2p(fp);
-
             let mut screen = screen.set("y", opt.window.header.height.r2p(fp));
             screen.unassign("xmlns");
 

@@ -19,7 +19,7 @@
                   "type": "object",
                   "additionalProperties": false,
                   "properties": {
-                    "horizonal": { "type": "number" },
+                    "horizontal": { "type": "number" },
                     "vertical": { "type": "number" }
                   },
                   "required": ["horizontal", "vertical"]

@@ -49,15 +49,15 @@ function test() {
     ${MAIN_EXECUTABLE:?} --config - --list-fonts > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --mode dark > /dev/null
 
-    local tmp=$(mktemp -t tmp.XXXXXX.svg)
     for asset in $(ls assets/test/input/*.ansi); do
         local asset_name=$(basename "${asset:?}" .ansi)
         echo "test ${asset_name:?}"
-        ${MAIN_EXECUTABLE:?} --config - --mode dark <"${asset:?}" -o "${tmp:?}"
         local golden=assets/test/output/${asset_name:?}.svg
+        local tmp=${golden:?}.tmp
+        ${MAIN_EXECUTABLE:?} --config - --mode dark <"${asset:?}" -o "${tmp:?}"
         diff "${golden:?}" "${tmp:?}"
+        rm -f ${tmp:?}
     done
-    rm -f ${tmp:?}
 }
 
 function merge() {

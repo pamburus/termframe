@@ -358,6 +358,26 @@ pub struct Padding {
     pub right: Number,
 }
 
+impl std::ops::MulAssign<f32> for Padding {
+    /// Multiply all padding values by a scalar.
+    fn mul_assign(&mut self, rhs: f32) {
+        self.top *= rhs;
+        self.bottom *= rhs;
+        self.left *= rhs;
+        self.right *= rhs;
+    }
+}
+
+impl std::ops::Mul<f32> for Padding {
+    type Output = Self;
+
+    // Multiply all padding values by a scalar and return the result.
+    fn mul(mut self, rhs: f32) -> Self {
+        self *= rhs;
+        self
+    }
+}
+
 /// Loader structure for loading settings.
 pub struct Loader {
     paths: Vec<PathBuf>,

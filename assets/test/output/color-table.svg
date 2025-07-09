@@ -15,10 +15,10 @@
 <circle cx="34" cy="14" fill="#ffbd2e" r="6" stroke="#ffbd2e" stroke-width="0.5"/>
 <circle cx="54" cy="14" fill="#28c941" r="6" stroke="#28c941" stroke-width="0.5"/>
 </g>
-<svg class="terminal" font-family="JetBrains Mono, Fira Code, Source Code Pro, Cascadia Code, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace, Symbols Nerd Font Mono" font-size="12" height="30em" width="49.6em" y="28">
-<svg fill="#dcdfe4" x="0.8em" y="0.6em">
+<svg class="terminal" font-family="JetBrains Mono, Fira Code, Source Code Pro, Cascadia Code, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace, Symbols Nerd Font Mono" font-size="12" height="360" width="595.2" y="28">
+<svg fill="#dcdfe4" x="9.6" y="7.2">
 <g>
-<svg height="28.8em" viewBox="0 0 48 28.8" width="48em">
+<svg height="345.6" viewBox="0 0 48 28.8" width="576">
 <g stroke-width="0.025">
 <path d="M9,0 H13.2 V3.6 H9 Z" fill="#3e4451" stroke="#3e4451"/>
 <path d="M13.8,0 H18 V3.6 H13.8 Z" fill="#e06c75" stroke="#e06c75"/>
@@ -38,70 +38,70 @@
 <path d="M42.6,6 H46.8 V27.6 H42.6 Z" fill="#f7f9fc" stroke="#f7f9fc"/>
 </g>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="0em">
+<svg height="14.4" overflow="hidden" width="576" y="0">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;36m </tspan><tspan fill="#56b6c2" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="15em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="39em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="1.2em">
+<svg height="14.4" overflow="hidden" width="576" y="14.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">37m </tspan><tspan fill="#dcdfe4" x="5.4em">gYw </tspan><tspan fill="#dcdfe4" x="10.2em">gYw </tspan><tspan fill="#dcdfe4" x="15em">gYw </tspan><tspan fill="#dcdfe4" x="19.8em">gYw </tspan><tspan fill="#dcdfe4" x="24.6em">gYw </tspan><tspan fill="#dcdfe4" x="29.4em">gYw </tspan><tspan fill="#dcdfe4" x="34.2em">gYw </tspan><tspan fill="#dcdfe4" x="39em">gYw </tspan><tspan fill="#dcdfe4" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="2.4em">
+<svg height="14.4" overflow="hidden" width="576" y="28.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;37m </tspan><tspan fill="#dcdfe4" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="15em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="39em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="4.8em">
+<svg height="14.4" overflow="hidden" width="576" y="57.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="5.4em">def </tspan><tspan fill="#dcdfe4" x="9.6em">100m </tspan><tspan fill="#dcdfe4" x="14.4em">101m </tspan><tspan fill="#dcdfe4" x="19.2em">102m </tspan><tspan fill="#dcdfe4" x="24em">103m </tspan><tspan fill="#dcdfe4" x="28.8em">104m </tspan><tspan fill="#dcdfe4" x="33.6em">105m </tspan><tspan fill="#dcdfe4" x="38.4em">106m </tspan><tspan fill="#dcdfe4" x="43.2em">107m </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="6em">
+<svg height="14.4" overflow="hidden" width="576" y="72">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="3em">m </tspan><tspan fill="#dcdfe4" x="5.4em">gYw </tspan><tspan fill="#dcdfe4" x="10.2em">gYw </tspan><tspan fill="#dcdfe4" x="15em">gYw </tspan><tspan fill="#dcdfe4" x="19.8em">gYw </tspan><tspan fill="#dcdfe4" x="24.6em">gYw </tspan><tspan fill="#dcdfe4" x="29.4em">gYw </tspan><tspan fill="#dcdfe4" x="34.2em">gYw </tspan><tspan fill="#dcdfe4" x="39em">gYw </tspan><tspan fill="#dcdfe4" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="7.2em">
+<svg height="14.4" overflow="hidden" width="576" y="86.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="2.4em">1m </tspan><tspan fill="#dcdfe4" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="15em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="39em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="8.4em">
+<svg height="14.4" overflow="hidden" width="576" y="100.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">30m </tspan><tspan fill="#3e4451" x="5.4em">gYw </tspan><tspan fill="#3e4451" x="10.2em">gYw </tspan><tspan fill="#3e4451" x="15em">gYw </tspan><tspan fill="#3e4451" x="19.8em">gYw </tspan><tspan fill="#3e4451" x="24.6em">gYw </tspan><tspan fill="#3e4451" x="29.4em">gYw </tspan><tspan fill="#3e4451" x="34.2em">gYw </tspan><tspan fill="#3e4451" x="39em">gYw </tspan><tspan fill="#3e4451" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="9.6em">
+<svg height="14.4" overflow="hidden" width="576" y="115.2">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;30m </tspan><tspan fill="#3e4451" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#3e4451" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#3e4451" font-weight="bold" x="15em">gYw </tspan><tspan fill="#3e4451" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#3e4451" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#3e4451" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#3e4451" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#3e4451" font-weight="bold" x="39em">gYw </tspan><tspan fill="#3e4451" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="10.8em">
+<svg height="14.4" overflow="hidden" width="576" y="129.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">31m </tspan><tspan fill="#e06c75" x="5.4em">gYw </tspan><tspan fill="#e06c75" x="10.2em">gYw </tspan><tspan fill="#e06c75" x="15em">gYw </tspan><tspan fill="#e06c75" x="19.8em">gYw </tspan><tspan fill="#e06c75" x="24.6em">gYw </tspan><tspan fill="#e06c75" x="29.4em">gYw </tspan><tspan fill="#e06c75" x="34.2em">gYw </tspan><tspan fill="#e06c75" x="39em">gYw </tspan><tspan fill="#e06c75" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="12em">
+<svg height="14.4" overflow="hidden" width="576" y="144">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;31m </tspan><tspan fill="#e06c75" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#e06c75" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#e06c75" font-weight="bold" x="15em">gYw </tspan><tspan fill="#e06c75" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#e06c75" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#e06c75" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#e06c75" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#e06c75" font-weight="bold" x="39em">gYw </tspan><tspan fill="#e06c75" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="13.2em">
+<svg height="14.4" overflow="hidden" width="576" y="158.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">32m </tspan><tspan fill="#98c379" x="5.4em">gYw </tspan><tspan fill="#98c379" x="10.2em">gYw </tspan><tspan fill="#98c379" x="15em">gYw </tspan><tspan fill="#98c379" x="19.8em">gYw </tspan><tspan fill="#98c379" x="24.6em">gYw </tspan><tspan fill="#98c379" x="29.4em">gYw </tspan><tspan fill="#98c379" x="34.2em">gYw </tspan><tspan fill="#98c379" x="39em">gYw </tspan><tspan fill="#98c379" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="14.4em">
+<svg height="14.4" overflow="hidden" width="576" y="172.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;32m </tspan><tspan fill="#98c379" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#98c379" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#98c379" font-weight="bold" x="15em">gYw </tspan><tspan fill="#98c379" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#98c379" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#98c379" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#98c379" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#98c379" font-weight="bold" x="39em">gYw </tspan><tspan fill="#98c379" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="15.6em">
+<svg height="14.4" overflow="hidden" width="576" y="187.2">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">33m </tspan><tspan fill="#e5c07b" x="5.4em">gYw </tspan><tspan fill="#e5c07b" x="10.2em">gYw </tspan><tspan fill="#e5c07b" x="15em">gYw </tspan><tspan fill="#e5c07b" x="19.8em">gYw </tspan><tspan fill="#e5c07b" x="24.6em">gYw </tspan><tspan fill="#e5c07b" x="29.4em">gYw </tspan><tspan fill="#e5c07b" x="34.2em">gYw </tspan><tspan fill="#e5c07b" x="39em">gYw </tspan><tspan fill="#e5c07b" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="16.8em">
+<svg height="14.4" overflow="hidden" width="576" y="201.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;33m </tspan><tspan fill="#e5c07b" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#e5c07b" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#e5c07b" font-weight="bold" x="15em">gYw </tspan><tspan fill="#e5c07b" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#e5c07b" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#e5c07b" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#e5c07b" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#e5c07b" font-weight="bold" x="39em">gYw </tspan><tspan fill="#e5c07b" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="18em">
+<svg height="14.4" overflow="hidden" width="576" y="216">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">34m </tspan><tspan fill="#61afef" x="5.4em">gYw </tspan><tspan fill="#61afef" x="10.2em">gYw </tspan><tspan fill="#61afef" x="15em">gYw </tspan><tspan fill="#61afef" x="19.8em">gYw </tspan><tspan fill="#61afef" x="24.6em">gYw </tspan><tspan fill="#61afef" x="29.4em">gYw </tspan><tspan fill="#61afef" x="34.2em">gYw </tspan><tspan fill="#61afef" x="39em">gYw </tspan><tspan fill="#61afef" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="19.2em">
+<svg height="14.4" overflow="hidden" width="576" y="230.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;34m </tspan><tspan fill="#61afef" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#61afef" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#61afef" font-weight="bold" x="15em">gYw </tspan><tspan fill="#61afef" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#61afef" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#61afef" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#61afef" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#61afef" font-weight="bold" x="39em">gYw </tspan><tspan fill="#61afef" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="20.4em">
+<svg height="14.4" overflow="hidden" width="576" y="244.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">35m </tspan><tspan fill="#c678dd" x="5.4em">gYw </tspan><tspan fill="#c678dd" x="10.2em">gYw </tspan><tspan fill="#c678dd" x="15em">gYw </tspan><tspan fill="#c678dd" x="19.8em">gYw </tspan><tspan fill="#c678dd" x="24.6em">gYw </tspan><tspan fill="#c678dd" x="29.4em">gYw </tspan><tspan fill="#c678dd" x="34.2em">gYw </tspan><tspan fill="#c678dd" x="39em">gYw </tspan><tspan fill="#c678dd" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="21.6em">
+<svg height="14.4" overflow="hidden" width="576" y="259.2">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;35m </tspan><tspan fill="#c678dd" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#c678dd" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#c678dd" font-weight="bold" x="15em">gYw </tspan><tspan fill="#c678dd" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#c678dd" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#c678dd" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#c678dd" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#c678dd" font-weight="bold" x="39em">gYw </tspan><tspan fill="#c678dd" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="22.8em">
+<svg height="14.4" overflow="hidden" width="576" y="273.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">36m </tspan><tspan fill="#56b6c2" x="5.4em">gYw </tspan><tspan fill="#56b6c2" x="10.2em">gYw </tspan><tspan fill="#56b6c2" x="15em">gYw </tspan><tspan fill="#56b6c2" x="19.8em">gYw </tspan><tspan fill="#56b6c2" x="24.6em">gYw </tspan><tspan fill="#56b6c2" x="29.4em">gYw </tspan><tspan fill="#56b6c2" x="34.2em">gYw </tspan><tspan fill="#56b6c2" x="39em">gYw </tspan><tspan fill="#56b6c2" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="24em">
+<svg height="14.4" overflow="hidden" width="576" y="288">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;36m </tspan><tspan fill="#56b6c2" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="15em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="39em">gYw </tspan><tspan fill="#56b6c2" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="25.2em">
+<svg height="14.4" overflow="hidden" width="576" y="302.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="1.8em">37m </tspan><tspan fill="#dcdfe4" x="5.4em">gYw </tspan><tspan fill="#dcdfe4" x="10.2em">gYw </tspan><tspan fill="#dcdfe4" x="15em">gYw </tspan><tspan fill="#dcdfe4" x="19.8em">gYw </tspan><tspan fill="#dcdfe4" x="24.6em">gYw </tspan><tspan fill="#dcdfe4" x="29.4em">gYw </tspan><tspan fill="#dcdfe4" x="34.2em">gYw </tspan><tspan fill="#dcdfe4" x="39em">gYw </tspan><tspan fill="#dcdfe4" x="43.8em">gYw </tspan></text>
 </svg>
-<svg height="1.2em" overflow="hidden" width="48em" y="26.4em">
+<svg height="14.4" overflow="hidden" width="576" y="316.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4" x="0.6em">1;37m </tspan><tspan fill="#dcdfe4" font-weight="bold" x="5.4em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="10.2em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="15em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="19.8em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="24.6em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="29.4em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="34.2em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="39em">gYw </tspan><tspan fill="#dcdfe4" font-weight="bold" x="43.8em">gYw </tspan></text>
 </svg>
 </g>

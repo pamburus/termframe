@@ -72,7 +72,7 @@ impl Suggestions {
     /// # Returns
     ///
     /// An iterator over the suggestions.
-    pub fn iter(&self) -> SuggestionsIter {
+    pub fn iter(&self) -> SuggestionsIter<'_> {
         SuggestionsIter {
             iter: self.candidates.iter(),
         }

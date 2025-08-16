@@ -23,10 +23,10 @@ fn update_theme_aliases() {
         if path.is_file() && name.ends_with(THEME_EXTENSION) {
             let name = name.trim_end_matches(THEME_EXTENSION);
             let alias = kebab_case(&name.replace("+", " plus "));
-            if alias != name {
-                if let Some(other) = aliases.insert(alias.to_owned(), name.to_owned()) {
-                    panic!("Conflicting aliases for {other} and {name}: {alias}");
-                }
+            if alias != name
+                && let Some(other) = aliases.insert(alias.to_owned(), name.to_owned())
+            {
+                panic!("Conflicting aliases for {other} and {name}: {alias}");
             }
         }
     }

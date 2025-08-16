@@ -455,10 +455,10 @@ fn make_font_face(
     chars: Rc<dyn CharSet>,
     metrics_match: bool,
 ) -> render::FontFace {
-    if let Some(ff) = font.family() {
-        if ff != family {
-            log::warn!("font family mismatch for {url}: expected {family:?}, got {ff:?}",);
-        }
+    if let Some(ff) = font.family()
+        && ff != family
+    {
+        log::warn!("font family mismatch for {url}: expected {family:?}, got {ff:?}",);
     }
 
     render::FontFace {

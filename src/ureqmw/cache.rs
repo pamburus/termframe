@@ -144,7 +144,7 @@ struct LockerMap(Mutex<HashMap<String, Arc<Mutex<()>>>>);
 
 impl LockerMap {
     /// Retrieves a lock for the specified key.
-    fn locker(&self, key: String) -> Locker {
+    fn locker(&self, key: String) -> Locker<'_> {
         let mut lockers = self.0.lock().unwrap();
         Locker {
             map: self,

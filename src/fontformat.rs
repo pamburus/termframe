@@ -17,6 +17,7 @@ impl FontFormat {
     /// # Examples
     ///
     /// ```
+    /// use termframe::fontformat::FontFormat;
     /// let format = FontFormat::Ttf;
     /// assert_eq!(format.mime(), "font/ttf");
     /// ```
@@ -34,6 +35,7 @@ impl FontFormat {
     /// # Examples
     ///
     /// ```
+    /// use termframe::fontformat::FontFormat;
     /// let format = FontFormat::Ttf;
     /// assert_eq!(format.css(), "truetype");
     /// ```

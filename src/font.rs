@@ -119,7 +119,7 @@ impl FontFile {
     }
 
     /// Get the font object from the font file.
-    pub fn font(&self) -> Result<Font> {
+    pub fn font(&self) -> Result<Font<'_>> {
         let provider = self.data.scope().read::<FontData>()?.table_provider(0)?;
 
         let name_data = provider.read_table_data(tag::NAME)?;

@@ -227,12 +227,11 @@ impl SvgRenderer {
                         span.assign("text-decoration", "line-through");
                     }
 
-                    if cluster.attrs.underline_color() != ColorAttribute::Default {
-                        if let Some(mut color) = opt.theme.resolve(cluster.attrs.underline_color())
-                        {
-                            color.a = 1.0;
-                            span.assign("text-decoration-color", color.to_css_hex());
-                        }
+                    if cluster.attrs.underline_color() != ColorAttribute::Default
+                        && let Some(mut color) = opt.theme.resolve(cluster.attrs.underline_color())
+                    {
+                        color.a = 1.0;
+                        span.assign("text-decoration-color", color.to_css_hex());
                     }
 
                     if cluster.attrs.underline() != Underline::None {
@@ -976,10 +975,8 @@ impl<'a> Iterator for Subclusters<'a> {
                 width = next.width(),
             );
 
-            if split {
-                if let Some(segment) = self.split() {
-                    return Some(segment);
-                }
+            if split && let Some(segment) = self.split() {
+                return Some(segment);
             }
 
             self.cell_range.end += next.width();
@@ -1323,12 +1320,11 @@ fn match_font_face(
         }
     }
 
-    if let Some(style) = style {
-        if let Some(face_style) = &face.style {
-            if *face_style != style {
-                return false;
-            }
-        }
+    if let Some(style) = style
+        && let Some(face_style) = &face.style
+        && *face_style != style
+    {
+        return false;
     }
 
     face.chars.has_char(ch)

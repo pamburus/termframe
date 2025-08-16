@@ -7,9 +7,9 @@ use termwiz::surface::Surface;
 
 // local imports
 use crate::{
-    Theme,
     config::{Padding, Settings, mode::Mode, winstyle::Window},
     fontformat::FontFormat,
+    theme::Theme,
 };
 
 // modules

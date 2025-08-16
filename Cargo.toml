@@ -8,6 +8,7 @@ version = "0.6.0"
 edition = "2024"
 license = "MIT"
 build = "build/build.rs"
+default-run = "termframe"
 
 [build-dependencies]
 voca_rs = "1"
@@ -64,3 +65,11 @@ wild = "2"
 [patch.crates-io]
 pathfinder_simd = { git = "https://github.com/servo/pathfinder.git", rev = "8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd" }
 svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }
+
+[lib]
+name = "termframe"
+path = "src/lib.rs"
+
+[[bin]]
+name = "termframe"
+path = "src/main.rs"

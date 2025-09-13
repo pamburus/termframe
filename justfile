@@ -1,31 +1,39 @@
 fonts := "JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace"
 tmp-themes-dir := ".tmp/themes"
 
-[doc('build')]
+[private]
+default:
+    @just --list
+
+# Build the project in debug mode
 build *ARGS:
     cargo build {{ ARGS }}
 
-[doc('run')]
+# Build the project in release mode
+build-release *ARGS:
+    cargo build --locked --release {{ ARGS }}
+
+# Run the application, example: `just run -- --help`
 run *ARGS:
     cargo run {{ ARGS }}
 
-[doc('install')]
+# Install binary and man pages
 install: && install-man-pages
-    cargo install --path . --locked
+    cargo install --locked --path .
 
-[doc('run tests')]
+# Run tests for all packages in the workspace
 test *ARGS:
-    cargo test --locked --all-targets --all-features {{ ARGS }}
+    cargo test --locked --all-targets --all-features --workspace {{ ARGS }}
 
-[doc('run linters')]
+# Run the Rust linter (clippy)
 clippy *ARGS:
     cargo clippy --locked --all-targets --all-features {{ ARGS }}
 
-[doc('update dependencies')]
+# Update dependencies
 update *ARGS:
     cargo update {{ ARGS }}
 
-[doc('update themes')]
+# Update themes
 update-themes *ARGS:
     rm -fr "{{tmp-themes-dir}}"
     git clone -n --depth=1 --filter=tree:0 git@github.com:mbadolato/iTerm2-Color-Schemes.git "{{tmp-themes-dir}}"
@@ -34,13 +42,13 @@ update-themes *ARGS:
     rm -fr "{{tmp-themes-dir}}"
     cargo build
 
-[doc('install man pages')]
+# Install man pages
 install-man-pages:
     mkdir -p ~/share/man/man1
     cargo run --release --locked -- --config - --man-page >~/share/man/man1/termframe.1
     @echo $(tput bold)$(tput setaf 3)note:$(tput sgr0) ensure $(tput setaf 2)~/share/man$(tput sgr0) is added to $(tput setaf 2)MANPATH$(tput sgr0) environment variable
 
-[doc('generate help page screenshots')]
+# Generate help page screenshots
 help: (help-for "dark") (help-for "light")
 
 [private]
@@ -67,7 +75,7 @@ sample-for mode:
         --output doc/sample-{{mode}}.svg \
         ./scripts/sample {{mode}}
 
-[doc('generate color table screenshot')]
+# Generate color table screenshot
 color-table theme mode:
     cargo run --locked -- \
         --config - \
@@ -82,7 +90,7 @@ color-table theme mode:
         --output doc/color-table-{{kebabcase(theme)}}-{{kebabcase(mode)}}.svg \
         ./scripts/color-table.sh
 
-[doc('collect code coverage')]
+# Collect code coverage
 coverage: contrib-coverage
 	build/ci/coverage.sh
 

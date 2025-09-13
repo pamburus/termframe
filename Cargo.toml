@@ -9,6 +9,7 @@ edition = "2024"
 license = "MIT"
 build = "build/build.rs"
 default-run = "termframe"
+rust-version = "1.88.0"
 
 [build-dependencies]
 voca_rs = "1"

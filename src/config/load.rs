@@ -12,9 +12,9 @@ use std::{
 use rust_embed::RustEmbed;
 use serde::de::DeserializeOwned;
 use serde_json as json;
-use serde_yml as yaml;
 use strum::{Display, EnumIter, IntoEnumIterator};
 use thiserror::Error;
+use yaml_peg::serde as yaml;
 
 // local imports
 use crate::xerr::{Highlight, Suggestions};
@@ -69,7 +69,7 @@ pub enum Error {
 pub enum ParseError {
     /// Error for parsing YAML.
     #[error("failed to parse yaml: {0}")]
-    Yaml(#[from] serde_yml::Error),
+    Yaml(#[from] yaml::SerdeError),
 
     /// Error for parsing TOML.
     #[error(transparent)]
@@ -172,7 +172,7 @@ pub trait Load {
     {
         let s = std::str::from_utf8(data)?;
         match format {
-            Format::Yaml => Ok(yaml::from_str(s)?),
+            Format::Yaml => Ok(yaml::from_str(s)?.remove(0)),
             Format::Toml => Ok(toml::from_str(s)?),
             Format::Json => Ok(json::from_str(s)?),
         }
@@ -364,4 +364,18 @@ impl From<Origin> for ItemInfo {
 pub enum Origin {
     Stock,
     Custom,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::theme::ThemeConfig;
+
+    #[test]
+    fn test_from_buf_yaml_format() {
+        // Test YAML format parsing to cover line 175
+        let yaml_data = b"---\ntags: []\ntheme:\n  colors:\n    background: \"#000000\"\n    foreground: \"#ffffff\"\n    palette: {}";
+        let result = ThemeConfig::from_buf(yaml_data, Format::Yaml);
+        assert!(result.is_ok());
+    }
 }

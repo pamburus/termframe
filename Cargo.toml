@@ -4,7 +4,7 @@ authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
 description = "Terminal output SVG screenshot tool"
 categories = ["command-line-utilities"]
 keywords = ["cli", "terminal", "screenshot", "svg"]
-version = "0.6.2-alpha.1"
+version = "0.6.2-alpha.2"
 edition = "2024"
 license = "MIT"
 build = "build/build.rs"
@@ -49,7 +49,6 @@ rust-embed = "8"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1" }
 serde_plain = "1"
-serde_yml = "0.0"
 shell-escape = "0.1"
 strsim = "0.11"
 strum = { version = "0.27", features = ["derive"] }
@@ -62,6 +61,7 @@ ureq = "3"
 url = "2"
 voca_rs = "1"
 wild = "2"
+yaml-peg = "1"
 
 [patch.crates-io]
 pathfinder_simd = { git = "https://github.com/servo/pathfinder.git", rev = "8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd" }

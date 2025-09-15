@@ -21,13 +21,19 @@ run *ARGS:
 install: && install-man-pages
     cargo install --locked --path .
 
+# Run all CI checks locally
+ci: test lint
+
 # Run tests for all packages in the workspace
 test *ARGS:
-    cargo test --locked --all-targets --all-features --workspace {{ ARGS }}
+    cargo test --all-targets --all-features --workspace {{ ARGS }}
+
+# Run the Rust linter (clippy)
+lint *ARGS: (clippy ARGS)
 
 # Run the Rust linter (clippy)
 clippy *ARGS:
-    cargo clippy --locked --all-targets --all-features {{ ARGS }}
+    cargo clippy --all-targets --all-features {{ ARGS }}
 
 # Update dependencies
 update *ARGS:

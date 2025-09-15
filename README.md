@@ -13,8 +13,9 @@ This tool is a non-interactive terminal emulator that executes a single command,
 * Optional font embedding for enhanced customization.
 * Dark and light mode compatibility.
 * Extensive theme collection from [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes).
-* Support for custom themes, refer to [configuration files](#configuration-files).
-* Customizable [window styles](assets/window-styles/macos.toml), see [configuration files](#configuration-files).
+* Support for custom themes, refer to [custom themes](#custom-themes).
+* Flexible configuration system, see [configuration files](#configuration-files).
+* Customizable [window styles](assets/window-styles/macos.toml), see [custom window styles](#custom-window-styles).
 
 ## Sample
 
@@ -114,6 +115,52 @@ PNG images: [sample-dark.png](https://github.com/user-attachments/assets/5fe3fcf
 #### Default configuration file
 
 * [config.toml](assets/config.toml)
+
+### Custom Themes
+
+You can create custom themes by placing theme files in the `themes` subfolder of your configuration directory.
+
+#### Theme file locations
+
+Create a `themes` folder in your configuration directory:
+
+| OS      | Theme Directory Location                                          |
+| ------- | ----------------------------------------------------------------- |
+| macOS   | `~/.config/termframe/themes/`                                     |
+| Linux   | `~/.config/termframe/themes/`                                     |
+| Windows | `%USERPROFILE%\AppData\Roaming\termframe\themes\`               |
+
+#### Theme file formats
+
+Theme files can be in TOML, YAML, or JSON format. Use the appropriate file extension (`.toml`, `.yaml`, `.yml`, or `.json`).
+
+#### Theme examples
+
+* **Dual mode theme** (supports both dark and light modes): [`assets/themes/One Double.toml`](assets/themes/One%20Double.toml)
+* **Single mode theme** (dark mode only): [`assets/themes/One Double Dark.toml`](assets/themes/One%20Double%20Dark.toml)
+
+### Custom Window Styles
+
+You can create custom window styles by placing window style files in the `window-styles` subfolder of your configuration directory.
+
+#### Window style file locations
+
+Create a `window-styles` folder in your configuration directory:
+
+| OS      | Window Styles Directory Location                                  |
+| ------- | ----------------------------------------------------------------- |
+| macOS   | `~/.config/termframe/window-styles/`                              |
+| Linux   | `~/.config/termframe/window-styles/`                              |
+| Windows | `%USERPROFILE%\AppData\Roaming\termframe\window-styles\`         |
+
+#### Window style file formats
+
+Window style files can be in TOML, YAML, or JSON format. Use the appropriate file extension (`.toml`, `.yaml`, `.yml`, or `.json`).
+
+#### Window style examples
+
+* **macOS style**: [`assets/window-styles/macos.toml`](assets/window-styles/macos.toml)
+* **Compact style**: [`assets/window-styles/compact.toml`](assets/window-styles/compact.toml)
 
 ### Environment variables
 

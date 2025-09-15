@@ -9,6 +9,7 @@ use std::{
 use config::ConfigError;
 use owo_colors::OwoColorize;
 use thiserror::Error;
+use yaml_peg::serde as yaml;
 
 use crate::{
     config::{theme, winstyle},
@@ -51,7 +52,7 @@ pub enum Error {
 
     /// YAML parsing error
     #[error("failed to parse yaml: {0}")]
-    Yaml(#[from] serde_yml::Error),
+    Yaml(#[from] yaml::SerdeError),
 
     /// TOML parsing error
     #[error("failed to parse toml: {0}")]

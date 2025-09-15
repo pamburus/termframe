@@ -39,6 +39,7 @@ family = [
     "DejaVu Sans Mono",
     "monospace",
     "Symbols Nerd Font Mono",
+    "Noto Color Emoji",
 ]
 #
 # Font size in pixels.
@@ -151,4 +152,26 @@ files = [
     "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s12.woff2",
     "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s13.woff2",
     "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s14.woff2",
+]
+
+#
+# Font "Noto Color Emoji"
+#
+[[fonts]]
+family = "Noto Color Emoji"
+license = { type = "SIL Open Font License 1.1", link = "https://fonts.google.com/noto/specimen/Noto+Color+Emoji/license" }
+files = [
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.0.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.1.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.2.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.3.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.4.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.5.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.6.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.7.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.8.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.9.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.10.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.11.woff2",
+    "https://fonts.gstatic.com/s/notocoloremoji/v36/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFabts6diysYTngZPnMC1MfLd4hQ.12.woff2",
 ]

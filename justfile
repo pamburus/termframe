@@ -66,11 +66,11 @@ update *ARGS:
 # Update themes
 update-themes *ARGS:
     rm -fr "{{tmp-themes-dir}}"
-    git clone -n --depth=1 --filter=tree:0 git@github.com:mbadolato/iTerm2-Color-Schemes.git "{{tmp-themes-dir}}"
+    git clone -n --depth=1 --filter=tree:0 https://github.com/mbadolato/iTerm2-Color-Schemes.git "{{tmp-themes-dir}}"
     cd "{{tmp-themes-dir}}" && git sparse-checkout set --no-cone /termframe && git checkout
     rsync -a --delete "{{tmp-themes-dir}}"/termframe/ assets/themes/ --exclude-from=assets/themes/.rsync-exclude
     rm -fr "{{tmp-themes-dir}}"
-    cargo build
+    cargo check
 
 # Install man pages
 install-man-pages:

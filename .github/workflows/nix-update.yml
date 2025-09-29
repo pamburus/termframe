@@ -10,63 +10,45 @@ permissions:
   pull-requests: write
   actions: write
 
-env:
-  BRANCH_NAME: update-flake-lock
-
 jobs:
   update-lock:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
+        uses: actions/checkout@v5
 
       - name: Install Nix
-        uses: cachix/install-nix-action@v30
-
-      - name: Setup GPG
-        run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-          git config user.signingkey $(gpg --list-secret-keys --keyid-format LONG | grep 'sec' | awk '{print $2}' | cut -d'/' -f2)
-          git config commit.gpgSign true
-          git config user.name "GitHub Actions Bot"
-          git config user.email "github-actions.pamburus.stapling152@passinbox.com"
-          echo '#!/bin/sh' > ~/.gpg-no-tty.sh
-          echo 'exec gpg --no-tty --batch --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" "$@"' >> ~/.gpg-no-tty.sh
-          chmod +x ~/.gpg-no-tty.sh
-          git config gpg.program "${HOME}/.gpg-no-tty.sh"
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        uses: cachix/install-nix-action@v31
 
       - name: Update flake.lock
         run: nix flake update
 
-      - name: Check for changes
-        id: check_changes
-        run: |
-          git add flake.lock
-          if git diff-index --quiet HEAD; then
-            echo "No changes to commit."
-            echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
-          else
-            echo "Changes detected."
-            echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
-          fi
+      - name: Generate token
+        id: generate-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Commit changes
-        if: env.CHANGES_DETECTED == 'true'
-        run: |
-          git checkout -b $BRANCH_NAME
-          git commit -m "build(nix): update flake.lock" -S
-          git push origin $BRANCH_NAME
-        env:
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Create pull request for flake.lock update
+        id: create-pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          commit-message: "chore(deps): update nix flake dependencies"
+          branch: update-flake-lock
+          title: "chore(deps): update flake.lock"
+          body: "This pull request updates the flake.lock file with the latest flake inputs."
+          author: "GitHub Action <action@github.com>"
+          labels: |
+            dependencies
+            automated
+          delete-branch: true
 
-      - name: Create pull request with GitHub CLI
-        if: env.CHANGES_DETECTED == 'true'
+      - name: Enable auto-merge
+        id: enable-auto-merge
+        if: steps.create-pr.outputs.pull-request-number
         run: |
-          gh pr create --base main --head $BRANCH_NAME --title "build(nix): update flake.lock" --body "This pull request updates the flake.lock file with the latest flake inputs."
+          gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}

@@ -70,7 +70,7 @@ update-themes *ARGS:
     cd "{{tmp-themes-dir}}" && git sparse-checkout set --no-cone /termframe && git checkout
     rsync -a --delete "{{tmp-themes-dir}}"/termframe/ assets/themes/ --exclude-from=assets/themes/.rsync-exclude
     rm -fr "{{tmp-themes-dir}}"
-    cargo check
+    ROOT=.. cargo check --manifest-path build/Cargo.toml
 
 # Install man pages
 install-man-pages:

@@ -1,38 +1,62 @@
 fonts := "JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace"
 tmp-themes-dir := ".tmp/themes"
+previous-tag := "git tag -l \"v*.*.*\" --merged HEAD --sort=-version:refname | head -1"
 
 [private]
 default:
     @just --list
 
 # Build the project in debug mode
-build *ARGS:
+build *ARGS: (setup "build")
     cargo build {{ ARGS }}
 
 # Build the project in release mode
-build-release *ARGS:
+build-release *ARGS: (setup "build")
     cargo build --locked --release {{ ARGS }}
 
 # Run the application, example: `just run -- --help`
-run *ARGS:
+run *ARGS: (setup "build")
     cargo run {{ ARGS }}
 
 # Install binary and man pages
 install: && install-man-pages
     cargo install --locked --path .
 
+# Build and publish new release
+release type="patch": (setup "cargo-edit")
+    gh workflow run -R pamburus/termframe release.yml --ref $(git branch --show-current) --field release-type={{type}}
+
+# Bump version
+bump type="alpha": (setup "cargo-edit")
+    cargo set-version --package termframe --bump {{type}}
+
+# List changes since the previous release
+changes since="auto": (setup "git-cliff" "bat" "gh")
+    #!/usr/bin/env bash
+    set -euo pipefail
+    since=$(if [ "{{since}}" = auto ]; then {{previous-tag}}; else echo "{{since}}"; fi)
+    version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "termframe") | .version')
+    GITHUB_REPO=pamburus/termframe \
+    GITHUB_TOKEN=$(gh auth token) \
+        git-cliff --tag "v${version:?}" "${since:?}..HEAD" \
+        | bat -l md --paging=never
+
+# Show previous release tag
+previous-tag:
+    @{{previous-tag}}
+
 # Run all CI checks locally
 ci: test lint
 
 # Run tests for all packages in the workspace
-test *ARGS:
+test *ARGS: (setup "build")
     cargo test --all-targets --all-features --workspace {{ ARGS }}
 
 # Run the Rust linter (clippy)
 lint *ARGS: (clippy ARGS)
 
 # Run the Rust linter (clippy)
-clippy *ARGS:
+clippy *ARGS: (setup "clippy")
     cargo clippy --all-targets --all-features {{ ARGS }}
 
 # Update dependencies
@@ -97,9 +121,10 @@ color-table theme mode:
         ./scripts/color-table.sh
 
 # Collect code coverage
-coverage: contrib-coverage
+coverage: (setup "coverage")
 	build/ci/coverage.sh
 
+# Helper recipe to ensure required tools are available for a given task
 [private]
-contrib-coverage:
-	contrib/bin/setup.sh coverage
+setup *tools:
+    @contrib/bin/setup.sh {{tools}}

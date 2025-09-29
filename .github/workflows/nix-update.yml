@@ -51,4 +51,4 @@ jobs:
         run: |
           gh pr merge --auto -ds ${{ steps.create-pr.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ github.token }}

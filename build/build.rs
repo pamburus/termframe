@@ -1,5 +1,5 @@
 // std imports
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, env, fs, path::PathBuf, sync::LazyLock};
 
 // third-party imports
 use voca_rs::case::kebab_case;
@@ -8,15 +8,20 @@ const THEME_EXTENSION: &str = ".toml";
 const THEME_DIR: &str = "assets/themes";
 const THEME_ALIASES: &str = "assets/themes/.aliases.json";
 
+static ROOT: LazyLock<PathBuf> =
+    LazyLock::new(|| PathBuf::from(env::var("ROOT").unwrap_or_else(|_| ".".to_string())));
+
 fn main() {
     update_theme_aliases();
 }
 
 fn update_theme_aliases() {
     let mut aliases = BTreeMap::<String, String>::new();
+    let theme_dir = ROOT.join(THEME_DIR);
+    let theme_aliases = ROOT.join(THEME_ALIASES);
 
-    println!("cargo:rerun-if-changed={THEME_DIR}");
-    for entry in std::fs::read_dir(THEME_DIR).unwrap() {
+    println!("cargo:rerun-if-changed={}", theme_dir.display());
+    for entry in fs::read_dir(&theme_dir).unwrap() {
         let entry = entry.unwrap();
         let path = entry.path();
         let name = path.file_name().unwrap().to_str().unwrap();
@@ -31,15 +36,15 @@ fn update_theme_aliases() {
         }
     }
 
-    if let Ok(existing) = std::fs::read(THEME_ALIASES) {
+    if let Ok(existing) = fs::read(&theme_aliases) {
         let existing: BTreeMap<String, String> = serde_json::from_slice(&existing).unwrap();
         if existing == aliases {
             return;
         }
     }
 
-    std::fs::write(
-        THEME_ALIASES,
+    fs::write(
+        &theme_aliases,
         serde_json::to_string_pretty(&aliases).unwrap(),
     )
     .unwrap();

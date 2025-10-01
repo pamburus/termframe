@@ -6,7 +6,7 @@ export RUSTFLAGS="-C instrument-coverage"
 export CARGO_TARGET_DIR="target/coverage"
 export LLVM_PROFILE_FILE="target/coverage/test-%m-%p.profraw"
 export MAIN_EXECUTABLE="target/coverage/debug/termframe"
-export TIDY_THEMES_EXE="target/coverage/debug/tidy-themes"
+export TIDY_THEMES_EXE="target/coverage/debug/examples/tidy-themes"
 
 LLVM_BIN=$(rustc --print sysroot)/lib/rustlib/$(rustc -vV | sed -n 's|host: ||p')/bin
 
@@ -42,6 +42,7 @@ function clean() {
 function test() {
     cargo test --tests --workspace
     cargo build --workspace
+    cargo build --manifest-path tools/tidy-themes/Cargo.toml --example tidy-themes
     ${MAIN_EXECUTABLE:?} --config - --help > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --shell-completions zsh > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --man-page > /dev/null

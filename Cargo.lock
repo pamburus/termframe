@@ -2867,7 +2867,7 @@ dependencies = [
 
 [[package]]
 name = "termframe"
-version = "0.6.4"
+version = "0.6.5-alpha.1"
 dependencies = [
  "allsorts",
  "anyhow",
@@ -2909,6 +2909,7 @@ dependencies = [
  "term_size",
  "termwiz",
  "thiserror 2.0.16",
+ "tidy-themes",
  "toml",
  "ureq",
  "url",
@@ -3028,6 +3029,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.106",
+]
+
+[[package]]
+name = "tidy-themes"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "voca_rs",
 ]
 
 [[package]]

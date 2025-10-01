@@ -1,11 +1,12 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
 export RUSTFLAGS="-C instrument-coverage"
 export CARGO_TARGET_DIR="target/coverage"
 export LLVM_PROFILE_FILE="target/coverage/test-%m-%p.profraw"
 export MAIN_EXECUTABLE="target/coverage/debug/termframe"
+export TIDY_THEMES_EXE="target/coverage/debug/tidy-themes"
 
 LLVM_BIN=$(rustc --print sysroot)/lib/rustlib/$(rustc -vV | sed -n 's|host: ||p')/bin
 
@@ -21,6 +22,7 @@ IGNORE=(
 
 function executables() {
     echo ${MAIN_EXECUTABLE:?}
+    echo ${TIDY_THEMES_EXE:?}
     cargo test --workspace --tests --no-run --message-format=json \
     | jq -r 'select(.profile.test == true) | .filenames[]' \
     | grep -v dSYM -
@@ -39,7 +41,7 @@ function clean() {
 
 function test() {
     cargo test --tests --workspace
-    cargo build
+    cargo build --workspace
     ${MAIN_EXECUTABLE:?} --config - --help > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --shell-completions zsh > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --man-page > /dev/null
@@ -48,6 +50,19 @@ function test() {
     ${MAIN_EXECUTABLE:?} --config - --list-window-styles > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --list-fonts > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --mode dark > /dev/null
+
+    ${TIDY_THEMES_EXE:?} assets/themes target/coverage/tmp/.aliases.json
+    diff -u assets/themes/.aliases.json target/coverage/tmp/.aliases.json
+    mtime1=$(date -r assets/themes/.aliases.json +%s)
+
+    ${TIDY_THEMES_EXE:?} assets/themes target/coverage/tmp/.aliases.json
+    diff -u assets/themes/.aliases.json target/coverage/tmp/.aliases.json
+    mtime2=$(date -r assets/themes/.aliases.json +%s)
+
+    if [ ${mtime2:?} != ${mtime1:?} ]; then
+        echo "Theme aliases file has been modified without modifications in the source files"
+        exit 1
+    fi
 
     for asset in $(ls assets/test/input/*.ansi); do
         local asset_name=$(basename "${asset:?}" .ansi)

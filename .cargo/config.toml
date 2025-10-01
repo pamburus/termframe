@@ -1,0 +1,2 @@
+[alias]
+tidy-themes = "run --manifest-path tools/tidy-themes/Cargo.toml --example tidy-themes"

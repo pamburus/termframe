@@ -1,0 +1,63 @@
+name: Update dependencies
+
+on:
+  schedule:
+    - cron: "00 17 * * FRI" # Every Friday at 17:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+jobs:
+  update-themes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate token
+        id: generate-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Update dependencies
+        id: update-dependencies
+        run: |
+          cargo update 2> >(tee /dev/stderr) >/tmp/cargo-update.log
+          echo "cargo-update-log<<EOF" >> ${GITHUB_OUTPUT}
+          cat /tmp/cargo-update.log >> ${GITHUB_OUTPUT}
+          echo "EOF" >> ${GITHUB_OUTPUT}
+
+      - name: Create pull request for dependencies update
+        id: create-pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "build(deps): update dependencies"
+          branch: update-dependencies
+          title: "build(deps): update dependencies"
+          body: |
+            This pull request updates all dependencies to the latest versions according to the version restrictions specified in Cargo.toml file.
+
+            ${{ steps.update-dependencies.outputs.cargo-update-log }}
+          labels: |
+            dependencies
+            automated
+          delete-branch: true
+
+      # - name: Enable auto-merge
+      #   id: enable-auto-merge
+      #   if: steps.create-pr.outputs.pull-request-number
+      #   run: |
+      #     gh pr merge --auto -ds ${{ steps.create-pr.outputs.pull-request-number }}
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}

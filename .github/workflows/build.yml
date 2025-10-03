@@ -18,6 +18,10 @@ permissions:
   issues: read
   actions: read
 
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
 jobs:
   build:
     name: Build for ${{ matrix.name }}

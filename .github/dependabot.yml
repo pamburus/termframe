@@ -10,8 +10,8 @@ updates:
     schedule:
       interval: weekly
       day: friday
-      time: "19:00"
-      timezone: "Europe/Belgrade"
+      time: "18:00"
+      timezone: "Etc/UTC"
     allow:
       - dependency-type: all
     groups:

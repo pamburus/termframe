@@ -15,7 +15,8 @@ defaults:
     shell: bash -euo pipefail {0}
 
 jobs:
-  update-themes:
+  update-dependencies:
+    name: Update dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Generate token
@@ -33,22 +34,24 @@ jobs:
       - name: Update dependencies
         id: update-dependencies
         run: |
-          cargo update 2> >(tee /dev/stderr) >/tmp/cargo-update.log
-          echo "cargo-update-log<<EOF" >> ${GITHUB_OUTPUT}
-          cat /tmp/cargo-update.log >> ${GITHUB_OUTPUT}
-          echo "EOF" >> ${GITHUB_OUTPUT}
+          cargo update 2> >(tee /dev/stderr) | ./scripts/cargo-update-filter.sh > /tmp/cargo-update.log
+          echo "log=$(jq -Rs . < /tmp/cargo-update.log)" >> ${GITHUB_OUTPUT}
+          echo "table=$(./scripts/cargo-update-to-table.sh < /tmp/cargo-update.log | jq -Rs .)" >> ${GITHUB_OUTPUT}
 
       - name: Create pull request for dependencies update
         id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
-          commit-message: "build(deps): update dependencies"
+          commit-message: |
+            build(deps): update dependencies
+
+            ${{ fromJSON(steps.update-dependencies.outputs.log) }}
           branch: update-dependencies
           title: "build(deps): update dependencies"
           body: |
             This pull request updates all dependencies to the latest versions according to the version restrictions specified in Cargo.toml file.
 
-            ${{ steps.update-dependencies.outputs.cargo-update-log }}
+            ${{ fromJSON(steps.update-dependencies.outputs.table) }}
           labels: |
             dependencies
             automated

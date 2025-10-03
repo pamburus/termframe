@@ -15,7 +15,8 @@ defaults:
     shell: bash -euo pipefail {0}
 
 jobs:
-  update-themes:
+  update-dependencies:
+    name: Update dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Generate token

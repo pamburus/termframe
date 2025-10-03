@@ -103,8 +103,8 @@ jobs:
 
       - name: Commit version update
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.name "missionis[bot]"
+          git config --local user.email "234988995+missionis[bot]@users.noreply.github.com"
           git add Cargo.toml Cargo.lock
           git commit -m "chore(release): bump version to ${{ steps.update-version.outputs.version }}"
           git push origin "refs/heads/${{ steps.create-temp-branch.outputs.branch }}"
@@ -178,8 +178,8 @@ jobs:
         run: |
           VERSION=${{ needs.prepare-release.outputs.version }}
 
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.name "missionis[bot]"
+          git config --local user.email "234988995+missionis[bot]@users.noreply.github.com"
 
           git add nix/binary-hashes.nix
           git commit -m "build(nix): update binary hashes for v${VERSION:?}"
@@ -187,27 +187,38 @@ jobs:
           # Create final tag pointing to commit with all changes
           git tag "v${VERSION:?}"
 
-      - name: Fast-forward target branch and publish release
+      - name: Create and merge release PR
         run: |
           VERSION=${{ needs.prepare-release.outputs.version }}
           RELEASE_TAG=${{ needs.prepare-release.outputs.release-tag }}
           TEMP_BRANCH=${{ needs.prepare-release.outputs.temp-branch }}
           TARGET_BRANCH=${{ github.ref_name }}
 
-          git checkout -B "${TARGET_BRANCH:?}" "origin/${TARGET_BRANCH:?}"
-          git merge --ff-only "refs/heads/${TEMP_BRANCH:?}"
-          git push origin "refs/heads/${TARGET_BRANCH:?}"
+          # Create PR for the release
+          gh pr create \
+            --base "${TARGET_BRANCH:?}" \
+            --head "${TEMP_BRANCH:?}" \
+            --title "Release v${VERSION:?}" \
+            --body "Automated release v${VERSION:?}." \
+            --subject "merge release v${VERSION:?}" \
+            --label "release"
+
+          # Auto-merge the PR immediately
+          gh pr merge --merge -d "${TEMP_BRANCH:?}"
+
+          # Push the release tag
           git push origin "refs/tags/v${VERSION:?}"
 
+          # Publish the release
           gh release edit "${RELEASE_TAG:?}" --tag "v${VERSION:?}" --draft=false --latest
 
-          git push origin --delete "refs/heads/${TEMP_BRANCH:?}" || true
+          # Update latest tag if it exists
           if [ "$(git tag -l latest --merged HEAD)" = latest ]; then
             git tag -f latest HEAD
             git push -f origin refs/tags/latest
           fi
 
           echo "✅ Release v${VERSION:?} completed successfully!"
-          echo "🏷️ Target branch fast-forwarded and tag v${VERSION:?} pushed"
+          echo "🏷️ PR merged and tag v${VERSION:?} pushed"
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}

@@ -46,12 +46,13 @@ jobs:
             build(deps): update dependencies
 
             ${{ fromJSON(steps.update.outputs.log) }}
-          branch: update
+          branch: update-${{ github.event.repository.pushed_at }}-${{ github.run_number }}
           title: "build(deps): update dependencies"
           body: |
             Updates dependencies to latest versions per Cargo.toml constraints.
 
             ${{ fromJSON(steps.update.outputs.table) }}
+          committer: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
           labels: |
             dependencies
             automated

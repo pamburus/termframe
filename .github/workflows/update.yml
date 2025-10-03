@@ -42,11 +42,12 @@ jobs:
         id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ steps.generate-token.outputs.token }}
           commit-message: |
             build(deps): update dependencies
 
             ${{ fromJSON(steps.update.outputs.log) }}
-          branch: update-${{ github.event.repository.pushed_at }}-${{ github.run_number }}
+          branch: update-${{ github.run_number }}-${{ github.run_id }}
           title: "build(deps): update dependencies"
           body: |
             Updates dependencies to latest versions per Cargo.toml constraints.

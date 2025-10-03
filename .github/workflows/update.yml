@@ -53,10 +53,11 @@ jobs:
             Updates dependencies to latest versions per Cargo.toml constraints.
 
             ${{ fromJSON(steps.update.outputs.table) }}
+          author: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
           committer: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
           labels: |
             dependencies
-            automated
+            rust
           delete-branch: true
 
       - name: Enable auto-merge

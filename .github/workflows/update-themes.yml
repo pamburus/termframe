@@ -44,13 +44,16 @@ jobs:
         id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ steps.generate-token.outputs.token }}
           commit-message: "feat(themes): update all themes"
           branch: update-themes
           title: "chore(themes): update all themes"
           body: "This pull request updates all themes to the latest versions."
+          author: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
+          committer: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
           labels: |
             dependencies
-            automated
+            themes
           delete-branch: true
 
       - name: Enable auto-merge

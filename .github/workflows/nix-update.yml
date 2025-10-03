@@ -41,13 +41,16 @@ jobs:
         id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ steps.generate-token.outputs.token }}
           commit-message: "chore(deps): update nix flake dependencies"
           branch: update-flake-lock
           title: "chore(deps): update flake.lock"
           body: "This pull request updates the flake.lock file with the latest flake inputs."
+          author: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
+          committer: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
           labels: |
             dependencies
-            automated
+            nix
           delete-branch: true
 
       - name: Enable auto-merge

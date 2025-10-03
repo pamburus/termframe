@@ -14,8 +14,17 @@ jobs:
   update-themes:
     runs-on: ubuntu-latest
     steps:
+      - name: Generate token
+        id: generate-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
 
       - name: Install just
         uses: taiki-e/install-action@v2
@@ -26,24 +35,23 @@ jobs:
         id: update-themes
         run: just update-themes
 
-      - name: Generate token
-        id: generate-token
-        uses: tibdex/github-app-token@v2
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-
       - name: Create pull request for themes update
         id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ steps.generate-token.outputs.token }}
           commit-message: "feat(themes): update all themes"
           branch: update-themes
           title: "chore(themes): update all themes"
           body: "This pull request updates all themes to the latest versions."
-          author: "GitHub Action <action@github.com>"
           labels: |
             dependencies
             automated
           delete-branch: true
+
+      - name: Enable auto-merge
+        id: enable-auto-merge
+        if: steps.create-pr.outputs.pull-request-number
+        run: |
+          gh pr merge --auto -ds ${{ steps.create-pr.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ github.token }}

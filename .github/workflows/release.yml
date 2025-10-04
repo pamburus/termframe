@@ -200,7 +200,6 @@ jobs:
             --head "${TEMP_BRANCH:?}" \
             --title "Release v${VERSION:?}" \
             --body "Automated release v${VERSION:?}." \
-            --subject "merge release v${VERSION:?}" \
             --label "release"
 
           # Auto-merge the PR immediately

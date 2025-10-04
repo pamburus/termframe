@@ -222,3 +222,11 @@ jobs:
           echo "🏷️ PR merged and tag v${VERSION:?} pushed"
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+      - name: Trigger publish workflow
+        run: |
+          gh workflow run publish.yml \
+            --repo pamburus/action-hub \
+            --field package="termframe"
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}

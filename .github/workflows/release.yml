@@ -184,26 +184,23 @@ jobs:
           git add nix/binary-hashes.nix
           git commit -m "build(nix): update binary hashes for v${VERSION:?}"
 
+          # Push the commit to remote branch
+          git push origin "refs/heads/${{ needs.prepare-release.outputs.temp-branch }}"
+
           # Create final tag pointing to commit with all changes
           git tag "v${VERSION:?}"
 
-      - name: Create and merge release PR
+      - name: Merge into the target branch and publish release
         run: |
           VERSION=${{ needs.prepare-release.outputs.version }}
           RELEASE_TAG=${{ needs.prepare-release.outputs.release-tag }}
           TEMP_BRANCH=${{ needs.prepare-release.outputs.temp-branch }}
           TARGET_BRANCH=${{ github.ref_name }}
 
-          # Create PR for the release
-          gh pr create \
-            --base "${TARGET_BRANCH:?}" \
-            --head "${TEMP_BRANCH:?}" \
-            --title "Release v${VERSION:?}" \
-            --body "Automated release v${VERSION:?}." \
-            --label "release"
-
-          # Auto-merge the PR immediately
-          gh pr merge --merge -d "${TEMP_BRANCH:?}"
+          # Merge the temporary branch into the target branch
+          git checkout -B "${TARGET_BRANCH:?}" "origin/${TARGET_BRANCH:?}"
+          git merge "refs/heads/${TEMP_BRANCH:?}"
+          git push origin "refs/heads/${TARGET_BRANCH:?}"
 
           # Push the release tag
           git push origin "refs/tags/v${VERSION:?}"
@@ -217,12 +214,15 @@ jobs:
             git push -f origin refs/tags/latest
           fi
 
+          # Delete the temporary branch
+          git push origin --delete "refs/heads/${TEMP_BRANCH:?}" || true
+
           echo "✅ Release v${VERSION:?} completed successfully!"
-          echo "🏷️ PR merged and tag v${VERSION:?} pushed"
+          echo "🏷️ Target branch updated and tag v${VERSION:?} pushed"
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
 
-      - name: Trigger publish workflow
+      - name: Trigger publish workflow to distribute release
         run: |
           gh workflow run publish.yml \
             --repo pamburus/action-hub \

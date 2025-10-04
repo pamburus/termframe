@@ -1,8 +1,8 @@
 {
-  "0.6.5" = {
-    "termframe-linux-arm64-musl.tar.gz" = "sha256-PH5mTRfQBoJsoCE42ipK4lg5Nkdi71IncsyPXQrgLVE=";
-    "termframe-linux-x86_64-musl.tar.gz" = "sha256-TCesedFV8Edo4F9qKnsXxdavXMCaBcWm/7swlzBmiGs=";
-    "termframe-macos-arm64.tar.gz" = "sha256-K9XeVNt6TSSNUyPnSblkj7QmRDwY1VNRprjrldYDxrM=";
-    "termframe-macos-x86_64.tar.gz" = "sha256-V0o43KgyS2hwrXqIKCpT2oN+MCZ/KDoNdN1rgDrKeVw=";
+  "0.6.6" = {
+    "termframe-linux-arm64-musl.tar.gz" = "sha256-J6nnadNXcVQ78O3Hb4zhb89/HPILCQ8IZsUWi8gZAJQ=";
+    "termframe-linux-x86_64-musl.tar.gz" = "sha256-hiwbp3tB++YyKGJKWFIKIdZMVv5WaYUQoEfxLtv7Q/s=";
+    "termframe-macos-arm64.tar.gz" = "sha256-Cnf6BhCYWOQtIIuoFo/zvzO9+jsQHWeQOghO6IS+QZA=";
+    "termframe-macos-x86_64.tar.gz" = "sha256-yPVjkk4siVgFUD+pr8UJs4pTxTDzMKkA5rKexznT5is=";
   };
 }

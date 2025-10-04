@@ -145,7 +145,7 @@ jobs:
 
       - name: Package using `7z`
         if: matrix.archiver == '7z' && matrix.universal == false
-        run: 7z a ${{ matrix.asset }} .\target\${{ matrix.target }}\release\termframe.exe
+        run: 7z a ${{ matrix.asset }} ./target/${{ matrix.target }}/release/termframe.exe
 
       - name: Make universal binary
         if: matrix.family == 'macos' && matrix.universal == true

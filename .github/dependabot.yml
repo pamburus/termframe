@@ -11,6 +11,9 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "04:00"
+    labels:
+      - "dependencies"
+      - "github-actions"
     commit-message:
       prefix: "build"
       include: "scope"

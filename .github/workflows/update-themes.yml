@@ -40,9 +40,26 @@ jobs:
 
       - name: Update themes
         id: update-themes
-        run: just update-themes
+        run: |
+          just update-themes
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "::set-output name=updated::false"
+          else
+            echo "::set-output name=updated::true"
+          fi
+
+      - name: Install cargo-edit
+        if: steps.update-themes.outputs.updated == 'true'
+        run: cargo install cargo-edit
+
+      - name: Update version in Cargo.toml
+        if: steps.update-themes.outputs.updated == 'true'
+        id: update-version
+        run: |
+          cargo set-version --package ${{ github.event.repository.name }} --bump alpha
 
       - name: Create pull request for themes update
+        if: steps.update-themes.outputs.updated == 'true'
         id: create-pr
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:

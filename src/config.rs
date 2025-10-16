@@ -3,13 +3,14 @@ use std::{
     collections::HashMap,
     fmt, include_str,
     path::{Path, PathBuf},
+    str::FromStr,
     sync::LazyLock,
 };
 
 // third-party imports
 use anyhow::{Context, Result};
 use config::{Config, File, FileFormat};
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 
 // local imports
 use crate::appdirs::AppDirs;
@@ -209,11 +210,11 @@ pub struct FontFaceFallback {
 }
 
 /// Terminal settings structure.
-#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub struct Terminal {
-    pub width: u16,
-    pub height: u16,
+    pub width: Dimension<u16>,
+    pub height: Dimension<u16>,
 }
 
 /// Font settings structure.
@@ -495,4 +496,202 @@ impl SourceFile {
 /// Trait for patching settings.
 pub trait Patch {
     fn patch(&self, settings: Settings) -> Settings;
+}
+
+/// Dimension enumeration supporting fixed values, auto-sizing, and range constraints.
+#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+pub enum Dimension<T> {
+    Auto,
+    Limited { min: Option<T>, max: Option<T> },
+    Fixed(T),
+}
+
+impl<T> From<T> for Dimension<T> {
+    fn from(value: T) -> Self {
+        Self::Fixed(value)
+    }
+}
+
+impl<'de, T> Deserialize<'de> for Dimension<T>
+where
+    T: Deserialize<'de> + FromStr + Copy,
+    T::Err: std::fmt::Display,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserialize_dimension(deserializer)
+    }
+}
+
+impl<T> Dimension<T>
+where
+    T: PartialOrd + Copy,
+{
+    /// Get the minimum value of the dimension if it exists.
+    pub fn min(&self) -> Option<T> {
+        match self {
+            Self::Auto => None,
+            Self::Limited { min, .. } => *min,
+            Self::Fixed(value) => Some(*value),
+        }
+    }
+
+    /// Get the maximum value of the dimension if it exists.
+    pub fn max(&self) -> Option<T> {
+        match self {
+            Self::Auto => None,
+            Self::Limited { max, .. } => *max,
+            Self::Fixed(value) => Some(*value),
+        }
+    }
+
+    /// Resolve the dimension to a fixed value based on the provided default.
+    pub fn resolve(&self, default: T) -> T {
+        match self {
+            Self::Auto => default,
+            Self::Limited { min, max } => {
+                let mut value = default;
+                if let Some(min) = min {
+                    if value < *min {
+                        value = *min;
+                    }
+                }
+                if let Some(max) = max {
+                    if value > *max {
+                        value = *max;
+                    }
+                }
+                value
+            }
+            Self::Fixed(value) => *value,
+        }
+    }
+}
+
+/// Range type for parsing range syntax like "80..", "..120", "80..120"
+#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+pub struct PartialRange<T> {
+    pub min: Option<T>,
+    pub max: Option<T>,
+}
+
+impl<T> FromStr for PartialRange<T>
+where
+    T: FromStr + Copy,
+{
+    type Err = RangeParseError<T>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let Some(dot_pos) = s.find("..") else {
+            return Err(RangeParseError::MissingDots);
+        };
+
+        if s[dot_pos + 2..].contains("..") {
+            return Err(RangeParseError::InvalidFormat);
+        }
+
+        let (min_str, max_str) = s.split_at(dot_pos);
+        let max_str = &max_str[2..]; // Skip the ".."
+
+        let min = if min_str.is_empty() {
+            None
+        } else {
+            Some(
+                min_str
+                    .parse::<T>()
+                    .map_err(RangeParseError::BoundParseError)?,
+            )
+        };
+
+        let max = if max_str.is_empty() {
+            None
+        } else {
+            Some(
+                max_str
+                    .parse::<T>()
+                    .map_err(RangeParseError::BoundParseError)?,
+            )
+        };
+
+        Ok(PartialRange { min, max })
+    }
+}
+
+pub enum RangeParseError<T>
+where
+    T: FromStr + Copy,
+{
+    MissingDots,
+    InvalidFormat,
+    BoundParseError(T::Err),
+}
+
+impl<T> std::fmt::Display for RangeParseError<T>
+where
+    T: FromStr + Copy,
+    T::Err: std::fmt::Display,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            RangeParseError::MissingDots => write!(f, "expected range syntax with '..'"),
+            RangeParseError::InvalidFormat => write!(f, "invalid range format"),
+            RangeParseError::BoundParseError(e) => write!(f, "bound parse error: {}", e),
+        }
+    }
+}
+
+impl<'de, T> Deserialize<'de> for PartialRange<T>
+where
+    T: FromStr + Copy,
+    T::Err: std::fmt::Display,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = <&str>::deserialize(deserializer)?;
+        Self::from_str(s).map_err(serde::de::Error::custom)
+    }
+}
+
+/// Custom deserializer for Dimension that supports range syntax
+fn deserialize_dimension<'de, D, T>(deserializer: D) -> Result<Dimension<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de> + FromStr + Copy,
+    T::Err: std::fmt::Display,
+{
+    #[derive(Deserialize)]
+    #[serde(rename_all = "kebab-case")]
+    #[serde(untagged)]
+    enum DimensionInternal<T> {
+        Auto,
+        Limited { min: Option<T>, max: Option<T> },
+        Fixed(T),
+    }
+
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum Helper<T>
+    where
+        T: FromStr + Copy,
+        T::Err: std::fmt::Display,
+    {
+        Range(PartialRange<T>),
+        Original(DimensionInternal<T>),
+    }
+
+    match Helper::deserialize(deserializer)? {
+        Helper::Range(range) => Ok(Dimension::Limited {
+            min: range.min,
+            max: range.max,
+        }),
+        Helper::Original(dim) => match dim {
+            DimensionInternal::Auto => Ok(Dimension::Auto),
+            DimensionInternal::Limited { min, max } => Ok(Dimension::Limited { min, max }),
+            DimensionInternal::Fixed(val) => Ok(Dimension::Fixed(val)),
+        },
+    }
 }

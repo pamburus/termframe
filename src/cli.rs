@@ -1,5 +1,5 @@
 // std imports
-use std::fmt;
+use std::{fmt, str::FromStr};
 
 // third-party imports
 use clap::{
@@ -11,7 +11,7 @@ use clap_complete::Shell;
 use enumset_ext::convert::str::EnumSet;
 
 // local imports
-use crate::config::{self, FontFamilyOption, PaddingOption, Settings, ThemeSetting};
+use crate::config::{self, FontFamilyOption, PaddingOption, PartialRange, Settings, ThemeSetting};
 
 const STYLES: Styles = Styles::styled()
     .header(AnsiColor::Green.on_default().bold())
@@ -27,12 +27,12 @@ pub struct Opt {
     pub bootstrap: BootstrapArgs,
 
     /// Width of the virtual terminal window.
-    #[arg(long, short = 'W', default_value_t = cfg().terminal.width, overrides_with = "width", value_name = "COLUMNS")]
-    pub width: u16,
+    #[arg(long, short = 'W', default_value_t = cfg().terminal.width.into(), overrides_with = "width", value_name = "COLUMNS")]
+    pub width: Dimension<u16>,
 
     /// Height of the virtual terminal window.
-    #[arg(long, short = 'H', default_value_t = cfg().terminal.height, overrides_with = "height", value_name = "LINES")]
-    pub height: u16,
+    #[arg(long, short = 'H', default_value_t = cfg().terminal.height.into(), overrides_with = "height", value_name = "LINES")]
+    pub height: Dimension<u16>,
 
     /// Override padding for the inner text in font size units.
     #[arg(long, overrides_with = "padding", value_name = "EM")]
@@ -180,8 +180,8 @@ impl config::Patch for Opt {
     fn patch(&self, settings: Settings) -> Settings {
         let mut settings = settings;
 
-        settings.terminal.width = self.width;
-        settings.terminal.height = self.height;
+        settings.terminal.width = self.width.into();
+        settings.terminal.height = self.height.into();
         if !self.font_family.is_empty() {
             settings.font.family = FontFamilyOption::Multiple(self.font_family.clone());
         }
@@ -316,7 +316,7 @@ impl From<FontWeight> for config::FontWeight {
     }
 }
 
-impl std::str::FromStr for FontWeight {
+impl FromStr for FontWeight {
     type Err = String;
 
     /// Parses a string into a `FontWeight`.
@@ -355,6 +355,133 @@ impl fmt::Display for FontWeight {
             Self::Normal => write!(f, "normal"),
             Self::Bold => write!(f, "bold"),
             Self::Fixed(weight) => write!(f, "{weight}"),
+        }
+    }
+}
+
+/// Font family option enumeration.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Dimension<T> {
+    Auto,
+    Limited { min: Option<T>, max: Option<T> },
+    Fixed(T),
+}
+
+impl<T> Dimension<T> {
+    pub fn max(self) -> Option<T> {
+        match self {
+            Self::Fixed(value) => Some(value),
+            Self::Limited { max, .. } => max,
+            Self::Auto => None,
+        }
+    }
+
+    pub fn min(self) -> Option<T> {
+        match self {
+            Self::Fixed(value) => Some(value),
+            Self::Limited { min, .. } => min,
+            Self::Auto => None,
+        }
+    }
+
+    pub fn limit(self, mut value: T) -> T
+    where
+        T: PartialOrd + Ord,
+    {
+        match self {
+            Self::Fixed(value) => value,
+            Self::Limited { min, max } => {
+                if let Some(min) = min {
+                    value = value.max(min);
+                }
+                if let Some(max) = max {
+                    value = value.min(max);
+                }
+                value
+            }
+            Self::Auto => value,
+        }
+    }
+}
+
+impl<T> From<config::Dimension<T>> for Dimension<T> {
+    fn from(value: config::Dimension<T>) -> Self {
+        match value {
+            config::Dimension::Auto => Self::Auto,
+            config::Dimension::Limited { min, max } => Self::Limited { min, max },
+            config::Dimension::Fixed(value) => Self::Fixed(value),
+        }
+    }
+}
+
+impl<T> From<Dimension<T>> for config::Dimension<T> {
+    fn from(value: Dimension<T>) -> Self {
+        match value {
+            Dimension::Auto => Self::Auto,
+            Dimension::Limited { min, max } => Self::Limited { min, max },
+            Dimension::Fixed(value) => Self::Fixed(value),
+        }
+    }
+}
+
+impl<T> fmt::Display for Dimension<T>
+where
+    T: fmt::Display,
+{
+    /// Formats the `Dimension` for display.
+    ///
+    /// # Arguments
+    ///
+    /// * `f` - The formatter.
+    ///
+    /// # Returns
+    ///
+    /// A `fmt::Result`.
+    ///
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Auto => write!(f, "auto"),
+            Self::Limited { min, max } => match (min, max) {
+                (Some(min), Some(max)) => write!(f, "{min}..{max}"),
+                (Some(min), None) => write!(f, "{min}.."),
+                (None, Some(max)) => write!(f, "..{max}"),
+                (None, None) => write!(f, ".."),
+            },
+            Self::Fixed(value) => write!(f, "{value}"),
+        }
+    }
+}
+
+impl<T> FromStr for Dimension<T>
+where
+    T: FromStr + Clone + Copy + fmt::Display + Eq + PartialEq,
+    <T as FromStr>::Err: fmt::Display,
+{
+    type Err = String;
+
+    /// Parses a string into a `FontWeight`.
+    ///
+    /// # Arguments
+    ///
+    /// * `s` - The string to parse.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the parsed `FontWeight` or an error message.
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "auto" => Ok(Self::Auto),
+            s if s.contains("..") => {
+                let range = PartialRange::from_str(s).map_err(|e| e.to_string())?;
+                Ok(Self::Limited {
+                    min: range.min,
+                    max: range.max,
+                })
+            }
+            s => match s.parse() {
+                Ok(value) => Ok(Self::Fixed(value)),
+                Err(_) => Err(format!("Invalid dimension value: {s}")),
+            },
         }
     }
 }

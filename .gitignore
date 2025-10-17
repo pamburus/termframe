@@ -1,5 +1,6 @@
 /.vscode
 /.tmp
+/.zed
 /target
 /output.svg
 /*.ansi

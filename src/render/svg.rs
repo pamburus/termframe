@@ -409,9 +409,19 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
     if cfg.window.shadow && opt.window.shadow.enabled {
         let shadow = &opt.window.shadow;
         window = window
-            .add(element::Filter::new().set("id", "shadow").add(
-                element::FilterEffectGaussianBlur::new().set("stdDeviation", shadow.blur.r2p(fp)),
-            ))
+            .add(
+                element::Filter::new()
+                    .set("id", "shadow")
+                    .set("filterUnits", "userSpaceOnUse")
+                    .set("x", "-32")
+                    .set("y", "-24")
+                    .set("width", (width + 72.0).r2p(fp))
+                    .set("height", (height + 72.0).r2p(fp))
+                    .add(
+                        element::FilterEffectGaussianBlur::new()
+                            .set("stdDeviation", shadow.blur.r2p(fp)),
+                    ),
+            )
             .add(
                 element::Rectangle::new()
                     .set("width", width)

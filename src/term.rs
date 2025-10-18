@@ -161,17 +161,87 @@ impl Terminal {
     }
 
     pub fn recommended_width(&self) -> u16 {
-        // Compute recommended width from the full transcript (scrollback + visible),
-        // by joining logical lines across wrapped rows and measuring trimmed widths.
-        let logicals = self.join_logical_lines(self.transcript_lines());
-        let mut max_width = 0usize;
-        for ln in &logicals {
-            let w = Self::trimmed_line_width(ln);
-            if w > max_width {
-                max_width = w;
+        self.process_logical_lines_with_accumulator(0usize, |max_width, width| {
+            if width > *max_width {
+                *max_width = width;
             }
+        }) as u16
+    }
+
+    /// Process logical lines from the transcript with a flexible accumulator pattern.
+    /// The callback receives a mutable reference to the accumulator and the width of each logical line.
+    /// This allows for various aggregation patterns (max, sum, count, etc.).
+    ///
+    /// OPTIMIZATION: Iterates over transcript references (scrollback + visible) without cloning.
+    /// Scrollback lines are borrowed as &Line, visible lines use Cow::as_ref().
+    fn process_logical_lines_with_accumulator<T, F>(&self, mut accumulator: T, mut callback: F) -> T
+    where
+        F: FnMut(&mut T, usize),
+    {
+        let mut logical_width = 0usize;
+        let mut prev_wrapped = false;
+
+        // Process scrollback lines (already owned, borrow as &Line)
+        for line in &self.state.scrollback {
+            let this_wrapped = line.last_cell_was_wrapped();
+
+            if prev_wrapped {
+                // Previous row wrapped, so this continues the same logical line
+                logical_width += Self::trimmed_line_width(line);
+            } else {
+                // Previous row did not wrap; finish that logical line and start a new one
+                if logical_width > 0 {
+                    callback(&mut accumulator, logical_width);
+                }
+                logical_width = Self::trimmed_line_width(line);
+            }
+
+            prev_wrapped = this_wrapped;
         }
-        max_width as u16
+
+        // Process visible lines (as Cow references, avoid into_owned())
+        for cow_line in self.surface.screen_lines() {
+            let line = cow_line.as_ref();
+            let this_wrapped = line.last_cell_was_wrapped();
+
+            if prev_wrapped {
+                // Previous row wrapped, so this continues the same logical line
+                logical_width += Self::trimmed_line_width(line);
+            } else {
+                // Previous row did not wrap; finish that logical line and start a new one
+                if logical_width > 0 {
+                    callback(&mut accumulator, logical_width);
+                }
+                logical_width = Self::trimmed_line_width(line);
+            }
+
+            prev_wrapped = this_wrapped;
+        }
+
+        // Don't forget the final logical line
+        if logical_width > 0 {
+            callback(&mut accumulator, logical_width);
+        }
+
+        accumulator
+    }
+
+    /// Example method demonstrating reusability: count total logical lines in transcript.
+    /// This shows how process_logical_lines_with_accumulator can be used for different aggregations.
+    #[allow(dead_code)]
+    pub fn count_logical_lines(&self) -> usize {
+        self.process_logical_lines_with_accumulator(0usize, |count, _width| {
+            *count += 1;
+        })
+    }
+
+    /// Example method demonstrating reusability: compute total character width across all logical lines.
+    /// This shows another aggregation pattern using the same building block.
+    #[allow(dead_code)]
+    pub fn total_logical_width(&self) -> usize {
+        self.process_logical_lines_with_accumulator(0usize, |total, width| {
+            *total += width;
+        })
     }
 
     pub fn set_width(&mut self, width: u16) {
@@ -211,6 +281,9 @@ impl Terminal {
         self.size.rows = height;
     }
 
+    /// Build owned transcript lines (scrollback + visible).
+    /// This clones data and is used when owned Lines are needed for operations
+    /// like wrapping. For read-only operations, consider transcript_line_refs().
     fn transcript_lines(&self) -> Vec<Line> {
         let mut out: Vec<Line> = Vec::new();
         // append scrollback lines (chronological order)
@@ -239,6 +312,16 @@ impl Terminal {
     }
 
     fn join_logical_lines(&self, lines: Vec<Line>) -> Vec<Line> {
+        self.join_logical_lines_from_iter(lines.into_iter())
+    }
+
+    /// Join logical lines from an iterator of owned Lines.
+    /// This is the core logical line joining implementation that both
+    /// join_logical_lines() and other methods can reuse.
+    fn join_logical_lines_from_iter<I>(&self, lines: I) -> Vec<Line>
+    where
+        I: Iterator<Item = Line>,
+    {
         let seq = self.surface.current_seqno();
         let mut out: Vec<Line> = Vec::new();
         let mut current: Option<Line> = None;
@@ -1235,6 +1318,52 @@ mod tests {
     }
 
     #[test]
+    fn test_recommended_width_with_scrollback_optimization() {
+        // Test that the optimized recommended_width implementation works correctly
+        // with both scrollback and visible content, including wrapped lines
+        let mut term = Terminal::new(Options {
+            cols: Some(6),
+            rows: Some(3),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        // First line: "hello!" (6 chars, fits in one row)
+        let mut reader = Cursor::new(b"hello!\n".as_ref());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // Second line: "verylongline" (12 chars, wraps to 2 rows: "verylo" + "ngline")
+        let mut reader = Cursor::new(b"verylongline\n".as_ref());
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // Third line: "short" (5 chars, fits in one row)
+        let mut reader = Cursor::new(b"short\n".as_ref());
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // At this point we should have scrolled since we have more than 3 rows of content
+        // The recommended width should be 12 (from "verylongline")
+        assert_eq!(term.recommended_width(), 12);
+
+        // Add another very long line to test with more scrollback content
+        let mut reader = Cursor::new(b"superlonglinethatis21".as_ref());
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // Now the recommended width should be 21
+        assert_eq!(term.recommended_width(), 21);
+
+        // Verify that we can still measure correctly with different content distributions
+        // across scrollback and visible areas
+        let surface_height = term.surface.dimensions().1;
+        let scrollback_count = term.state.scrollback.len();
+
+        // Ensure we actually have content in both scrollback and visible areas
+        assert!(scrollback_count > 0, "Should have scrollback content");
+        assert!(surface_height > 0, "Should have visible content");
+    }
+
+    #[test]
     fn test_long_lines_with_scroll_no_merge_and_correct_width() {
         // width=8, height=7; two long logical lines that will soft-wrap
         let mut term = Terminal::new(Options {
@@ -1463,6 +1592,50 @@ mod tests {
         // After rewrap to width=9, all three lines fit as single rows
         term.set_width(9);
         assert_eq!(term.recommended_height(), 3);
+    }
+
+    #[test]
+    fn test_building_blocks_reusability() {
+        // Test that our building blocks work correctly and can be reused for different computations
+        let mut term = Terminal::new(Options {
+            cols: Some(6),
+            rows: Some(2),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        // Add some content: "hello\n" + "verylongline\n" + "short"
+        let mut reader = Cursor::new(b"hello\nverylongline\nshort".as_ref());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // Test different uses of the same building block
+        let recommended_width = term.recommended_width();
+        let logical_line_count = term.count_logical_lines();
+        let total_width = term.total_logical_width();
+
+        // Verify expected values
+        assert_eq!(
+            recommended_width, 12,
+            "longest line should be 'verylongline' (12 chars)"
+        );
+        assert_eq!(logical_line_count, 3, "should have 3 logical lines");
+        assert_eq!(
+            total_width,
+            5 + 12 + 5,
+            "total should be sum of all logical line widths"
+        );
+
+        // Verify that our building block produces the same recommended_width as the original would
+        // by checking it matches the longest individual logical line
+        let mut max_individual = 0;
+        term.process_logical_lines_with_accumulator((), |_acc, width| {
+            if width > max_individual {
+                max_individual = width;
+            }
+        });
+        assert_eq!(recommended_width as usize, max_individual);
     }
 
     #[test]

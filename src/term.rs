@@ -99,7 +99,7 @@ impl Terminal {
 
             self.parser.parse(buffer, |action| {
                 let (bx, by) = self.surface.cursor_position();
-                log::debug!("parse: action={:?}, cursor_before=({}, {})", action, bx, by);
+                log::trace!("parse: action={:?}, cursor_before=({}, {})", action, bx, by);
                 let seq = Self::apply_action_with_autowrap(
                     &mut self.surface,
                     &mut self.state,
@@ -107,7 +107,7 @@ impl Terminal {
                     action,
                 );
                 let (ax, ay) = self.surface.cursor_position();
-                log::debug!("parse: cursor_after=({}, {}), seq={}", ax, ay, seq);
+                log::trace!("parse: cursor_after=({}, {}), seq={}", ax, ay, seq);
                 self.surface.flush_changes_older_than(seq);
             });
 
@@ -491,11 +491,11 @@ impl Terminal {
             Action::PrintString(s) => surface.add_change(s),
             Action::Control(code) => match code {
                 ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed => {
-                    log::debug!("Control: LF/VT/FF -> CRLF");
+                    log::trace!("Control: LF/VT/FF -> CRLF");
                     surface.add_change("\r\n")
                 }
                 ControlCode::CarriageReturn => {
-                    log::debug!("Control: CR");
+                    log::trace!("Control: CR");
                     surface.add_change("\r")
                 }
                 ControlCode::HorizontalTab => surface.add_change(Change::CursorPosition {
@@ -1053,7 +1053,7 @@ impl Terminal {
     ) -> SequenceNo {
         // Cursor prior to applying the action
         let (x0, y0) = surface.cursor_position();
-        log::debug!(
+        log::trace!(
             "autowrap: before action={:?}, cursor=({}, {})",
             action,
             x0,
@@ -1119,7 +1119,7 @@ impl Terminal {
         let seq = Self::apply_action(surface, st, &mut writer, action.clone());
 
         let (x1, y1) = surface.cursor_position();
-        log::debug!(
+        log::trace!(
             "autowrap: after action={:?}, cursor=({}, {}), seq={}",
             action,
             x1,
@@ -1206,7 +1206,7 @@ impl Terminal {
                     ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
                 ) && y0 == h.saturating_sub(1)
                 {
-                    log::debug!(
+                    log::trace!(
                         "autowrap: detected scroll caused by {:?}; rotating ledger",
                         code
                     );
@@ -1224,7 +1224,7 @@ impl Terminal {
     fn mark_row_soft_wrapped(surface: &mut Surface, row: usize, _seq: SequenceNo) {
         let (w, h) = surface.dimensions();
         if row >= h || w == 0 {
-            log::debug!("mark_row_soft_wrapped: row {} out of range (h={})", row, h);
+            log::trace!("mark_row_soft_wrapped: row {} out of range (h={})", row, h);
             return;
         }
 
@@ -1242,7 +1242,7 @@ impl Terminal {
 
         let was = cells[idx].attrs().wrapped();
         cells[idx].attrs_mut().set_wrapped(true);
-        log::debug!(
+        log::trace!(
             "mark_row_soft_wrapped: row {} cell {} wrapped: {} -> true",
             row,
             idx,

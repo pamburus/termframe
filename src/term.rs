@@ -207,73 +207,8 @@ impl Terminal {
 
     pub fn set_height(&mut self, height: u16) {
         let w = self.surface.dimensions().0;
-        self.reflow_transcript_to_window(w, height as usize);
+        self.unscroll_to_window(w, height as usize);
         self.size.rows = height;
-    }
-
-    /// Return the minimum column width needed so that no soft-wrapped line
-    /// in `surface` would wrap (i.e., a width that fits the longest logical line).
-    pub fn min_width_to_unwrap(&self) -> usize {
-        let (_w, h) = self.surface.dimensions();
-
-        // Compute width of a physical row, ignoring trailing spaces
-        let trimmed_row_width = |row: usize| -> usize {
-            if let Some(line) = self.surface.screen_lines().get(row) {
-                let mut width = 0usize;
-                for cell in line.visible_cells() {
-                    // Ignore trailing/blank cells
-                    if cell.str().trim().is_empty() {
-                        continue;
-                    }
-                    let end = cell.cell_index() + cell.width().max(1);
-                    if end > width {
-                        width = end;
-                    }
-                }
-                width
-            } else {
-                0
-            }
-        };
-
-        // Check whether a given row has any non-space content
-        let has_non_space = |row: usize| -> bool {
-            self.surface
-                .screen_lines()
-                .get(row)
-                .map(|line| line.visible_cells().any(|c| !c.str().trim().is_empty()))
-                .unwrap_or(false)
-        };
-
-        let mut max_width = 0usize;
-        let mut i = 0usize;
-
-        // Walk physical rows, summing widths across soft-wrapped sequences.
-        while i < h {
-            // Start a new logical line at row i
-            let mut logical_width = trimmed_row_width(i);
-
-            // While the ledger indicates continuation and the next row has content,
-            // accumulate widths from subsequent rows.
-            while i + 1 < h {
-                let cur_is_wrapped = *self.state.wrap_flags.get(i).unwrap_or(&false);
-
-                if cur_is_wrapped && has_non_space(i + 1) {
-                    i += 1;
-                    logical_width += trimmed_row_width(i);
-                    continue;
-                }
-                break;
-            }
-
-            if logical_width > max_width {
-                max_width = logical_width;
-            }
-
-            i += 1;
-        }
-
-        max_width
     }
 
     fn transcript_lines(&self) -> Vec<Line> {
@@ -335,10 +270,11 @@ impl Terminal {
         out
     }
 
-    /// Reflow the full transcript to `new_width` and materialize the bottom `window_height` rows.
-    /// This updates scrollback (rows above the window), resizes the surface to the provided
-    /// width and height, renders the visible window, and refreshes wrap flags.
-    fn reflow_transcript_to_window(&mut self, new_width: usize, window_height: usize) {
+    /// Unscroll the transcript to a given window:
+    /// - Reflow the full transcript to `new_width`
+    /// - Materialize the bottom `window_height` rows on the Surface
+    /// - Rebuild scrollback and refresh wrap flags for visible rows
+    fn unscroll_to_window(&mut self, new_width: usize, window_height: usize) {
         let seq = self.surface.current_seqno();
 
         // 1) Build logical lines from full transcript (scrollback + visible).
@@ -393,10 +329,10 @@ impl Terminal {
     }
 
     /// Rewrap the whole surface to `new_width`, merging previously wrapped rows,
-    /// keeping the current viewport height.
+    /// while keeping the current viewport height unchanged.
     fn rewrap_surface(&mut self, new_width: usize) -> usize {
         let (_, h) = self.surface.dimensions();
-        self.reflow_transcript_to_window(new_width, h);
+        self.unscroll_to_window(new_width, h);
         self.surface.current_seqno()
     }
 
@@ -773,12 +709,6 @@ impl State {
                 *last = false;
             }
         }
-    }
-
-    /// Set a new scrollback limit and trim existing scrollback if needed.
-    fn set_scrollback_limit(&mut self, limit: usize) {
-        self.scrollback_limit = limit;
-        self.trim_scrollback_to_limit();
     }
 
     /// Push a line into scrollback and enforce the limit.
@@ -1395,16 +1325,16 @@ impl Terminal {
             let (w, h) = surface.dimensions();
             match &action {
                 Action::Print(ch) => {
-                    if *ch != '\n' && *ch != '\r' {
-                        if let Some(ch_width) = UnicodeWidthChar::width(*ch) {
-                            if ch_width > 0 {
-                                let cap = w.saturating_sub(x0);
-                                if y0 == h.saturating_sub(1) && ch_width > cap {
-                                    // one row will scroll out from the top
-                                    if let Some(cow) = surface.screen_lines().get(0) {
-                                        st.push_scrollback_line(cow.clone().into_owned());
-                                    }
-                                }
+                    if *ch != '\n'
+                        && *ch != '\r'
+                        && let Some(ch_width) = UnicodeWidthChar::width(*ch)
+                        && ch_width > 0
+                    {
+                        let cap = w.saturating_sub(x0);
+                        if y0 == h.saturating_sub(1) && ch_width > cap {
+                            // one row will scroll out from the top
+                            if let Some(cow) = surface.screen_lines().first() {
+                                st.push_scrollback_line(cow.clone().into_owned());
                             }
                         }
                     }
@@ -1435,12 +1365,10 @@ impl Terminal {
                     if matches!(
                         code,
                         ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
-                    ) {
-                        if y0 == h.saturating_sub(1) {
-                            if let Some(cow) = surface.screen_lines().get(0) {
-                                st.push_scrollback_line(cow.clone().into_owned());
-                            }
-                        }
+                    ) && y0 == h.saturating_sub(1)
+                        && let Some(cow) = surface.screen_lines().first()
+                    {
+                        st.push_scrollback_line(cow.clone().into_owned());
                     }
                 }
                 _ => {}
@@ -1536,14 +1464,13 @@ impl Terminal {
                 if matches!(
                     code,
                     ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
-                ) {
-                    if y0 == h.saturating_sub(1) {
-                        log::debug!(
-                            "autowrap: detected scroll caused by {:?}; rotating ledger",
-                            code
-                        );
-                        st.rotate_on_scroll();
-                    }
+                ) && y0 == h.saturating_sub(1)
+                {
+                    log::debug!(
+                        "autowrap: detected scroll caused by {:?}; rotating ledger",
+                        code
+                    );
+                    st.rotate_on_scroll();
                 }
             }
             _ => {}

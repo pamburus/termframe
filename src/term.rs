@@ -964,6 +964,160 @@ mod tests {
         // A single logical line "abcdef" should yield recommended_width = 6
         assert_eq!(term.recommended_width(), 6);
     }
+
+    #[test]
+    fn test_long_lines_with_scroll_no_merge_and_correct_width() {
+        // width=8, height=5; two long logical lines that will soft-wrap
+        let mut term = Terminal::new(Options {
+            cols: Some(8),
+            rows: Some(5),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        let s1: String = std::iter::repeat('A').take(17).collect(); // 17 columns
+        let s2: String = std::iter::repeat('B').take(18).collect(); // 18 columns
+        let input = format!("{}\n{}\n", s1, s2);
+
+        let mut reader = std::io::Cursor::new(input.into_bytes());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // Reconstruct logical lines by joining rows while the previous row was wrapped.
+        let mut logicals: Vec<String> = Vec::new();
+        let mut acc = String::new();
+        let mut prev_wrapped = false;
+
+        for cow in term.surface().screen_lines() {
+            let line = cow;
+            let mut text = String::new();
+            for cell in line.visible_cells() {
+                text.push_str(cell.str());
+            }
+            let trimmed = text.trim_end();
+
+            if acc.is_empty() {
+                acc.push_str(trimmed);
+            } else if prev_wrapped {
+                acc.push_str(trimmed);
+            } else {
+                logicals.push(acc);
+                acc = String::new();
+                acc.push_str(trimmed);
+            }
+            prev_wrapped = line.last_cell_was_wrapped();
+        }
+        if !acc.is_empty() {
+            logicals.push(acc);
+        }
+
+        // We expect at least the last two logical lines to be the ones we input,
+        // and they must not have been merged together.
+        assert!(
+            logicals.len() >= 2,
+            "expected at least two logical lines after wrapping"
+        );
+        let n = logicals.len();
+        assert_eq!(
+            logicals[n - 2].len(),
+            17,
+            "first long logical line length mismatch"
+        );
+        assert_eq!(
+            logicals[n - 1].len(),
+            18,
+            "second long logical line length mismatch"
+        );
+        assert!(
+            logicals[n - 2].chars().all(|c| c == 'A'),
+            "first logical line content corrupted"
+        );
+        assert!(
+            logicals[n - 1].chars().all(|c| c == 'B'),
+            "second logical line content corrupted"
+        );
+
+        // The recommended width should match the longest logical line
+        assert_eq!(term.recommended_width(), 18);
+    }
+
+    #[test]
+    fn test_many_long_lines_scroll_no_corruption() {
+        // width=8, height=5; produce many long lines to force multiple scrolls.
+        let mut term = Terminal::new(Options {
+            cols: Some(8),
+            rows: Some(5),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        // Generate 12 lines alternating characters to detect any cross-line merging.
+        let mut input = String::new();
+        for i in 0..12 {
+            let ch = if i % 2 == 0 { 'X' } else { 'Y' };
+            let line: String = std::iter::repeat(ch).take(13).collect(); // each 13 cols
+            input.push_str(&line);
+            input.push('\n');
+        }
+
+        let mut reader = std::io::Cursor::new(input.into_bytes());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // Reconstruct logical lines
+        let mut logicals: Vec<String> = Vec::new();
+        let mut acc = String::new();
+        let mut prev_wrapped = false;
+
+        for cow in term.surface().screen_lines() {
+            let line = cow;
+            let mut text = String::new();
+            for cell in line.visible_cells() {
+                text.push_str(cell.str());
+            }
+            let trimmed = text.trim_end();
+
+            if acc.is_empty() {
+                acc.push_str(trimmed);
+            } else if prev_wrapped {
+                acc.push_str(trimmed);
+            } else {
+                logicals.push(acc);
+                acc = String::new();
+                acc.push_str(trimmed);
+            }
+            prev_wrapped = line.last_cell_was_wrapped();
+        }
+        if !acc.is_empty() {
+            logicals.push(acc);
+        }
+
+        assert!(
+            !logicals.is_empty(),
+            "expected at least one logical line after feeding many lines"
+        );
+
+        // Check that the last few logical lines are intact and not merged with each other.
+        let k = logicals.len().min(5);
+        for j in 0..k {
+            let s = &logicals[logicals.len() - 1 - j];
+            assert!(
+                s.chars().all(|c| c == 'X') || s.chars().all(|c| c == 'Y'),
+                "logical line contains mixed characters (corruption): {:?}",
+                s
+            );
+            assert_eq!(
+                s.len(),
+                13,
+                "logical line length should be 13 after join across wraps"
+            );
+        }
+
+        // The recommended width should match the longest logical line
+        assert_eq!(term.recommended_width(), 13);
+    }
 }
 
 impl Terminal {

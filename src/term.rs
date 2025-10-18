@@ -372,6 +372,7 @@ impl Terminal {
             .last()
             .map(|ln| ln.visible_cells().all(|c| c.str().trim().is_empty()))
             .unwrap_or(false)
+        // Empty reflowed vec means no trailing rows to trim
         {
             reflowed.pop();
         }
@@ -420,7 +421,7 @@ impl Terminal {
                 let wrapped = reflowed
                     .get(window_start + row)
                     .map(|ln| ln.last_cell_was_wrapped())
-                    .unwrap_or(false);
+                    .unwrap_or(false); // Missing reflowed line means not wrapped
                 *flag = wrapped;
             }
         }
@@ -1137,7 +1138,7 @@ impl Terminal {
             Action::Print(ch) => {
                 // Width-aware single-char wrap detection to mark/rotate the wrap ledger precisely.
                 if ch != '\n' && ch != '\r' {
-                    let ch_width = UnicodeWidthChar::width(ch).unwrap_or(0);
+                    let ch_width = UnicodeWidthChar::width(ch).unwrap_or(0); // Control chars have 0 width
                     if ch_width > 0 {
                         let cap = w.saturating_sub(x0);
                         if ch_width > cap {
@@ -1233,7 +1234,7 @@ impl Terminal {
             .screen_lines()
             .get(row)
             .and_then(|line| line.visible_cells().last().map(|c| c.cell_index()))
-            .unwrap_or(w.saturating_sub(1));
+            .unwrap_or(w.saturating_sub(1)); // Empty line wraps at last column
 
         // Now take a mutable borrow and flip the bit in place.
         let mut rows = surface.screen_cells();

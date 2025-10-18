@@ -266,17 +266,15 @@ impl Terminal {
     }
 
     fn trimmed_line_width(line: &Line) -> usize {
-        let mut width = 0usize;
+        // Find rightmost non-empty cell by tracking the maximum position
+        let mut rightmost_end = 0;
         for cell in line.visible_cells() {
-            if cell.str().trim().is_empty() {
-                continue;
-            }
-            let end = cell.cell_index() + cell.width().max(1);
-            if end > width {
-                width = end;
+            if !cell.str().trim().is_empty() {
+                let end = cell.cell_index() + cell.width().max(1);
+                rightmost_end = rightmost_end.max(end);
             }
         }
-        width
+        rightmost_end
     }
 
     fn join_logical_lines(&self, lines: Vec<Line>) -> Vec<Line> {

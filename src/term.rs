@@ -1245,8 +1245,8 @@ mod tests {
             env: HashMap::new(),
         });
 
-        let s1: String = std::iter::repeat('A').take(17).collect(); // 17 columns
-        let s2: String = std::iter::repeat('B').take(18).collect(); // 18 columns
+        let s1: String = "A".repeat(17); // 17 columns
+        let s2: String = "B".repeat(18); // 18 columns
         let input = format!("{}\n{}\n", s1, s2);
 
         let mut reader = std::io::Cursor::new(input.into_bytes());
@@ -1266,15 +1266,11 @@ mod tests {
             }
             let trimmed = text.trim_end();
 
-            if acc.is_empty() {
-                acc.push_str(trimmed);
-            } else if prev_wrapped {
-                acc.push_str(trimmed);
-            } else {
+            if !acc.is_empty() && !prev_wrapped {
                 logicals.push(acc);
                 acc = String::new();
-                acc.push_str(trimmed);
             }
+            acc.push_str(trimmed);
             prev_wrapped = line.last_cell_was_wrapped();
         }
         if !acc.is_empty() {
@@ -1326,7 +1322,7 @@ mod tests {
         let mut input = String::new();
         for i in 0..12 {
             let ch = if i % 2 == 0 { 'X' } else { 'Y' };
-            let line: String = std::iter::repeat(ch).take(13).collect(); // each 13 cols
+            let line: String = ch.to_string().repeat(13); // each 13 cols
             input.push_str(&line);
             input.push('\n');
         }
@@ -1348,15 +1344,11 @@ mod tests {
             }
             let trimmed = text.trim_end();
 
-            if acc.is_empty() {
-                acc.push_str(trimmed);
-            } else if prev_wrapped {
-                acc.push_str(trimmed);
-            } else {
+            if !acc.is_empty() && !prev_wrapped {
                 logicals.push(acc);
                 acc = String::new();
-                acc.push_str(trimmed);
             }
+            acc.push_str(trimmed);
             prev_wrapped = line.last_cell_was_wrapped();
         }
         if !acc.is_empty() {

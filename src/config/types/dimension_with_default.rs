@@ -185,6 +185,42 @@ where
     }
 }
 
+impl<T> FromStr for DimensionWithDefault<T>
+where
+    T: FromStr + Copy,
+    T::Err: fmt::Display,
+{
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // Support suffix "@default" syntax like "80..240:4@160"
+        if let Some(at) = s.rfind('@') {
+            let (left, right) = s.split_at(at);
+            let def_str = &right[1..];
+
+            // Parse the dimension (left side). Empty left means "auto".
+            let dim = if left.trim().is_empty() {
+                Dimension::Auto
+            } else {
+                Dimension::from_str(left).map_err(|e| e.to_string())?
+            };
+
+            // Parse the default (right side) if present (non-empty)
+            let default = if def_str.trim().is_empty() {
+                None
+            } else {
+                Some(def_str.parse::<T>().map_err(|e| e.to_string())?)
+            };
+
+            Ok(Self { dim, default })
+        } else {
+            // Fallback: parse as a plain Dimension<T> (no default provided)
+            let dim = Dimension::from_str(s).map_err(|e| e.to_string())?;
+            Ok(Self { dim, default: None })
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

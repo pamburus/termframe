@@ -850,6 +850,216 @@ fn tabulate_back(pos: usize, n: usize) -> usize {
 
 const TAB_STOP: usize = 8;
 
+impl Terminal {
+    /// Apply an action while detecting automatic wrapping at the right margin.
+    /// If printing caused the cursor to advance to later rows (without an explicit LF),
+    /// mark those crossed rows as soft-wrapped by setting the last-cell wrapped bit.
+    fn apply_action_with_autowrap(
+        surface: &mut Surface,
+        st: &mut State,
+        mut writer: impl io::Write,
+        action: Action,
+    ) -> SequenceNo {
+        // Cursor prior to applying the action
+        let (x0, y0) = surface.cursor_position();
+        log::debug!(
+            "autowrap: before action={:?}, cursor=({}, {})",
+            action,
+            x0,
+            y0
+        );
+
+        // Capture scrolled-out rows (scrollback) before applying actions that will scroll
+        {
+            let (w, h) = surface.dimensions();
+            match &action {
+                Action::Print(ch) => {
+                    if *ch != '\n'
+                        && *ch != '\r'
+                        && let Some(ch_width) = UnicodeWidthChar::width(*ch)
+                        && ch_width > 0
+                    {
+                        let cap = w.saturating_sub(x0);
+                        if y0 == h.saturating_sub(1) && ch_width > cap {
+                            // one row will scroll out from the top
+                            if let Some(cow) = surface.screen_lines().first() {
+                                st.push_scrollback_line(cow.clone().into_owned());
+                            }
+                        }
+                    }
+                }
+                Action::PrintString(s) => {
+                    let disp_width = UnicodeWidthStr::width(s.as_str());
+                    if disp_width > 0 {
+                        let cap = w.saturating_sub(x0);
+                        let total_wraps = if disp_width > cap {
+                            1 + (disp_width - cap - 1) / w
+                        } else {
+                            0
+                        };
+                        if total_wraps > 0 {
+                            let rows_available = h.saturating_sub(1).saturating_sub(y0);
+                            let wraps_before_bottom = total_wraps.min(rows_available);
+                            let bottom_wraps = total_wraps.saturating_sub(wraps_before_bottom);
+                            // Push the top N rows that will be scrolled out
+                            for i in 0..bottom_wraps {
+                                if let Some(cow) = surface.screen_lines().get(i) {
+                                    st.push_scrollback_line(cow.clone().into_owned());
+                                }
+                            }
+                        }
+                    }
+                }
+                Action::Control(code) => {
+                    if matches!(
+                        code,
+                        ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
+                    ) && y0 == h.saturating_sub(1)
+                        && let Some(cow) = surface.screen_lines().first()
+                    {
+                        st.push_scrollback_line(cow.clone().into_owned());
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        // Apply the original action
+        let seq = Self::apply_action(surface, st, &mut writer, action.clone());
+
+        let (x1, y1) = surface.cursor_position();
+        log::debug!(
+            "autowrap: after action={:?}, cursor=({}, {}), seq={}",
+            action,
+            x1,
+            y1,
+            seq
+        );
+
+        // Keep the ledger height in sync with the surface.
+        let (w, h) = surface.dimensions();
+        st.ensure_height(h);
+
+        // If this was printing and we crossed rows, that indicates autowraps.
+        // Additionally, detect the bottom-scroll case where wrapping occurs but y doesn't change:
+        // when xpos exceeded width on entry (x0 >= width) and after printing we observed x1 < x0.
+        match action {
+            Action::Print(ch) => {
+                // Width-aware single-char wrap detection to mark/rotate the wrap ledger precisely.
+                if ch != '\n' && ch != '\r' {
+                    let ch_width = UnicodeWidthChar::width(ch).unwrap_or(0);
+                    if ch_width > 0 {
+                        let cap = w.saturating_sub(x0);
+                        if ch_width > cap {
+                            // This print will trigger a wrap
+                            if y0 < h.saturating_sub(1) {
+                                // Wrapped within buffer: mark current row y0
+                                if let Some(flag) = st.wrap_flags.get_mut(y0) {
+                                    *flag = true;
+                                }
+                                Self::mark_row_soft_wrapped(surface, y0, seq);
+                            } else {
+                                // Bottom scroll wrap: rotate ledger and mark h-2
+                                st.rotate_on_scroll();
+                                if h >= 2 {
+                                    let r = h - 2;
+                                    if let Some(flag) = st.wrap_flags.get_mut(r) {
+                                        *flag = true;
+                                    }
+                                    Self::mark_row_soft_wrapped(surface, r, seq);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Action::PrintString(ref s) => {
+                // Estimate wraps for this chunk using display width.
+                let disp_width = UnicodeWidthStr::width(s.as_str());
+                let cap = w.saturating_sub(x0);
+                if disp_width > 0 {
+                    let total_wraps = if disp_width > cap {
+                        1 + (disp_width - cap - 1) / w
+                    } else {
+                        0
+                    };
+                    if total_wraps > 0 {
+                        let rows_available = h.saturating_sub(1).saturating_sub(y0);
+                        let wraps_before_bottom = total_wraps.min(rows_available);
+                        let bottom_wraps = total_wraps.saturating_sub(wraps_before_bottom);
+                        // First, mark wraps within the buffer before hitting bottom.
+                        for r in y0..(y0 + wraps_before_bottom) {
+                            if let Some(flag) = st.wrap_flags.get_mut(r) {
+                                *flag = true;
+                            }
+                            Self::mark_row_soft_wrapped(surface, r, seq);
+                        }
+                        // Then, handle bottom scroll wraps by rotating the ledger and marking h-2.
+                        for _ in 0..bottom_wraps {
+                            st.rotate_on_scroll();
+                            if h >= 2 {
+                                let r = h - 2;
+                                if let Some(flag) = st.wrap_flags.get_mut(r) {
+                                    *flag = true;
+                                }
+                                Self::mark_row_soft_wrapped(surface, r, seq);
+                            }
+                        }
+                    }
+                }
+            }
+            Action::Control(code) => {
+                // For LF/VT/FF at bottom: a scroll up occurs and y may remain unchanged.
+                if matches!(
+                    code,
+                    ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
+                ) && y0 == h.saturating_sub(1)
+                {
+                    log::debug!(
+                        "autowrap: detected scroll caused by {:?}; rotating ledger",
+                        code
+                    );
+                    st.rotate_on_scroll();
+                }
+            }
+            _ => {}
+        }
+
+        seq
+    }
+
+    /// Mark a specific row as soft-wrapped by setting the wrapped bit on its last cell.
+    /// Writes the updated line back to the surface via a minimal diff.
+    fn mark_row_soft_wrapped(surface: &mut Surface, row: usize, _seq: SequenceNo) {
+        let (w, h) = surface.dimensions();
+        if row >= h || w == 0 {
+            log::debug!("mark_row_soft_wrapped: row {} out of range (h={})", row, h);
+            return;
+        }
+
+        // In-place: mark the wrapped flag on the last visible cell in the row.
+        // First compute the last visible cell index without holding a mutable borrow.
+        let idx = surface
+            .screen_lines()
+            .get(row)
+            .and_then(|line| line.visible_cells().last().map(|c| c.cell_index()))
+            .unwrap_or(w.saturating_sub(1));
+
+        // Now take a mutable borrow and flip the bit in place.
+        let mut rows = surface.screen_cells();
+        let cells = &mut rows[row];
+
+        let was = cells[idx].attrs().wrapped();
+        cells[idx].attrs_mut().set_wrapped(true);
+        log::debug!(
+            "mark_row_soft_wrapped: row {} cell {} wrapped: {} -> true",
+            row,
+            idx,
+            was
+        );
+    }
+}
+
 #[cfg(test)]
 mod tests {
     // Unified tests live at file end. Please don't add another `mod tests` elsewhere.
@@ -1298,215 +1508,5 @@ mod tests {
             .map(|c| c.str().to_string())
             .collect();
         assert_eq!(top.trim_end(), "AAAAAAAAA");
-    }
-}
-
-impl Terminal {
-    /// Apply an action while detecting automatic wrapping at the right margin.
-    /// If printing caused the cursor to advance to later rows (without an explicit LF),
-    /// mark those crossed rows as soft-wrapped by setting the last-cell wrapped bit.
-    fn apply_action_with_autowrap(
-        surface: &mut Surface,
-        st: &mut State,
-        mut writer: impl io::Write,
-        action: Action,
-    ) -> SequenceNo {
-        // Cursor prior to applying the action
-        let (x0, y0) = surface.cursor_position();
-        log::debug!(
-            "autowrap: before action={:?}, cursor=({}, {})",
-            action,
-            x0,
-            y0
-        );
-
-        // Capture scrolled-out rows (scrollback) before applying actions that will scroll
-        {
-            let (w, h) = surface.dimensions();
-            match &action {
-                Action::Print(ch) => {
-                    if *ch != '\n'
-                        && *ch != '\r'
-                        && let Some(ch_width) = UnicodeWidthChar::width(*ch)
-                        && ch_width > 0
-                    {
-                        let cap = w.saturating_sub(x0);
-                        if y0 == h.saturating_sub(1) && ch_width > cap {
-                            // one row will scroll out from the top
-                            if let Some(cow) = surface.screen_lines().first() {
-                                st.push_scrollback_line(cow.clone().into_owned());
-                            }
-                        }
-                    }
-                }
-                Action::PrintString(s) => {
-                    let disp_width = UnicodeWidthStr::width(s.as_str());
-                    if disp_width > 0 {
-                        let cap = w.saturating_sub(x0);
-                        let total_wraps = if disp_width > cap {
-                            1 + (disp_width - cap - 1) / w
-                        } else {
-                            0
-                        };
-                        if total_wraps > 0 {
-                            let rows_available = h.saturating_sub(1).saturating_sub(y0);
-                            let wraps_before_bottom = total_wraps.min(rows_available);
-                            let bottom_wraps = total_wraps.saturating_sub(wraps_before_bottom);
-                            // Push the top N rows that will be scrolled out
-                            for i in 0..bottom_wraps {
-                                if let Some(cow) = surface.screen_lines().get(i) {
-                                    st.push_scrollback_line(cow.clone().into_owned());
-                                }
-                            }
-                        }
-                    }
-                }
-                Action::Control(code) => {
-                    if matches!(
-                        code,
-                        ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
-                    ) && y0 == h.saturating_sub(1)
-                        && let Some(cow) = surface.screen_lines().first()
-                    {
-                        st.push_scrollback_line(cow.clone().into_owned());
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        // Apply the original action
-        let seq = Self::apply_action(surface, st, &mut writer, action.clone());
-
-        let (x1, y1) = surface.cursor_position();
-        log::debug!(
-            "autowrap: after action={:?}, cursor=({}, {}), seq={}",
-            action,
-            x1,
-            y1,
-            seq
-        );
-
-        // Keep the ledger height in sync with the surface.
-        let (w, h) = surface.dimensions();
-        st.ensure_height(h);
-
-        // If this was printing and we crossed rows, that indicates autowraps.
-        // Additionally, detect the bottom-scroll case where wrapping occurs but y doesn't change:
-        // when xpos exceeded width on entry (x0 >= width) and after printing we observed x1 < x0.
-        match action {
-            Action::Print(ch) => {
-                // Width-aware single-char wrap detection to mark/rotate the wrap ledger precisely.
-                if ch != '\n' && ch != '\r' {
-                    let ch_width = UnicodeWidthChar::width(ch).unwrap_or(0);
-                    if ch_width > 0 {
-                        let cap = w.saturating_sub(x0);
-                        if ch_width > cap {
-                            // This print will trigger a wrap
-                            if y0 < h.saturating_sub(1) {
-                                // Wrapped within buffer: mark current row y0
-                                if let Some(flag) = st.wrap_flags.get_mut(y0) {
-                                    *flag = true;
-                                }
-                                Self::mark_row_soft_wrapped(surface, y0, seq);
-                            } else {
-                                // Bottom scroll wrap: rotate ledger and mark h-2
-                                st.rotate_on_scroll();
-                                if h >= 2 {
-                                    let r = h - 2;
-                                    if let Some(flag) = st.wrap_flags.get_mut(r) {
-                                        *flag = true;
-                                    }
-                                    Self::mark_row_soft_wrapped(surface, r, seq);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            Action::PrintString(ref s) => {
-                // Estimate wraps for this chunk using display width.
-                let disp_width = UnicodeWidthStr::width(s.as_str());
-                let cap = w.saturating_sub(x0);
-                if disp_width > 0 {
-                    let total_wraps = if disp_width > cap {
-                        1 + (disp_width - cap - 1) / w
-                    } else {
-                        0
-                    };
-                    if total_wraps > 0 {
-                        let rows_available = h.saturating_sub(1).saturating_sub(y0);
-                        let wraps_before_bottom = total_wraps.min(rows_available);
-                        let bottom_wraps = total_wraps.saturating_sub(wraps_before_bottom);
-                        // First, mark wraps within the buffer before hitting bottom.
-                        for r in y0..(y0 + wraps_before_bottom) {
-                            if let Some(flag) = st.wrap_flags.get_mut(r) {
-                                *flag = true;
-                            }
-                            Self::mark_row_soft_wrapped(surface, r, seq);
-                        }
-                        // Then, handle bottom scroll wraps by rotating the ledger and marking h-2.
-                        for _ in 0..bottom_wraps {
-                            st.rotate_on_scroll();
-                            if h >= 2 {
-                                let r = h - 2;
-                                if let Some(flag) = st.wrap_flags.get_mut(r) {
-                                    *flag = true;
-                                }
-                                Self::mark_row_soft_wrapped(surface, r, seq);
-                            }
-                        }
-                    }
-                }
-            }
-            Action::Control(code) => {
-                // For LF/VT/FF at bottom: a scroll up occurs and y may remain unchanged.
-                if matches!(
-                    code,
-                    ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
-                ) && y0 == h.saturating_sub(1)
-                {
-                    log::debug!(
-                        "autowrap: detected scroll caused by {:?}; rotating ledger",
-                        code
-                    );
-                    st.rotate_on_scroll();
-                }
-            }
-            _ => {}
-        }
-
-        seq
-    }
-
-    /// Mark a specific row as soft-wrapped by setting the wrapped bit on its last cell.
-    /// Writes the updated line back to the surface via a minimal diff.
-    fn mark_row_soft_wrapped(surface: &mut Surface, row: usize, _seq: SequenceNo) {
-        let (w, h) = surface.dimensions();
-        if row >= h || w == 0 {
-            log::debug!("mark_row_soft_wrapped: row {} out of range (h={})", row, h);
-            return;
-        }
-
-        // In-place: mark the wrapped flag on the last visible cell in the row.
-        // First compute the last visible cell index without holding a mutable borrow.
-        let idx = surface
-            .screen_lines()
-            .get(row)
-            .and_then(|line| line.visible_cells().last().map(|c| c.cell_index()))
-            .unwrap_or(w.saturating_sub(1));
-
-        // Now take a mutable borrow and flip the bit in place.
-        let mut rows = surface.screen_cells();
-        let cells = &mut rows[row];
-
-        let was = cells[idx].attrs().wrapped();
-        cells[idx].attrs_mut().set_wrapped(true);
-        log::debug!(
-            "mark_row_soft_wrapped: row {} cell {} wrapped: {} -> true",
-            row,
-            idx,
-            was
-        );
     }
 }

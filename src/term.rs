@@ -97,12 +97,16 @@ impl Terminal {
             }
 
             self.parser.parse(buffer, |action| {
+                let (bx, by) = self.surface.cursor_position();
+                log::debug!("parse: action={:?}, cursor_before=({}, {})", action, bx, by);
                 let seq = Self::apply_action_with_autowrap(
                     &mut self.surface,
                     &mut self.state,
                     &mut writer,
                     action,
                 );
+                let (ax, ay) = self.surface.cursor_position();
+                log::debug!("parse: cursor_after=({}, {}), seq={}", ax, ay, seq);
                 self.surface.flush_changes_older_than(seq);
             });
 
@@ -366,9 +370,13 @@ impl Terminal {
             Action::PrintString(s) => surface.add_change(s),
             Action::Control(code) => match code {
                 ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed => {
+                    log::debug!("Control: LF/VT/FF -> CRLF");
                     surface.add_change("\r\n")
                 }
-                ControlCode::CarriageReturn => surface.add_change("\r"),
+                ControlCode::CarriageReturn => {
+                    log::debug!("Control: CR");
+                    surface.add_change("\r")
+                }
                 ControlCode::HorizontalTab => surface.add_change(Change::CursorPosition {
                     x: Position::Absolute(tabulate(surface.cursor_position().0, 1)),
                     y: Position::Relative(0),
@@ -877,28 +885,52 @@ impl Terminal {
         action: Action,
     ) -> SequenceNo {
         // Cursor prior to applying the action
-        let (_x0, y0) = surface.cursor_position();
+        let (x0, y0) = surface.cursor_position();
+        log::debug!(
+            "autowrap: before action={:?}, cursor=({}, {})",
+            action,
+            x0,
+            y0
+        );
 
         // Apply the original action
         let seq = Self::apply_action(surface, st, &mut writer, action.clone());
 
+        let (x1, y1) = surface.cursor_position();
+        log::debug!(
+            "autowrap: after action={:?}, cursor=({}, {}), seq={}",
+            action,
+            x1,
+            y1,
+            seq
+        );
+
         // If this was printing and we crossed rows, that indicates autowraps.
         match action {
             Action::Print(ch) => {
-                if ch != '\n' && ch != '\r' {
-                    let (_x1, y1) = surface.cursor_position();
-                    if y1 > y0 {
-                        for r in y0..y1 {
-                            Self::mark_row_soft_wrapped(surface, r, seq);
-                        }
+                if ch != '\n' && ch != '\r' && y1 > y0 {
+                    log::debug!(
+                        "autowrap: detected row advance from {} to {} during Print('{}')",
+                        y0,
+                        y1,
+                        ch
+                    );
+                    for r in y0..y1 {
+                        log::debug!("autowrap: mark row {} as soft-wrapped", r);
+                        Self::mark_row_soft_wrapped(surface, r, seq);
                     }
                 }
             }
-            Action::PrintString(_) => {
-                // termwiz emits newlines via Control codes, not inside PrintString
-                let (_x1, y1) = surface.cursor_position();
+            Action::PrintString(ref s) => {
                 if y1 > y0 {
+                    log::debug!(
+                        "autowrap: detected row advance from {} to {} during PrintString(len={})",
+                        y0,
+                        y1,
+                        s.len()
+                    );
                     for r in y0..y1 {
+                        log::debug!("autowrap: mark row {} as soft-wrapped", r);
                         Self::mark_row_soft_wrapped(surface, r, seq);
                     }
                 }
@@ -913,9 +945,23 @@ impl Terminal {
     /// Writes the updated line back to the surface via a minimal diff.
     fn mark_row_soft_wrapped(surface: &mut Surface, row: usize, seq: SequenceNo) {
         if let Some(line_cow) = surface.screen_lines().get(row) {
+            log::debug!(
+                "mark_row_soft_wrapped: row={} (before wrapped={})",
+                row,
+                line_cow.last_cell_was_wrapped()
+            );
             let mut ln = line_cow.clone().into_owned();
             ln.set_last_cell_was_wrapped(true, seq);
             Self::replace_row_with_line_static(surface, row, &ln);
+            if let Some(updated) = surface.screen_lines().get(row) {
+                log::debug!(
+                    "mark_row_soft_wrapped: row={} (after wrapped={})",
+                    row,
+                    updated.last_cell_was_wrapped()
+                );
+            }
+        } else {
+            log::debug!("mark_row_soft_wrapped: row {} out of range", row);
         }
     }
 

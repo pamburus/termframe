@@ -325,18 +325,24 @@ impl Terminal {
     /// - Materialize the bottom `window_height` rows on the Surface
     /// - Rebuild scrollback and refresh wrap flags for visible rows
     fn unscroll_to_window(&mut self, new_width: usize, window_height: usize) {
-        let seq = self.surface.current_seqno();
+        let reflowed = self.reflow_transcript_to_width(new_width);
+        let window_start = reflowed.len().saturating_sub(window_height);
 
-        // 1) Build logical lines from full transcript (scrollback + visible).
+        self.rebuild_scrollback_from_reflowed(&reflowed, window_start);
+        self.apply_reflowed_window_to_surface(&reflowed, window_start, new_width, window_height);
+    }
+
+    /// Reflow the full transcript to the specified width, trimming trailing blank rows.
+    fn reflow_transcript_to_width(&self, new_width: usize) -> Vec<Line> {
+        let seq = self.surface.current_seqno();
         let logicals = self.join_logical_lines(self.transcript_lines());
 
-        // 2) Re-wrap each logical line to the new width.
         let mut reflowed: Vec<Line> = Vec::new();
         for ln in logicals {
             reflowed.extend(ln.wrap(new_width, seq));
         }
 
-        // 3) Trim trailing blank rows to avoid empty tail.
+        // Trim trailing blank rows to avoid empty tail
         while reflowed
             .last()
             .map(|ln| ln.visible_cells().all(|c| c.str().trim().is_empty()))
@@ -345,32 +351,41 @@ impl Terminal {
             reflowed.pop();
         }
 
-        // 4) Compute bottom window slice for the requested height.
-        let total = reflowed.len();
-        let start = total.saturating_sub(window_height);
+        reflowed
+    }
 
-        // 5) Rebuild scrollback from the portion above the visible window.
+    /// Rebuild scrollback from the reflowed lines that fall above the visible window.
+    fn rebuild_scrollback_from_reflowed(&mut self, reflowed: &[Line], window_start: usize) {
         self.state.scrollback.clear();
-        for ln in reflowed.iter().take(start) {
+        for ln in reflowed.iter().take(window_start) {
             self.state.push_scrollback_line(ln.clone());
         }
+    }
 
-        // 6) Resize surface to the requested width and height.
+    /// Apply the reflowed window lines to the surface and update wrap flags.
+    fn apply_reflowed_window_to_surface(
+        &mut self,
+        reflowed: &[Line],
+        window_start: usize,
+        new_width: usize,
+        window_height: usize,
+    ) {
+        // Resize surface to the requested dimensions
         self.surface.resize(new_width, window_height);
 
-        // 7) Render the bottom window rows into the surface.
+        // Render the bottom window rows into the surface
         for row in 0..window_height {
-            if let Some(ln) = reflowed.get(start + row) {
+            if let Some(ln) = reflowed.get(window_start + row) {
                 self.replace_row_with_line(row, ln);
             }
         }
 
-        // 8) Update wrap flags for visible rows.
+        // Update wrap flags for visible rows
         self.state.ensure_height(window_height);
         for row in 0..window_height {
             if let Some(flag) = self.state.wrap_flags.get_mut(row) {
                 let wrapped = reflowed
-                    .get(start + row)
+                    .get(window_start + row)
                     .map(|ln| ln.last_cell_was_wrapped())
                     .unwrap_or(false);
                 *flag = wrapped;

@@ -128,15 +128,15 @@ fn test_padding_mul() {
 fn test_global_config() {
     // Initialize with custom settings
     let mut settings = Settings::default();
-    *settings.terminal.width = 100.into();
-    *settings.terminal.height = 40.into();
+    settings.terminal.width.current = 100.into();
+    settings.terminal.height.current = 40.into();
 
     config::global::initialize(settings.clone());
 
     // Get should return our custom settings
     let global_settings = config::global::get();
-    assert_eq!(*global_settings.terminal.width, 100.into());
-    assert_eq!(*global_settings.terminal.height, 40.into());
+    assert_eq!(global_settings.terminal.width.current, 100.into());
+    assert_eq!(global_settings.terminal.height.current, 40.into());
 }
 
 // Skip test_custom_source_loading as it requires access to internal FileFormat

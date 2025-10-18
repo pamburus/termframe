@@ -27,7 +27,7 @@ pub use types::{Dimension, DimensionWithDefault, Number};
 
 impl<T> From<types::DimensionWithDefault<T>> for types::Dimension<T> {
     fn from(v: types::DimensionWithDefault<T>) -> Self {
-        v.dim
+        v.current
     }
 }
 

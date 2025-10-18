@@ -28,7 +28,7 @@ use super::{dimension::Dimension, range::PartialRange, snap::SnapUp, stepped_ran
 ///   Otherwise, `dim` is constructed as `Limited(SteppedRange { min, max, step })`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DimensionWithDefault<T> {
-    pub dim: Dimension<T>,
+    pub current: Dimension<T>,
     pub default: Option<T>,
 }
 
@@ -60,7 +60,10 @@ where
     {
         let raw = DimensionWithDefaultRaw::<T>::deserialize(deserializer)?;
         Ok(match raw {
-            DimensionWithDefaultRaw::Simple(dim) => Self { dim, default: None },
+            DimensionWithDefaultRaw::Simple(dim) => Self {
+                current: dim,
+                default: None,
+            },
             DimensionWithDefaultRaw::Spec {
                 min,
                 max,
@@ -70,7 +73,7 @@ where
                 // If no constraints provided, treat as Auto with a default
                 if min.is_none() && max.is_none() && step.is_none() {
                     Self {
-                        dim: Dimension::Auto,
+                        current: Dimension::Auto,
                         default,
                     }
                 } else {
@@ -79,7 +82,7 @@ where
                         step,
                     };
                     Self {
-                        dim: Dimension::Limited(range),
+                        current: Dimension::Limited(range),
                         default,
                     }
                 }
@@ -93,7 +96,10 @@ where
     T: Copy,
 {
     fn from(dim: Dimension<T>) -> Self {
-        Self { dim, default: None }
+        Self {
+            current: dim,
+            default: None,
+        }
     }
 }
 
@@ -103,7 +109,7 @@ where
 {
     fn from(value: T) -> Self {
         Self {
-            dim: Dimension::Fixed(value),
+            current: Dimension::Fixed(value),
             default: None,
         }
     }
@@ -115,22 +121,22 @@ where
 {
     /// Returns the minimum bound if present.
     pub fn min(&self) -> Option<T> {
-        self.dim.min()
+        self.current.min()
     }
 
     /// Returns the maximum bound if present.
     pub fn max(&self) -> Option<T> {
-        self.dim.max()
+        self.current.max()
     }
 
     /// Returns the step if present.
     pub fn step(&self) -> Option<T> {
-        self.dim.step()
+        self.current.step()
     }
 
     /// Returns a `SteppedRange` representation of the dimension (fixed/auto normalized).
     pub fn range(&self) -> SteppedRange<T> {
-        self.dim.range()
+        self.current.range()
     }
 }
 
@@ -140,7 +146,7 @@ where
 {
     /// Clamps and snaps `value` to this dimension's constraints.
     pub fn fit(&self, value: T) -> T {
-        self.dim.fit(value)
+        self.current.fit(value)
     }
 
     /// Resolve an initial value:
@@ -151,7 +157,7 @@ where
         if let Some(d) = self.default {
             return self.fit(d);
         }
-        match self.dim {
+        match self.current {
             Dimension::Fixed(v) => v,
             _ => self.fit(fallback),
         }
@@ -162,13 +168,13 @@ where
 impl<T> std::ops::Deref for DimensionWithDefault<T> {
     type Target = Dimension<T>;
     fn deref(&self) -> &Self::Target {
-        &self.dim
+        &self.current
     }
 }
 
 impl<T> std::ops::DerefMut for DimensionWithDefault<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.dim
+        &mut self.current
     }
 }
 
@@ -179,8 +185,8 @@ where
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.default {
-            Some(d) => write!(f, "{}@{d}", self.dim),
-            None => write!(f, "{}", self.dim),
+            Some(d) => write!(f, "{}@{d}", self.current),
+            None => write!(f, "{}", self.current),
         }
     }
 }
@@ -212,11 +218,17 @@ where
                 Some(def_str.parse::<T>().map_err(|e| e.to_string())?)
             };
 
-            Ok(Self { dim, default })
+            Ok(Self {
+                current: dim,
+                default,
+            })
         } else {
             // Fallback: parse as a plain Dimension<T> (no default provided)
             let dim = Dimension::from_str(s).map_err(|e| e.to_string())?;
-            Ok(Self { dim, default: None })
+            Ok(Self {
+                current: dim,
+                default: None,
+            })
         }
     }
 }
@@ -235,14 +247,14 @@ mod tests {
     #[test]
     fn test_deserialize_simple_auto() {
         let cfg: ConfigSimple = toml::from_str(r#"dim = "auto""#).unwrap();
-        assert_eq!(cfg.dim.dim, Dimension::Auto);
+        assert_eq!(cfg.dim.current, Dimension::Auto);
         assert_eq!(cfg.dim.default, None);
     }
 
     #[test]
     fn test_deserialize_simple_fixed() {
         let cfg: ConfigSimple = toml::from_str("dim = 100").unwrap();
-        assert_eq!(cfg.dim.dim, Dimension::Fixed(100));
+        assert_eq!(cfg.dim.current, Dimension::Fixed(100));
         assert_eq!(cfg.dim.default, None);
     }
 
@@ -251,7 +263,7 @@ mod tests {
         // Existing Dimension table (no default) remains valid
         let cfg: ConfigSimple =
             toml::from_str(r#"dim = { min = 80, max = 120, step = 4 }"#).unwrap();
-        match cfg.dim.dim {
+        match cfg.dim.current {
             Dimension::Limited(sr) => {
                 assert_eq!(sr.range.min, Some(80));
                 assert_eq!(sr.range.max, Some(120));
@@ -266,7 +278,7 @@ mod tests {
     fn test_deserialize_with_default_only() {
         // Only default: Auto constraints with a preferred starting value
         let cfg: ConfigSimple = toml::from_str(r#"dim = { default = 160 }"#).unwrap();
-        assert_eq!(cfg.dim.dim, Dimension::Auto);
+        assert_eq!(cfg.dim.current, Dimension::Auto);
         assert_eq!(cfg.dim.default, Some(160));
     }
 
@@ -274,7 +286,7 @@ mod tests {
     fn test_deserialize_with_range_and_default() {
         let cfg: ConfigSimple =
             toml::from_str(r#"dim = { min = 80, max = 240, step = 4, default = 160 }"#).unwrap();
-        match cfg.dim.dim {
+        match cfg.dim.current {
             Dimension::Limited(sr) => {
                 assert_eq!(sr.range.min, Some(80));
                 assert_eq!(sr.range.max, Some(240));

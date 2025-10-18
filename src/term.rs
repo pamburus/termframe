@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, VecDeque},
     io::{self, BufRead, BufReader, BufWriter},
     mem,
     sync::{
@@ -161,7 +161,17 @@ impl Terminal {
     }
 
     pub fn recommended_width(&self) -> u16 {
-        self.min_width_to_unwrap() as u16
+        // Compute recommended width from the full transcript (scrollback + visible),
+        // by joining logical lines across wrapped rows and measuring trimmed widths.
+        let logicals = self.join_logical_lines(self.transcript_lines());
+        let mut max_width = 0usize;
+        for ln in &logicals {
+            let w = Self::trimmed_line_width(ln);
+            if w > max_width {
+                max_width = w;
+            }
+        }
+        max_width as u16
     }
 
     pub fn set_width(&mut self, width: u16) {
@@ -171,20 +181,15 @@ impl Terminal {
     }
 
     pub fn recommended_height(&self) -> u16 {
-        let mut max_row = 0;
-        let dimensions = self.surface.dimensions();
-
-        for row in 0..dimensions.1 {
-            let line = &self.surface.screen_lines()[row];
-            for cell in line.visible_cells() {
-                let text = cell.str();
-                if !text.trim().is_empty() {
-                    max_row = max_row.max(row as u16 + 1);
-                }
-            }
+        // Rewrap the full transcript to the current width and count rows.
+        let (w, _) = self.surface.dimensions();
+        let seq = self.surface.current_seqno();
+        let logicals = self.join_logical_lines(self.transcript_lines());
+        let mut total_rows = 0usize;
+        for ln in logicals {
+            total_rows += ln.wrap(w, seq).len();
         }
-
-        max_row
+        total_rows as u16
     }
 
     pub fn set_height(&mut self, height: u16) {
@@ -259,6 +264,56 @@ impl Terminal {
         max_width
     }
 
+    fn transcript_lines(&self) -> Vec<Line> {
+        let mut out: Vec<Line> = Vec::new();
+        // append scrollback lines (chronological order)
+        for ln in &self.state.scrollback {
+            out.push(ln.clone());
+        }
+        // append current visible rows
+        for cow in self.surface.screen_lines() {
+            out.push(cow.into_owned());
+        }
+        out
+    }
+
+    fn trimmed_line_width(line: &Line) -> usize {
+        let mut width = 0usize;
+        for cell in line.visible_cells() {
+            if cell.str().trim().is_empty() {
+                continue;
+            }
+            let end = cell.cell_index() + cell.width().max(1);
+            if end > width {
+                width = end;
+            }
+        }
+        width
+    }
+
+    fn join_logical_lines(&self, lines: Vec<Line>) -> Vec<Line> {
+        let seq = self.surface.current_seqno();
+        let mut out: Vec<Line> = Vec::new();
+        let mut current: Option<Line> = None;
+        for ln in lines {
+            if let Some(acc) = current.as_mut() {
+                acc.append_line(ln, seq);
+            } else {
+                current = Some(ln);
+            }
+            if let Some(accum) = current.as_ref() {
+                // If the last appended physical row is NOT wrapped, this logical line ends.
+                if !accum.last_cell_was_wrapped() {
+                    out.push(current.take().unwrap());
+                }
+            }
+        }
+        if let Some(acc) = current.take() {
+            out.push(acc);
+        }
+        out
+    }
+
     /// Rewrap the whole surface to `new_width`, merging previously wrapped rows.
     /// Returns the sequence number after edits.
     fn rewrap_surface(&mut self, new_width: usize) -> usize {
@@ -269,28 +324,8 @@ impl Terminal {
 
         let seq = self.surface.current_seqno();
 
-        // 1) Collect logical lines by merging rows while the previous physical row
-        //    is marked as wrapped in our ledger.
-        let mut logicals: Vec<Line> = Vec::new();
-        let mut current: Option<Line> = None;
-
-        for (i, cow) in self.surface.screen_lines().into_iter().enumerate() {
-            let line = cow.into_owned();
-            if let Some(acc) = current.as_mut() {
-                acc.append_line(line, seq);
-            } else {
-                current = Some(line);
-            }
-
-            // If this row is NOT wrapped, we reached the end of a logical line.
-            let wrapped = *self.state.wrap_flags.get(i).unwrap_or(&false);
-            if !wrapped {
-                logicals.push(current.take().unwrap());
-            }
-        }
-        if let Some(acc) = current.take() {
-            logicals.push(acc);
-        }
+        // 1) Build logical lines from full transcript (scrollback + visible).
+        let logicals = self.join_logical_lines(self.transcript_lines());
 
         // 2) Re-wrap each logical line to the new width.
         let mut reflowed: Vec<Line> = Vec::new();
@@ -658,6 +693,8 @@ struct State {
     background: SrgbaTuple,
     foreground: SrgbaTuple,
     wrap_flags: Vec<bool>,
+    scrollback: VecDeque<Line>,
+    scrollback_limit: usize,
 }
 
 impl State {
@@ -668,6 +705,8 @@ impl State {
             foreground,
             positions: Vec::new(),
             wrap_flags: vec![false; height],
+            scrollback: VecDeque::new(),
+            scrollback_limit: 10_000,
         }
     }
 
@@ -686,6 +725,25 @@ impl State {
             if let Some(last) = self.wrap_flags.last_mut() {
                 *last = false;
             }
+        }
+    }
+
+    /// Set a new scrollback limit and trim existing scrollback if needed.
+    fn set_scrollback_limit(&mut self, limit: usize) {
+        self.scrollback_limit = limit;
+        self.trim_scrollback_to_limit();
+    }
+
+    /// Push a line into scrollback and enforce the limit.
+    fn push_scrollback_line(&mut self, line: Line) {
+        self.scrollback.push_back(line);
+        self.trim_scrollback_to_limit();
+    }
+
+    /// Ensure scrollback does not exceed the configured limit.
+    fn trim_scrollback_to_limit(&mut self) {
+        while self.scrollback.len() > self.scrollback_limit {
+            self.scrollback.pop_front();
         }
     }
 }
@@ -1223,6 +1281,63 @@ impl Terminal {
             x0,
             y0
         );
+
+        // Capture scrolled-out rows (scrollback) before applying actions that will scroll
+        {
+            let (w, h) = surface.dimensions();
+            match &action {
+                Action::Print(ch) => {
+                    if *ch != '\n' && *ch != '\r' {
+                        if let Some(ch_width) = UnicodeWidthChar::width(*ch) {
+                            if ch_width > 0 {
+                                let cap = w.saturating_sub(x0);
+                                if y0 == h.saturating_sub(1) && ch_width > cap {
+                                    // one row will scroll out from the top
+                                    if let Some(cow) = surface.screen_lines().get(0) {
+                                        st.push_scrollback_line(cow.clone().into_owned());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Action::PrintString(s) => {
+                    let disp_width = UnicodeWidthStr::width(s.as_str());
+                    if disp_width > 0 {
+                        let cap = w.saturating_sub(x0);
+                        let total_wraps = if disp_width > cap {
+                            1 + (disp_width - cap - 1) / w
+                        } else {
+                            0
+                        };
+                        if total_wraps > 0 {
+                            let rows_available = h.saturating_sub(1).saturating_sub(y0);
+                            let wraps_before_bottom = total_wraps.min(rows_available);
+                            let bottom_wraps = total_wraps.saturating_sub(wraps_before_bottom);
+                            // Push the top N rows that will be scrolled out
+                            for i in 0..bottom_wraps {
+                                if let Some(cow) = surface.screen_lines().get(i) {
+                                    st.push_scrollback_line(cow.clone().into_owned());
+                                }
+                            }
+                        }
+                    }
+                }
+                Action::Control(code) => {
+                    if matches!(
+                        code,
+                        ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
+                    ) {
+                        if y0 == h.saturating_sub(1) {
+                            if let Some(cow) = surface.screen_lines().get(0) {
+                                st.push_scrollback_line(cow.clone().into_owned());
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
 
         // Apply the original action
         let seq = Self::apply_action(surface, st, &mut writer, action.clone());

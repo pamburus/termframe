@@ -11,7 +11,9 @@ use clap_complete::Shell;
 use enumset_ext::convert::str::EnumSet;
 
 // local imports
-use crate::config::{self, FontFamilyOption, PaddingOption, Settings, ThemeSetting};
+use crate::config::{
+    self, DimensionWithDefault, FontFamilyOption, PaddingOption, Settings, ThemeSetting,
+};
 
 const STYLES: Styles = Styles::styled()
     .header(AnsiColor::Green.on_default().bold())
@@ -28,11 +30,11 @@ pub struct Opt {
 
     /// Width of the virtual terminal window.
     #[arg(long, short = 'W', default_value_t = (*cfg().terminal.width).into(), overrides_with = "width", value_name = "COLUMNS")]
-    pub width: Dimension<u16>,
+    pub width: DimensionWithDefault<u16>,
 
     /// Height of the virtual terminal window.
     #[arg(long, short = 'H', default_value_t = (*cfg().terminal.height).into(), overrides_with = "height", value_name = "LINES")]
-    pub height: Dimension<u16>,
+    pub height: DimensionWithDefault<u16>,
 
     /// Override padding for the inner text in font size units.
     #[arg(long, overrides_with = "padding", value_name = "EM")]
@@ -180,8 +182,8 @@ impl config::Patch for Opt {
     fn patch(&self, settings: Settings) -> Settings {
         let mut settings = settings;
 
-        *settings.terminal.width = self.width;
-        *settings.terminal.height = self.height;
+        settings.terminal.width = self.width;
+        settings.terminal.height = self.height;
         if !self.font_family.is_empty() {
             settings.font.family = FontFamilyOption::Multiple(self.font_family.clone());
         }

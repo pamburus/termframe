@@ -163,7 +163,7 @@ impl App {
         }
 
         if !matches!(
-            (opt.width, opt.height),
+            (opt.width.current, opt.height.current),
             (cli::Dimension::Fixed(_), cli::Dimension::Fixed(_))
         ) {
             let width = terminal.recommended_width();

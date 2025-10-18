@@ -26,7 +26,7 @@ use super::{dimension::Dimension, range::PartialRange, snap::SnapUp, stepped_ran
 ///   When only `default` is specified (no min/max/step), `dim` becomes `Auto` and
 ///   `default` is preserved.
 ///   Otherwise, `dim` is constructed as `Limited(SteppedRange { min, max, step })`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Copy)]
 pub struct DimensionWithDefault<T> {
     pub current: Dimension<T>,
     pub default: Option<T>,

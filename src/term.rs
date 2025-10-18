@@ -22,8 +22,9 @@ use termwiz::{
         osc::{ColorOrQuery, DynamicColorNumber},
         parser::Parser,
     },
-    surface::{Change, Position, SEQ_ZERO, SequenceNo, Surface},
+    surface::{Change, Line, Position, SEQ_ZERO, SequenceNo, Surface, change::ChangeSequence},
 };
+use unicode_width::UnicodeWidthStr;
 
 /// Options for configuring the terminal.
 #[derive(Debug, Default)]
@@ -151,30 +152,167 @@ impl Terminal {
         Ok(())
     }
 
-    pub fn used_size(&self) -> (u16, u16) {
+    pub fn recommended_width(&self) -> u16 {
+        self.min_width_to_unwrap() as u16
+    }
+
+    pub fn set_width(&mut self, width: u16) {
+        self.rewrap_surface(width as usize);
+        self.size.cols = self.surface.dimensions().0 as u16;
+        self.size.rows = self.surface.dimensions().1 as u16;
+    }
+
+    pub fn recommended_height(&self) -> u16 {
         let mut max_row = 0;
-        let mut max_col = 0;
         let dimensions = self.surface.dimensions();
 
-        // Iterate through the surface to find the last non-blank cell
         for row in 0..dimensions.1 {
             let line = &self.surface.screen_lines()[row];
             for cell in line.visible_cells() {
                 let text = cell.str();
                 if !text.trim().is_empty() {
                     max_row = max_row.max(row as u16 + 1);
-                    max_col = max_col.max(cell.cell_index() as u16 + 1);
                 }
             }
         }
 
-        (max_col, max_row)
+        max_row
     }
 
-    pub fn resize(&mut self, cols: u16, rows: u16) {
-        self.surface.resize(cols as usize, rows as usize);
-        self.size.cols = cols;
-        self.size.rows = rows;
+    pub fn set_height(&mut self, height: u16) {
+        self.surface
+            .resize(self.surface.dimensions().0, height as usize);
+        self.size.rows = self.surface.dimensions().1 as u16;
+    }
+
+    /// Return the minimum column width needed so that no soft-wrapped line
+    /// in `surface` would wrap (i.e., a width that fits the longest logical line).
+    pub fn min_width_to_unwrap(&self) -> usize {
+        // 1) Collect logical lines by joining physical rows that were soft-wrapped.
+        let mut logicals: Vec<Line> = Vec::new();
+        let mut current: Option<Line> = None;
+
+        for cow in self.surface.screen_lines() {
+            let line = cow.into_owned();
+            if let Some(acc) = current.as_mut() {
+                if acc.last_cell_was_wrapped() {
+                    // Continuation of the same logical line
+                    acc.append_line(line, self.surface.current_seqno());
+                } else {
+                    // Paragraph ended
+                    logicals.push(current.take().unwrap());
+                    current = Some(line);
+                }
+            } else {
+                current = Some(line);
+            }
+        }
+        if let Some(acc) = current.take() {
+            logicals.push(acc);
+        }
+
+        // 2) For each logical line, compute its display width (columns).
+        //    We use the last occupied cell index + grapheme column width.
+        let mut max_width = 0usize;
+        for ln in &logicals {
+            let mut line_width = 0usize;
+            for cell in ln.visible_cells() {
+                let x = cell.cell_index(); // starting column of this grapheme
+                let w = UnicodeWidthStr::width(cell.str()); // 0, 1, or 2 (combining/normal/wide)
+                line_width = line_width.max(x + w);
+            }
+            max_width = max_width.max(line_width);
+        }
+
+        max_width
+    }
+
+    /// Rewrap the whole surface to `new_width`, merging previously wrapped rows.
+    /// Returns the sequence number after edits.
+    fn rewrap_surface(&mut self, new_width: usize) -> usize {
+        let (old_w, _) = self.surface.dimensions();
+        if new_width == old_w {
+            return self.surface.current_seqno();
+        }
+
+        let seq = self.surface.current_seqno();
+
+        // 1) Collect logical lines by merging consecutive rows whose previous row
+        //    ended with `last_cell_was_wrapped() == true`.
+        let mut logicals: Vec<Line> = Vec::new();
+        let mut current: Option<Line> = None;
+
+        for cow in self.surface.screen_lines() {
+            let line = cow.into_owned(); // get owned Line
+            if let Some(acc) = current.as_mut() {
+                if acc.last_cell_was_wrapped() {
+                    // Continue the same logical paragraph
+                    acc.append_line(line, seq);
+                } else {
+                    // Paragraph ended; stash it and start a new one
+                    logicals.push(current.take().unwrap());
+                    current = Some(line);
+                }
+            } else {
+                current = Some(line);
+            }
+        }
+        if let Some(acc) = current.take() {
+            logicals.push(acc);
+        }
+
+        // 2) Re-wrap each logical line to the new width.
+        let mut reflowed: Vec<Line> = Vec::new();
+        for ln in logicals {
+            reflowed.extend(ln.wrap(new_width, seq));
+        }
+
+        // 3) Resize the surface to fit the reflowed rows.
+        let new_h = reflowed.len().max(1);
+        self.surface.resize(new_width, new_h);
+
+        // 4) Replace each row using a diff so change stream stays optimal.
+        for (row, ln) in reflowed.iter().enumerate() {
+            self.replace_row_with_line(row, ln);
+        }
+
+        self.surface.current_seqno()
+    }
+
+    fn replace_row_with_line(&mut self, row: usize, ln: &Line) {
+        let (w, _) = self.surface.dimensions();
+
+        // Create a 1-row temp screen that contains exactly the desired line content.
+        let mut tmp = Surface::new(w, 1);
+
+        // Emit a compact stream of changes for ln into tmp.
+        let mut seq = ChangeSequence::new(1, w);
+        let mut last_attr = None;
+
+        for cell in ln.visible_cells() {
+            let x = cell.cell_index();
+
+            // Move cursor to the correct x for this run
+            seq.add(Change::CursorPosition {
+                x: Position::Absolute(x),
+                y: Position::Absolute(0),
+            });
+
+            // Update attributes only when they change
+            if last_attr.as_ref() != Some(cell.attrs()) {
+                seq.add(Change::AllAttributes(cell.attrs().clone()));
+                last_attr = Some(cell.attrs().clone());
+            }
+
+            // Append the grapheme(s)
+            seq.add(Change::Text(cell.str().to_owned()));
+        }
+
+        tmp.add_changes(seq.consume());
+
+        // Compute minimal diff for that single row and apply it to the real surface
+        let changes = self.surface.diff_region(0, row, w, 1, &tmp, 0, 0);
+        self.surface.add_changes(changes);
     }
 
     /// Applies an action to the terminal's surface and state, and writes output to the writer.

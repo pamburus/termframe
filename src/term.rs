@@ -24,7 +24,6 @@ use termwiz::{
     },
     surface::{Change, Line, Position, SEQ_ZERO, SequenceNo, Surface, change::ChangeSequence},
 };
-use unicode_width::UnicodeWidthStr;
 
 /// Options for configuring the terminal.
 #[derive(Debug, Default)]
@@ -98,8 +97,12 @@ impl Terminal {
             }
 
             self.parser.parse(buffer, |action| {
-                let seq =
-                    Self::apply_action(&mut self.surface, &mut self.state, &mut writer, action);
+                let seq = Self::apply_action_with_autowrap(
+                    &mut self.surface,
+                    &mut self.state,
+                    &mut writer,
+                    action,
+                );
                 self.surface.flush_changes_older_than(seq);
             });
 
@@ -188,40 +191,68 @@ impl Terminal {
     /// Return the minimum column width needed so that no soft-wrapped line
     /// in `surface` would wrap (i.e., a width that fits the longest logical line).
     pub fn min_width_to_unwrap(&self) -> usize {
-        // 1) Collect logical lines by joining physical rows that were soft-wrapped.
-        let mut logicals: Vec<Line> = Vec::new();
-        let mut current: Option<Line> = None;
+        let (_w, h) = self.surface.dimensions();
 
-        for cow in self.surface.screen_lines() {
-            let line = cow.into_owned();
-            if let Some(acc) = current.as_mut() {
-                if acc.last_cell_was_wrapped() {
-                    // Continuation of the same logical line
-                    acc.append_line(line, self.surface.current_seqno());
-                } else {
-                    // Paragraph ended
-                    logicals.push(current.take().unwrap());
-                    current = Some(line);
+        // Compute width of a physical row, ignoring trailing spaces
+        let trimmed_row_width = |row: usize| -> usize {
+            if let Some(line) = self.surface.screen_lines().get(row) {
+                let mut width = 0usize;
+                for cell in line.visible_cells() {
+                    // Ignore trailing/blank cells
+                    if cell.str().trim().is_empty() {
+                        continue;
+                    }
+                    let end = cell.cell_index() + cell.width().max(1);
+                    if end > width {
+                        width = end;
+                    }
                 }
+                width
             } else {
-                current = Some(line);
+                0
             }
-        }
-        if let Some(acc) = current.take() {
-            logicals.push(acc);
-        }
+        };
 
-        // 2) For each logical line, compute its display width (columns).
-        //    We use the last occupied cell index + grapheme column width.
+        // Check whether a given row has any non-space content
+        let has_non_space = |row: usize| -> bool {
+            self.surface
+                .screen_lines()
+                .get(row)
+                .map(|line| line.visible_cells().any(|c| !c.str().trim().is_empty()))
+                .unwrap_or(false)
+        };
+
         let mut max_width = 0usize;
-        for ln in &logicals {
-            let mut line_width = 0usize;
-            for cell in ln.visible_cells() {
-                let x = cell.cell_index(); // starting column of this grapheme
-                let w = UnicodeWidthStr::width(cell.str()); // 0, 1, or 2 (combining/normal/wide)
-                line_width = line_width.max(x + w);
+        let mut i = 0usize;
+
+        // Walk physical rows, summing widths across soft-wrapped sequences.
+        while i < h {
+            // Start a new logical line at row i
+            let mut logical_width = trimmed_row_width(i);
+
+            // While this row indicates continuation and the next row has content,
+            // accumulate widths from subsequent rows.
+            while i + 1 < h {
+                let cur_is_wrapped = self
+                    .surface
+                    .screen_lines()
+                    .get(i)
+                    .map(|line| line.last_cell_was_wrapped())
+                    .unwrap_or(false);
+
+                if cur_is_wrapped && has_non_space(i + 1) {
+                    i += 1;
+                    logical_width += trimmed_row_width(i);
+                    continue;
+                }
+                break;
             }
-            max_width = max_width.max(line_width);
+
+            if logical_width > max_width {
+                max_width = logical_width;
+            }
+
+            i += 1;
         }
 
         max_width
@@ -281,6 +312,8 @@ impl Terminal {
 
     fn replace_row_with_line(&mut self, row: usize, ln: &Line) {
         let (w, _) = self.surface.dimensions();
+        // Preserve current cursor position to avoid interfering with ongoing printing
+        let (cur_x, cur_y) = self.surface.cursor_position();
 
         // Create a 1-row temp screen that contains exactly the desired line content.
         let mut tmp = Surface::new(w, 1);
@@ -313,6 +346,12 @@ impl Terminal {
         // Compute minimal diff for that single row and apply it to the real surface
         let changes = self.surface.diff_region(0, row, w, 1, &tmp, 0, 0);
         self.surface.add_changes(changes);
+
+        // Restore cursor position
+        self.surface.add_change(Change::CursorPosition {
+            x: Position::Absolute(cur_x),
+            y: Position::Absolute(cur_y),
+        });
     }
 
     /// Applies an action to the terminal's surface and state, and writes output to the writer.
@@ -743,3 +782,186 @@ fn tabulate_back(pos: usize, n: usize) -> usize {
 }
 
 const TAB_STOP: usize = 8;
+
+#[cfg(test)]
+mod tests {
+    // Unified tests live at file end. Please don't add another `mod tests` elsewhere.
+    use super::*;
+    use std::collections::HashMap;
+    use std::io::Cursor;
+
+    #[test]
+    fn test_autowrap_marks_wrapped_lines() {
+        let mut term = Terminal::new(Options {
+            cols: Some(3),
+            rows: Some(3),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        let mut reader = Cursor::new(b"abcdef".as_ref());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        let rw = term.recommended_width();
+        assert_eq!(rw, 6, "recommended width should be 6 to fit");
+
+        let lines = term.surface().screen_lines();
+        assert!(
+            lines[0].last_cell_was_wrapped(),
+            "first line should be marked as soft-wrapped"
+        );
+
+        let l0: String = lines[0]
+            .visible_cells()
+            .map(|c| c.str().to_string())
+            .collect();
+        let l1: String = lines[1]
+            .visible_cells()
+            .map(|c| c.str().to_string())
+            .collect();
+
+        assert_eq!(l0.trim_end(), "abc");
+        assert_eq!(l1.trim_end(), "def");
+    }
+
+    #[test]
+    fn test_explicit_newline_not_marked_wrapped() {
+        let mut term = Terminal::new(Options {
+            cols: Some(5),
+            rows: Some(3),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        let mut reader = Cursor::new(b"abc\ndef".as_ref());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        let lines = term.surface().screen_lines();
+        assert!(
+            !lines[0].last_cell_was_wrapped(),
+            "explicit newline must not be marked as soft-wrapped"
+        );
+    }
+
+    #[test]
+    fn test_recommended_width_autowrap() {
+        let mut term = Terminal::new(Options {
+            cols: Some(3),
+            rows: Some(3),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        let mut reader = Cursor::new(b"abcdef".as_ref());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // A single logical line "abcdef" should yield recommended_width = 6
+        assert_eq!(term.recommended_width(), 6);
+    }
+}
+
+impl Terminal {
+    /// Apply an action while detecting automatic wrapping at the right margin.
+    /// If printing caused the cursor to advance to later rows (without an explicit LF),
+    /// mark those crossed rows as soft-wrapped by setting the last-cell wrapped bit.
+    fn apply_action_with_autowrap(
+        surface: &mut Surface,
+        st: &mut State,
+        mut writer: impl io::Write,
+        action: Action,
+    ) -> SequenceNo {
+        // Cursor prior to applying the action
+        let (_x0, y0) = surface.cursor_position();
+
+        // Apply the original action
+        let seq = Self::apply_action(surface, st, &mut writer, action.clone());
+
+        // If this was printing and we crossed rows, that indicates autowraps.
+        match action {
+            Action::Print(ch) => {
+                if ch != '\n' && ch != '\r' {
+                    let (_x1, y1) = surface.cursor_position();
+                    if y1 > y0 {
+                        for r in y0..y1 {
+                            Self::mark_row_soft_wrapped(surface, r, seq);
+                        }
+                    }
+                }
+            }
+            Action::PrintString(_) => {
+                // termwiz emits newlines via Control codes, not inside PrintString
+                let (_x1, y1) = surface.cursor_position();
+                if y1 > y0 {
+                    for r in y0..y1 {
+                        Self::mark_row_soft_wrapped(surface, r, seq);
+                    }
+                }
+            }
+            _ => {}
+        }
+
+        seq
+    }
+
+    /// Mark a specific row as soft-wrapped by setting the wrapped bit on its last cell.
+    /// Writes the updated line back to the surface via a minimal diff.
+    fn mark_row_soft_wrapped(surface: &mut Surface, row: usize, seq: SequenceNo) {
+        if let Some(line_cow) = surface.screen_lines().get(row) {
+            let mut ln = line_cow.clone().into_owned();
+            ln.set_last_cell_was_wrapped(true, seq);
+            Self::replace_row_with_line_static(surface, row, &ln);
+        }
+    }
+
+    /// A static variant of `replace_row_with_line` that operates on a `Surface` directly,
+    /// so it can be used safely from inside the parser callback.
+    fn replace_row_with_line_static(surface: &mut Surface, row: usize, ln: &Line) {
+        let (w, _) = surface.dimensions();
+        // Preserve current cursor position to avoid interfering with ongoing printing
+        let (cur_x, cur_y) = surface.cursor_position();
+
+        // Create a 1-row temp screen that contains exactly the desired line content.
+        let mut tmp = Surface::new(w, 1);
+
+        // Emit a compact stream of changes for ln into tmp.
+        let mut seq = ChangeSequence::new(1, w);
+        let mut last_attr = None;
+
+        for cell in ln.visible_cells() {
+            let x = cell.cell_index();
+
+            // Move cursor to the correct x for this run
+            seq.add(Change::CursorPosition {
+                x: Position::Absolute(x),
+                y: Position::Absolute(0),
+            });
+
+            // Update attributes only when they change
+            if last_attr.as_ref() != Some(cell.attrs()) {
+                seq.add(Change::AllAttributes(cell.attrs().clone()));
+                last_attr = Some(cell.attrs().clone());
+            }
+
+            // Append the grapheme(s)
+            seq.add(Change::Text(cell.str().to_owned()));
+        }
+
+        tmp.add_changes(seq.consume());
+
+        // Compute minimal diff for that single row and apply it to the real surface
+        let changes = surface.diff_region(0, row, w, 1, &tmp, 0, 0);
+        surface.add_changes(changes);
+
+        // Restore cursor position
+        surface.add_change(Change::CursorPosition {
+            x: Position::Absolute(cur_x),
+            y: Position::Absolute(cur_y),
+        });
+    }
+}

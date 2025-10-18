@@ -320,10 +320,28 @@ impl Terminal {
         result
     }
 
-    /// Unscroll the transcript to a given window:
-    /// - Reflow the full transcript to `new_width`
-    /// - Materialize the bottom `window_height` rows on the Surface
-    /// - Rebuild scrollback and refresh wrap flags for visible rows
+    /// Unscroll and reflow the terminal to display content at a new width and height.
+    ///
+    /// This is the core reflow operation that reconstructs the full terminal transcript
+    /// from scrollback and visible content, reflows it to new dimensions, and updates
+    /// both the surface and internal state to match.
+    ///
+    /// # Process
+    /// 1. Reflow full transcript (scrollback + visible) to new width
+    /// 2. Determine which lines fit in the new window height
+    /// 3. Rebuild scrollback with lines above the visible window
+    /// 4. Apply visible window lines to the surface
+    /// 5. Update wrap flags to match the reflowed content
+    ///
+    /// # Use Cases
+    /// - Terminal resize (width and/or height changes)
+    /// - Manual reflow operations
+    /// - Switching between different display modes
+    ///
+    /// # Performance
+    /// - O(transcript_size) for reflow computation
+    /// - O(window_height) for surface updates
+    /// - Preserves all content attributes during reflow
     fn unscroll_to_window(&mut self, new_width: usize, window_height: usize) {
         let reflowed = self.reflow_transcript_to_width(new_width);
         let window_start = reflowed.len().saturating_sub(window_height);
@@ -332,7 +350,14 @@ impl Terminal {
         self.apply_reflowed_window_to_surface(&reflowed, window_start, new_width, window_height);
     }
 
-    /// Reflow the full transcript to the specified width, trimming trailing blank rows.
+    /// Reflow the complete terminal transcript to the specified width.
+    ///
+    /// Joins logical lines from the full transcript (scrollback + visible content),
+    /// wraps them to the new width, and trims trailing blank rows.
+    ///
+    /// # Returns
+    /// Vector of reflowed Lines ready for display or further processing.
+    /// Trailing empty rows are removed to avoid unnecessary blank space.
     fn reflow_transcript_to_width(&self, new_width: usize) -> Vec<Line> {
         let seq = self.surface.current_seqno();
         let logicals = self.join_logical_lines(self.transcript_lines());
@@ -354,7 +379,11 @@ impl Terminal {
         reflowed
     }
 
-    /// Rebuild scrollback from the reflowed lines that fall above the visible window.
+    /// Rebuild the scrollback buffer from reflowed content above the visible window.
+    ///
+    /// Clears the current scrollback and repopulates it with lines that fall
+    /// above the visible window in the reflowed content. This maintains the
+    /// scrollback limit during the rebuild process.
     fn rebuild_scrollback_from_reflowed(&mut self, reflowed: &[Line], window_start: usize) {
         self.state.scrollback.clear();
         for ln in reflowed.iter().take(window_start) {
@@ -362,7 +391,11 @@ impl Terminal {
         }
     }
 
-    /// Apply the reflowed window lines to the surface and update wrap flags.
+    /// Apply reflowed window content to the surface and update internal state.
+    ///
+    /// Resizes the surface to match the new dimensions, renders the visible
+    /// window lines, and updates wrap flags to match the reflowed content.
+    /// This ensures the surface and state remain synchronized.
     fn apply_reflowed_window_to_surface(
         &mut self,
         reflowed: &[Line],
@@ -734,14 +767,34 @@ impl Terminal {
     }
 }
 
-/// Represents the state of the terminal, including cursor positions and colors.
+/// Represents the internal state of the terminal emulator.
+///
+/// This structure maintains critical state information for proper terminal operation:
+/// - Scroll-aware wrap detection for accurate reflow behavior
+/// - Scrollback buffer to preserve content that scrolls off-screen
+/// - Color state for rendering
+///
+/// # Performance Characteristics
+/// - `wrap_flags`: O(1) access, O(height) space
+/// - `scrollback`: O(1) push/pop, O(scrollback_limit) space
+/// - Operations are optimized for streaming terminal output
 #[derive(Debug)]
 struct State {
+    /// Saved cursor positions (currently unused legacy field)
     positions: Vec<(usize, usize)>,
+    /// Default background color for the terminal
     background: SrgbaTuple,
+    /// Default foreground color for the terminal
     foreground: SrgbaTuple,
+    /// Per-row wrap flags indicating which physical rows are soft-wrapped.
+    /// Index corresponds to surface row, value indicates if that row wrapped to the next.
+    /// This is essential for accurate logical line reconstruction during reflow.
     wrap_flags: Vec<bool>,
+    /// Scrollback buffer preserving lines that have scrolled off the visible surface.
+    /// Maintains full Line objects with attributes for proper transcript reconstruction.
+    /// Newest lines are at the back, oldest at the front.
     scrollback: VecDeque<Line>,
+    /// Maximum number of lines to keep in scrollback before trimming oldest entries
     scrollback_limit: usize,
 }
 
@@ -971,9 +1024,26 @@ impl Clone for LogicalLineState {
 }
 
 impl Terminal {
-    /// Apply an action while detecting automatic wrapping at the right margin.
-    /// If printing caused the cursor to advance to later rows (without an explicit LF),
-    /// mark those crossed rows as soft-wrapped by setting the last-cell wrapped bit.
+    /// Apply a terminal action while detecting and recording automatic line wrapping.
+    ///
+    /// This is the core terminal processing method that:
+    /// 1. Captures lines that will be scrolled out before applying scrolling actions
+    /// 2. Applies the action to the surface using termwiz's built-in processing
+    /// 3. Detects when automatic wrapping occurred by comparing cursor positions
+    /// 4. Marks wrapped rows in the wrap ledger for accurate reflow later
+    ///
+    /// # Autowrap Detection Algorithm
+    /// - For `Print(char)`: Uses character width to predict wrapping
+    /// - For `PrintString`: Estimates total wraps from display width
+    /// - For other actions: Handles scrolling effects
+    ///
+    /// # Performance
+    /// - O(1) for simple print operations
+    /// - O(N) for PrintString where N is string display width
+    /// - Minimizes row mutations to avoid mid-stream corruption
+    ///
+    /// # Returns
+    /// The sequence number from the surface after applying the action
     fn apply_action_with_autowrap(
         surface: &mut Surface,
         st: &mut State,

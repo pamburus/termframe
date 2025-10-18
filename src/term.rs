@@ -230,27 +230,33 @@ impl Terminal {
     }
 
     pub fn recommended_height(&self) -> u16 {
-        // Compute the height from the full transcript by rewrapping to the current width,
-        // then trim trailing blank rows.
-        let (w, _) = self.surface.dimensions();
-        let seq = self.surface.current_seqno();
+        let (width, _) = self.surface.dimensions();
+        let mut total_rows = 0;
+        let mut last_logical_empty = false;
+        let mut trailing_empty_rows = 0;
 
-        let logicals = self.join_logical_lines(self.transcript_lines());
-        let mut flat: Vec<Line> = Vec::new();
-        for ln in logicals {
-            flat.extend(ln.wrap(w, seq));
-        }
+        self.process_logical_lines_with_accumulator((), |_acc, logical_width| {
+            // Calculate rows needed for this logical line using ceiling division
+            let rows_needed = if logical_width == 0 {
+                1 // Empty logical lines still take one row
+            } else {
+                logical_width.div_ceil(width)
+            };
 
-        // Trim trailing blank rows
-        while flat
-            .last()
-            .map(|ln| ln.visible_cells().all(|c| c.str().trim().is_empty()))
-            .unwrap_or(false)
-        {
-            flat.pop();
-        }
+            // Track if this logical line is empty (for trailing trimming)
+            let is_empty = logical_width == 0;
+            if is_empty {
+                trailing_empty_rows += rows_needed;
+            } else {
+                // Non-empty line found, reset trailing counter
+                total_rows += trailing_empty_rows + rows_needed;
+                trailing_empty_rows = 0;
+            }
+            last_logical_empty = is_empty;
+        });
 
-        flat.len() as u16
+        // Don't count trailing empty logical lines
+        total_rows as u16
     }
 
     pub fn set_height(&mut self, height: u16) {

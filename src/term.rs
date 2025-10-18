@@ -856,6 +856,98 @@ mod tests {
     }
 
     #[test]
+    fn test_autowrap_marks_on_bottom_scroll() {
+        // width=3, height=2 to force bottom scroll on the 7th char
+        let mut term = Terminal::new(Options {
+            cols: Some(3),
+            rows: Some(2),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        let mut reader = std::io::Cursor::new(b"abcdefg".as_ref());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        let lines = term.surface().screen_lines();
+
+        // After bottom scroll caused by 'g', the line that just wrapped (previous bottom row)
+        // has moved up by one row. It is now row 0 and must be marked as wrapped.
+        assert!(
+            lines[0].last_cell_was_wrapped(),
+            "row 0 should be soft-wrapped after bottom scroll"
+        );
+
+        // Validate visible content is not corrupted.
+        let r0: String = lines[0]
+            .visible_cells()
+            .map(|c| c.str().to_string())
+            .collect();
+        let r1: String = lines[1]
+            .visible_cells()
+            .map(|c| c.str().to_string())
+            .collect();
+
+        assert_eq!(
+            r0.trim_end(),
+            "def",
+            "row 0 should contain the wrapped prior bottom line"
+        );
+        assert_eq!(
+            r1.trim_end(),
+            "g",
+            "row 1 should start with 'g' after scroll"
+        );
+    }
+
+    #[test]
+    fn test_multiple_bottom_scrolls_preserve_wrap_and_content() {
+        // width=3, height=2, long input to trigger multiple bottom scrolls
+        let mut term = Terminal::new(Options {
+            cols: Some(3),
+            rows: Some(2),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        // 12 chars: will cause several wraps and two bottom scrolls
+        let mut reader = std::io::Cursor::new(b"abcdefghijkl".as_ref());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        let lines = term.surface().screen_lines();
+
+        // After multiple scrolls, we expect:
+        //   row 0 == "ghi" (wrapped), row 1 == "jkl"
+        let r0: String = lines[0]
+            .visible_cells()
+            .map(|c| c.str().to_string())
+            .collect();
+        let r1: String = lines[1]
+            .visible_cells()
+            .map(|c| c.str().to_string())
+            .collect();
+
+        assert_eq!(
+            r0.trim_end(),
+            "ghi",
+            "row 0 content must be intact after multiple scrolls"
+        );
+        assert_eq!(
+            r1.trim_end(),
+            "jkl",
+            "row 1 content must be intact after multiple scrolls"
+        );
+
+        // The row that just wrapped prior to the last scroll should be marked as wrapped.
+        assert!(
+            lines[0].last_cell_was_wrapped(),
+            "row 0 should be soft-wrapped after multiple bottom scrolls"
+        );
+    }
+    #[test]
     fn test_recommended_width_autowrap() {
         let mut term = Terminal::new(Options {
             cols: Some(3),
@@ -971,26 +1063,33 @@ impl Terminal {
 
     /// Mark a specific row as soft-wrapped by setting the wrapped bit on its last cell.
     /// Writes the updated line back to the surface via a minimal diff.
-    fn mark_row_soft_wrapped(surface: &mut Surface, row: usize, seq: SequenceNo) {
-        if let Some(line_cow) = surface.screen_lines().get(row) {
-            log::debug!(
-                "mark_row_soft_wrapped: row={} (before wrapped={})",
-                row,
-                line_cow.last_cell_was_wrapped()
-            );
-            let mut ln = line_cow.clone().into_owned();
-            ln.set_last_cell_was_wrapped(true, seq);
-            Self::replace_row_with_line_static(surface, row, &ln);
-            if let Some(updated) = surface.screen_lines().get(row) {
-                log::debug!(
-                    "mark_row_soft_wrapped: row={} (after wrapped={})",
-                    row,
-                    updated.last_cell_was_wrapped()
-                );
-            }
-        } else {
-            log::debug!("mark_row_soft_wrapped: row {} out of range", row);
+    fn mark_row_soft_wrapped(surface: &mut Surface, row: usize, _seq: SequenceNo) {
+        let (w, h) = surface.dimensions();
+        if row >= h || w == 0 {
+            log::debug!("mark_row_soft_wrapped: row {} out of range (h={})", row, h);
+            return;
         }
+
+        // In-place: mark the wrapped flag on the last visible cell in the row.
+        // First compute the last visible cell index without holding a mutable borrow.
+        let idx = surface
+            .screen_lines()
+            .get(row)
+            .and_then(|line| line.visible_cells().last().map(|c| c.cell_index()))
+            .unwrap_or(w.saturating_sub(1));
+
+        // Now take a mutable borrow and flip the bit in place.
+        let mut rows = surface.screen_cells();
+        let cells = &mut rows[row];
+
+        let was = cells[idx].attrs().wrapped();
+        cells[idx].attrs_mut().set_wrapped(true);
+        log::debug!(
+            "mark_row_soft_wrapped: row {} cell {} wrapped: {} -> true",
+            row,
+            idx,
+            was
+        );
     }
 
     /// A static variant of `replace_row_with_line` that operates on a `Surface` directly,

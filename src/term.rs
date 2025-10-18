@@ -168,58 +168,42 @@ impl Terminal {
         }) as u16
     }
 
-    /// Process logical lines from the transcript with a flexible accumulator pattern.
-    /// Iterates over transcript references without cloning for optimal performance.
-    fn process_logical_lines_with_accumulator<T, F>(&self, mut accumulator: T, mut callback: F) -> T
+    /// Core logical line processor that handles the transcript iteration and logical line detection.
+    /// This unified implementation serves both reference-based (width calculation) and owned (line joining) use cases.
+    fn process_transcript_logical_lines<T, F>(&self, mut accumulator: T, mut processor: F) -> T
     where
-        F: FnMut(&mut T, usize),
+        F: FnMut(&mut T, LogicalLineState),
     {
-        let mut logical_width = 0usize;
-        let mut prev_wrapped = false;
+        let mut state = LogicalLineState::new();
 
         // Process scrollback lines (already owned, borrow as &Line)
         for line in &self.state.scrollback {
-            let this_wrapped = line.last_cell_was_wrapped();
-
-            if prev_wrapped {
-                // Previous row wrapped, so this continues the same logical line
-                logical_width += Self::trimmed_line_width(line);
-            } else {
-                // Previous row did not wrap; finish that logical line and start a new one
-                if logical_width > 0 {
-                    callback(&mut accumulator, logical_width);
-                }
-                logical_width = Self::trimmed_line_width(line);
-            }
-
-            prev_wrapped = this_wrapped;
+            state.process_line(line, &mut accumulator, &mut processor);
         }
 
         // Process visible lines (as Cow references, avoid into_owned())
         for cow_line in self.surface.screen_lines() {
             let line = cow_line.as_ref();
-            let this_wrapped = line.last_cell_was_wrapped();
-
-            if prev_wrapped {
-                // Previous row wrapped, so this continues the same logical line
-                logical_width += Self::trimmed_line_width(line);
-            } else {
-                // Previous row did not wrap; finish that logical line and start a new one
-                if logical_width > 0 {
-                    callback(&mut accumulator, logical_width);
-                }
-                logical_width = Self::trimmed_line_width(line);
-            }
-
-            prev_wrapped = this_wrapped;
+            state.process_line(line, &mut accumulator, &mut processor);
         }
 
-        // Don't forget the final logical line
-        if logical_width > 0 {
-            callback(&mut accumulator, logical_width);
-        }
+        // Finalize any remaining logical line
+        state.finalize(&mut accumulator, &mut processor);
 
         accumulator
+    }
+
+    /// Process logical lines from the transcript with a flexible accumulator pattern.
+    /// Iterates over transcript references without cloning for optimal performance.
+    fn process_logical_lines_with_accumulator<T, F>(&self, accumulator: T, mut callback: F) -> T
+    where
+        F: FnMut(&mut T, usize),
+    {
+        self.process_transcript_logical_lines(accumulator, |acc, state| {
+            if let Some(width) = state.logical_line_width {
+                callback(acc, width);
+            }
+        })
     }
 
     pub fn set_width(&mut self, width: u16) {
@@ -299,42 +283,43 @@ impl Terminal {
         self.join_logical_lines_from_iter(lines.into_iter())
     }
 
-    /// Join logical lines from an iterator of owned Lines.
-    /// This is the core logical line joining implementation that both
-    /// join_logical_lines() and other methods can reuse.
+    /// Join logical lines from an iterator of owned Lines using the unified core processor.
     fn join_logical_lines_from_iter<I>(&self, lines: I) -> Vec<Line>
     where
         I: Iterator<Item = Line>,
     {
         let seq = self.surface.current_seqno();
-        let mut out: Vec<Line> = Vec::new();
-        let mut current: Option<Line> = None;
-        let mut prev_wrapped = false;
+        let mut result = Vec::new();
 
-        for ln in lines {
-            let this_wrapped = ln.last_cell_was_wrapped();
+        // Create a mock processor state for the line iterator
+        let mut state = LogicalLineState::new();
+        let mut current_line: Option<Line> = None;
 
-            if let Some(acc) = current.as_mut() {
-                if prev_wrapped {
-                    // Previous physical row wrapped, so this row continues the same logical line
-                    acc.append_line(ln, seq);
-                } else {
-                    // Previous physical row did not wrap; finish that logical line and start a new one
-                    out.push(current.take().unwrap());
-                    current = Some(ln);
+        for line in lines {
+            let this_wrapped = line.last_cell_was_wrapped();
+
+            if state.prev_wrapped {
+                // Continue the current logical line
+                if let Some(ref mut current) = current_line {
+                    current.append_line(line, seq);
                 }
             } else {
-                current = Some(ln);
+                // Finish previous logical line and start new one
+                if let Some(completed) = current_line.take() {
+                    result.push(completed);
+                }
+                current_line = Some(line);
             }
 
-            // Track whether the current physical row wrapped, to decide how to treat the next row
-            prev_wrapped = this_wrapped;
+            state.prev_wrapped = this_wrapped;
         }
 
-        if let Some(acc) = current.take() {
-            out.push(acc);
+        // Push the final logical line
+        if let Some(final_line) = current_line {
+            result.push(final_line);
         }
-        out
+
+        result
     }
 
     /// Unscroll the transcript to a given window:
@@ -916,6 +901,61 @@ fn tabulate_back(pos: usize, n: usize) -> usize {
 }
 
 const TAB_STOP: usize = 8;
+
+/// State tracker for logical line processing that handles the wrap detection logic.
+/// This consolidates the logical line detection algorithm used by both width calculation
+/// and line joining operations.
+struct LogicalLineState {
+    logical_line_width: Option<usize>,
+    prev_wrapped: bool,
+}
+
+impl LogicalLineState {
+    fn new() -> Self {
+        Self {
+            logical_line_width: None,
+            prev_wrapped: false,
+        }
+    }
+
+    fn process_line<T, F>(&mut self, line: &Line, accumulator: &mut T, processor: &mut F)
+    where
+        F: FnMut(&mut T, LogicalLineState),
+    {
+        let this_wrapped = line.last_cell_was_wrapped();
+        let line_width = Terminal::trimmed_line_width(line);
+
+        if self.prev_wrapped {
+            // Continue the current logical line
+            self.logical_line_width = Some(self.logical_line_width.unwrap_or(0) + line_width);
+        } else {
+            // Finish previous logical line and start new one
+            if self.logical_line_width.is_some() {
+                processor(accumulator, *self);
+            }
+            self.logical_line_width = Some(line_width);
+        }
+
+        self.prev_wrapped = this_wrapped;
+    }
+
+    fn finalize<T, F>(&mut self, accumulator: &mut T, processor: &mut F)
+    where
+        F: FnMut(&mut T, LogicalLineState),
+    {
+        if self.logical_line_width.is_some() {
+            processor(accumulator, *self);
+        }
+    }
+}
+
+impl Copy for LogicalLineState {}
+
+impl Clone for LogicalLineState {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
 
 impl Terminal {
     /// Apply an action while detecting automatic wrapping at the right margin.

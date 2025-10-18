@@ -175,9 +175,10 @@ impl Terminal {
     }
 
     pub fn set_width(&mut self, width: u16) {
+        // Rewrap using keep-height strategy; do not change the viewport height here.
         self.rewrap_surface(width as usize);
-        self.size.cols = self.surface.dimensions().0 as u16;
-        self.size.rows = self.surface.dimensions().1 as u16;
+        // Update only reported columns
+        self.size.cols = width;
     }
 
     pub fn recommended_height(&self) -> u16 {
@@ -205,10 +206,9 @@ impl Terminal {
     }
 
     pub fn set_height(&mut self, height: u16) {
-        self.surface
-            .resize(self.surface.dimensions().0, height as usize);
-        self.size.rows = self.surface.dimensions().1 as u16;
-        self.state.ensure_height(self.surface.dimensions().1);
+        let w = self.surface.dimensions().0;
+        self.reflow_transcript_to_window(w, height as usize);
+        self.size.rows = height;
     }
 
     /// Return the minimum column width needed so that no soft-wrapped line
@@ -335,14 +335,10 @@ impl Terminal {
         out
     }
 
-    /// Rewrap the whole surface to `new_width`, merging previously wrapped rows.
-    /// Returns the sequence number after edits.
-    fn rewrap_surface(&mut self, new_width: usize) -> usize {
-        let (old_w, _) = self.surface.dimensions();
-        if new_width == old_w {
-            return self.surface.current_seqno();
-        }
-
+    /// Reflow the full transcript to `new_width` and materialize the bottom `window_height` rows.
+    /// This updates scrollback (rows above the window), resizes the surface to the provided
+    /// width and height, renders the visible window, and refreshes wrap flags.
+    fn reflow_transcript_to_window(&mut self, new_width: usize, window_height: usize) {
         let seq = self.surface.current_seqno();
 
         // 1) Build logical lines from full transcript (scrollback + visible).
@@ -354,7 +350,7 @@ impl Terminal {
             reflowed.extend(ln.wrap(new_width, seq));
         }
 
-        // Trim trailing blank rows to avoid overcounting empty tail
+        // 3) Trim trailing blank rows to avoid empty tail.
         while reflowed
             .last()
             .map(|ln| ln.visible_cells().all(|c| c.str().trim().is_empty()))
@@ -363,26 +359,44 @@ impl Terminal {
             reflowed.pop();
         }
 
-        // 3) Resize the surface to fit the reflowed rows.
-        let new_h = reflowed.len().max(1);
-        self.surface.resize(new_width, new_h);
+        // 4) Compute bottom window slice for the requested height.
+        let total = reflowed.len();
+        let start = total.saturating_sub(window_height);
 
-        // 4) Replace each row using a diff so change stream stays optimal.
-        for (row, ln) in reflowed.iter().enumerate() {
-            self.replace_row_with_line(row, ln);
+        // 5) Rebuild scrollback from the portion above the visible window.
+        self.state.scrollback.clear();
+        for ln in reflowed.iter().take(start) {
+            self.state.push_scrollback_line(ln.clone());
         }
 
-        // 5) Update the ledger to reflect new wrapping after reflow.
-        self.state.ensure_height(new_h);
-        for (row, ln) in reflowed.iter().enumerate() {
-            if let Some(flag) = self.state.wrap_flags.get_mut(row) {
-                *flag = ln.last_cell_was_wrapped();
+        // 6) Resize surface to the requested width and height.
+        self.surface.resize(new_width, window_height);
+
+        // 7) Render the bottom window rows into the surface.
+        for row in 0..window_height {
+            if let Some(ln) = reflowed.get(start + row) {
+                self.replace_row_with_line(row, ln);
             }
         }
 
-        // Clear scrollback after rebuilding from full transcript to avoid double counting
-        self.state.scrollback.clear();
+        // 8) Update wrap flags for visible rows.
+        self.state.ensure_height(window_height);
+        for row in 0..window_height {
+            if let Some(flag) = self.state.wrap_flags.get_mut(row) {
+                let wrapped = reflowed
+                    .get(start + row)
+                    .map(|ln| ln.last_cell_was_wrapped())
+                    .unwrap_or(false);
+                *flag = wrapped;
+            }
+        }
+    }
 
+    /// Rewrap the whole surface to `new_width`, merging previously wrapped rows,
+    /// keeping the current viewport height.
+    fn rewrap_surface(&mut self, new_width: usize) -> usize {
+        let (_, h) = self.surface.dimensions();
+        self.reflow_transcript_to_window(new_width, h);
         self.surface.current_seqno()
     }
 
@@ -1317,6 +1331,43 @@ mod tests {
         // After rewrap to width=9, all three lines fit as single rows
         term.set_width(9);
         assert_eq!(term.recommended_height(), 3);
+    }
+
+    #[test]
+    fn test_unscroll_on_height_increase_minimal_small_width() {
+        // Start 8x2; after set_width(9) we still see only bottom 2 lines.
+        // Increasing height to 3 must unscroll the earliest line into view.
+        let mut term = Terminal::new(Options {
+            cols: Some(8),
+            rows: Some(2),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        let data = "AAAAAAAAA\nBBBBBBBBB\nCCCCCCCCC\n";
+        let mut reader = std::io::Cursor::new(data.as_bytes());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // Width across the full transcript is 9
+        assert_eq!(term.recommended_width(), 9);
+
+        // Change width only; keep height at 2 (bottom window shows last two lines)
+        term.set_width(9);
+        assert_eq!(term.surface().dimensions().1 as u16, 2);
+
+        // Now increase height to 3; this should unscroll one more row into the visible window
+        term.set_height(3);
+        assert_eq!(term.surface().dimensions().1 as u16, 3);
+
+        // Verify the top visible row is now the first logical line
+        let lines = term.surface().screen_lines();
+        let top: String = lines[0]
+            .visible_cells()
+            .map(|c| c.str().to_string())
+            .collect();
+        assert_eq!(top.trim_end(), "AAAAAAAAA");
     }
 }
 

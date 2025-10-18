@@ -161,7 +161,7 @@ impl Terminal {
     }
 
     pub fn recommended_width(&self) -> u16 {
-        self.process_logical_lines_with_accumulator(0usize, |max_width, width| {
+        self.process_logical_lines_with_accumulator(0, |max_width, width| {
             if width > *max_width {
                 *max_width = width;
             }
@@ -169,11 +169,7 @@ impl Terminal {
     }
 
     /// Process logical lines from the transcript with a flexible accumulator pattern.
-    /// The callback receives a mutable reference to the accumulator and the width of each logical line.
-    /// This allows for various aggregation patterns (max, sum, count, etc.).
-    ///
-    /// OPTIMIZATION: Iterates over transcript references (scrollback + visible) without cloning.
-    /// Scrollback lines are borrowed as &Line, visible lines use Cow::as_ref().
+    /// Iterates over transcript references without cloning for optimal performance.
     fn process_logical_lines_with_accumulator<T, F>(&self, mut accumulator: T, mut callback: F) -> T
     where
         F: FnMut(&mut T, usize),
@@ -224,24 +220,6 @@ impl Terminal {
         }
 
         accumulator
-    }
-
-    /// Example method demonstrating reusability: count total logical lines in transcript.
-    /// This shows how process_logical_lines_with_accumulator can be used for different aggregations.
-    #[allow(dead_code)]
-    pub fn count_logical_lines(&self) -> usize {
-        self.process_logical_lines_with_accumulator(0usize, |count, _width| {
-            *count += 1;
-        })
-    }
-
-    /// Example method demonstrating reusability: compute total character width across all logical lines.
-    /// This shows another aggregation pattern using the same building block.
-    #[allow(dead_code)]
-    pub fn total_logical_width(&self) -> usize {
-        self.process_logical_lines_with_accumulator(0usize, |total, width| {
-            *total += width;
-        })
     }
 
     pub fn set_width(&mut self, width: u16) {
@@ -1612,8 +1590,16 @@ mod tests {
 
         // Test different uses of the same building block
         let recommended_width = term.recommended_width();
-        let logical_line_count = term.count_logical_lines();
-        let total_width = term.total_logical_width();
+
+        // Demonstrate reusability: count logical lines
+        let logical_line_count = term.process_logical_lines_with_accumulator(0, |count, _width| {
+            *count += 1;
+        });
+
+        // Demonstrate reusability: compute total width
+        let total_width = term.process_logical_lines_with_accumulator(0, |total, width| {
+            *total += width;
+        });
 
         // Verify expected values
         assert_eq!(

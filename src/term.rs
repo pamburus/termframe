@@ -1775,11 +1775,11 @@ mod tests {
 
         // Change width only; keep height at 2 (bottom window shows last two lines)
         term.set_width(9);
-        assert_eq!(term.surface().dimensions().1 as u16, 2);
+        assert_eq!(term.surface().dimensions().1, 2);
 
         // Now increase height to 3; this should unscroll one more row into the visible window
         term.set_height(3);
-        assert_eq!(term.surface().dimensions().1 as u16, 3);
+        assert_eq!(term.surface().dimensions().1, 3);
 
         // Verify the top visible row is now the first logical line
         let lines = term.surface().screen_lines();

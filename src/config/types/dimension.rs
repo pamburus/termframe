@@ -95,7 +95,7 @@ where
     pub fn fit(&self, value: T) -> T {
         match self {
             Self::Auto => value,
-            Self::Limited(range) => range.clamp(value),
+            Self::Limited(range) => range.fit(value),
             Self::Fixed(value) => *value,
         }
     }

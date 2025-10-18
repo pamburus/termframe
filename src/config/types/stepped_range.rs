@@ -75,7 +75,7 @@ impl<T> SteppedRange<T> {
     }
 
     /// Clamps a value to be within the range defined by `min` and `max`, snapping it up to the nearest step if specified.
-    pub fn clamp(&self, value: T) -> T
+    pub fn fit(&self, value: T) -> T
     where
         T: PartialOrd + Copy + SnapUp,
     {
@@ -84,7 +84,7 @@ impl<T> SteppedRange<T> {
         } else {
             value
         };
-        self.range.clamp(value)
+        self.range.fit(value)
     }
 
     // Convert to inner range (useful for compatibility)

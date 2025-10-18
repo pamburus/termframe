@@ -51,7 +51,7 @@ impl<T> PartialRange<T> {
     }
 
     /// Clamps a value to be within the range defined by `min` and `max`.
-    pub fn clamp(&self, value: T) -> T
+    pub fn fit(&self, value: T) -> T
     where
         T: PartialOrd + Copy,
     {

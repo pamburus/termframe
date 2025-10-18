@@ -906,6 +906,8 @@ impl Terminal {
         );
 
         // If this was printing and we crossed rows, that indicates autowraps.
+        // Additionally, detect the bottom-scroll case where wrapping occurs but y doesn't change:
+        // when xpos exceeded width on entry (x0 >= width) and after printing we observed x1 < x0.
         match action {
             Action::Print(ch) => {
                 if ch != '\n' && ch != '\r' && y1 > y0 {
@@ -918,6 +920,19 @@ impl Terminal {
                     for r in y0..y1 {
                         log::debug!("autowrap: mark row {} as soft-wrapped", r);
                         Self::mark_row_soft_wrapped(surface, r, seq);
+                    }
+                } else if ch != '\n' && ch != '\r' && y1 == y0 {
+                    let (w, _h) = surface.dimensions();
+                    if x0 >= w && x1 < x0 {
+                        log::debug!(
+                            "autowrap: detected scroll-wrap at bottom during Print('{}') (x0={}, x1={}, w={}, row={})",
+                            ch,
+                            x0,
+                            x1,
+                            w,
+                            y0
+                        );
+                        Self::mark_row_soft_wrapped(surface, y0, seq);
                     }
                 }
             }
@@ -932,6 +947,19 @@ impl Terminal {
                     for r in y0..y1 {
                         log::debug!("autowrap: mark row {} as soft-wrapped", r);
                         Self::mark_row_soft_wrapped(surface, r, seq);
+                    }
+                } else if y1 == y0 {
+                    let (w, _h) = surface.dimensions();
+                    if x0 >= w && x1 < x0 {
+                        log::debug!(
+                            "autowrap: detected scroll-wrap at bottom during PrintString(len={}) (x0={}, x1={}, w={}, row={})",
+                            s.len(),
+                            x0,
+                            x1,
+                            w,
+                            y0
+                        );
+                        Self::mark_row_soft_wrapped(surface, y0, seq);
                     }
                 }
             }

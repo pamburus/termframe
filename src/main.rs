@@ -129,8 +129,20 @@ impl App {
         let window = WindowStyleConfig::load_hybrid(&settings.window.style)?.window;
 
         let mut terminal = Terminal::new(term::Options {
-            cols: opt.width.min().or_else(|| opt.width.max()).or(Some(240)),
-            rows: opt.height.min().or_else(|| opt.height.max()).or(Some(1024)),
+            cols: Some(
+                settings
+                    .terminal
+                    .width
+                    .initial_or(opt.width.min().or_else(|| opt.width.max()).unwrap_or(240)),
+            ),
+            rows: Some(
+                settings.terminal.height.initial_or(
+                    opt.height
+                        .min()
+                        .or_else(|| opt.height.max())
+                        .unwrap_or(1024),
+                ),
+            ),
             background: Some(theme.bg.convert()),
             foreground: Some(theme.fg.convert()),
             env: settings.env.clone(),

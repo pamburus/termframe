@@ -97,6 +97,18 @@ where
     }
 }
 
+impl<T> From<T> for DimensionWithDefault<T>
+where
+    T: Copy,
+{
+    fn from(value: T) -> Self {
+        Self {
+            dim: Dimension::Fixed(value),
+            default: None,
+        }
+    }
+}
+
 impl<T> DimensionWithDefault<T>
 where
     T: Copy,
@@ -143,6 +155,20 @@ where
             Dimension::Fixed(v) => v,
             _ => self.fit(fallback),
         }
+    }
+}
+
+// Provide transparent access to the underlying Dimension
+impl<T> std::ops::Deref for DimensionWithDefault<T> {
+    type Target = Dimension<T>;
+    fn deref(&self) -> &Self::Target {
+        &self.dim
+    }
+}
+
+impl<T> std::ops::DerefMut for DimensionWithDefault<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.dim
     }
 }
 

@@ -27,11 +27,11 @@ pub struct Opt {
     pub bootstrap: BootstrapArgs,
 
     /// Width of the virtual terminal window.
-    #[arg(long, short = 'W', default_value_t = cfg().terminal.width.into(), overrides_with = "width", value_name = "COLUMNS")]
+    #[arg(long, short = 'W', default_value_t = (*cfg().terminal.width).into(), overrides_with = "width", value_name = "COLUMNS")]
     pub width: Dimension<u16>,
 
     /// Height of the virtual terminal window.
-    #[arg(long, short = 'H', default_value_t = cfg().terminal.height.into(), overrides_with = "height", value_name = "LINES")]
+    #[arg(long, short = 'H', default_value_t = (*cfg().terminal.height).into(), overrides_with = "height", value_name = "LINES")]
     pub height: Dimension<u16>,
 
     /// Override padding for the inner text in font size units.
@@ -180,8 +180,8 @@ impl config::Patch for Opt {
     fn patch(&self, settings: Settings) -> Settings {
         let mut settings = settings;
 
-        settings.terminal.width = self.width;
-        settings.terminal.height = self.height;
+        *settings.terminal.width = self.width;
+        *settings.terminal.height = self.height;
         if !self.font_family.is_empty() {
             settings.font.family = FontFamilyOption::Multiple(self.font_family.clone());
         }

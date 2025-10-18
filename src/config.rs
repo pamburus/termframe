@@ -23,7 +23,13 @@ pub mod winstyle;
 
 // re-exports
 pub use load::Load;
-pub use types::{Dimension, Number};
+pub use types::{Dimension, DimensionWithDefault, Number};
+
+impl<T> From<types::DimensionWithDefault<T>> for types::Dimension<T> {
+    fn from(v: types::DimensionWithDefault<T>) -> Self {
+        v.dim
+    }
+}
 
 pub const APP_NAME: &str = "termframe";
 
@@ -211,11 +217,11 @@ pub struct FontFaceFallback {
 }
 
 /// Terminal settings structure.
-#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Copy)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Terminal {
-    pub width: Dimension<u16>,
-    pub height: Dimension<u16>,
+    pub width: DimensionWithDefault<u16>,
+    pub height: DimensionWithDefault<u16>,
 }
 
 /// Font settings structure.

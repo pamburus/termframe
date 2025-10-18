@@ -181,15 +181,27 @@ impl Terminal {
     }
 
     pub fn recommended_height(&self) -> u16 {
-        // Rewrap the full transcript to the current width and count rows.
+        // Compute the height from the full transcript by rewrapping to the current width,
+        // then trim trailing blank rows.
         let (w, _) = self.surface.dimensions();
         let seq = self.surface.current_seqno();
+
         let logicals = self.join_logical_lines(self.transcript_lines());
-        let mut total_rows = 0usize;
+        let mut flat: Vec<Line> = Vec::new();
         for ln in logicals {
-            total_rows += ln.wrap(w, seq).len();
+            flat.extend(ln.wrap(w, seq));
         }
-        total_rows as u16
+
+        // Trim trailing blank rows
+        while flat
+            .last()
+            .map(|ln| ln.visible_cells().all(|c| c.str().trim().is_empty()))
+            .unwrap_or(false)
+        {
+            flat.pop();
+        }
+
+        flat.len() as u16
     }
 
     pub fn set_height(&mut self, height: u16) {
@@ -295,19 +307,28 @@ impl Terminal {
         let seq = self.surface.current_seqno();
         let mut out: Vec<Line> = Vec::new();
         let mut current: Option<Line> = None;
+        let mut prev_wrapped = false;
+
         for ln in lines {
+            let this_wrapped = ln.last_cell_was_wrapped();
+
             if let Some(acc) = current.as_mut() {
-                acc.append_line(ln, seq);
+                if prev_wrapped {
+                    // Previous physical row wrapped, so this row continues the same logical line
+                    acc.append_line(ln, seq);
+                } else {
+                    // Previous physical row did not wrap; finish that logical line and start a new one
+                    out.push(current.take().unwrap());
+                    current = Some(ln);
+                }
             } else {
                 current = Some(ln);
             }
-            if let Some(accum) = current.as_ref() {
-                // If the last appended physical row is NOT wrapped, this logical line ends.
-                if !accum.last_cell_was_wrapped() {
-                    out.push(current.take().unwrap());
-                }
-            }
+
+            // Track whether the current physical row wrapped, to decide how to treat the next row
+            prev_wrapped = this_wrapped;
         }
+
         if let Some(acc) = current.take() {
             out.push(acc);
         }
@@ -333,6 +354,15 @@ impl Terminal {
             reflowed.extend(ln.wrap(new_width, seq));
         }
 
+        // Trim trailing blank rows to avoid overcounting empty tail
+        while reflowed
+            .last()
+            .map(|ln| ln.visible_cells().all(|c| c.str().trim().is_empty()))
+            .unwrap_or(false)
+        {
+            reflowed.pop();
+        }
+
         // 3) Resize the surface to fit the reflowed rows.
         let new_h = reflowed.len().max(1);
         self.surface.resize(new_width, new_h);
@@ -349,6 +379,9 @@ impl Terminal {
                 *flag = ln.last_cell_was_wrapped();
             }
         }
+
+        // Clear scrollback after rebuilding from full transcript to avoid double counting
+        self.state.scrollback.clear();
 
         self.surface.current_seqno()
     }
@@ -1260,6 +1293,30 @@ mod tests {
             lines[0].last_cell_was_wrapped(),
             "previous bottom row (now row 0) should be marked as soft-wrapped after bottom autowrap"
         );
+    }
+    #[test]
+    fn test_unscroll_rewrap_height_minimal_small_width() {
+        // Minimal small-width repro: initial 8x2, three logical lines of length 9 each.
+        // They will scroll out during feed, then we unscroll+rewrap and ensure height is 3.
+        let mut term = Terminal::new(Options {
+            cols: Some(8),
+            rows: Some(2),
+            background: None,
+            foreground: None,
+            env: HashMap::new(),
+        });
+
+        let data = "AAAAAAAAA\nBBBBBBBBB\nCCCCCCCCC\n";
+        let mut reader = std::io::Cursor::new(data.as_bytes());
+        let mut writer = Vec::new();
+        term.feed(&mut reader, &mut writer).unwrap();
+
+        // Full transcript width should be 9
+        assert_eq!(term.recommended_width(), 9);
+
+        // After rewrap to width=9, all three lines fit as single rows
+        term.set_width(9);
+        assert_eq!(term.recommended_height(), 3);
     }
 }
 

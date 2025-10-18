@@ -46,7 +46,7 @@ previous-tag:
     @{{previous-tag}}
 
 # Run all CI checks locally
-ci: test lint
+ci: test lint coverage
 
 # Run tests for all packages in the workspace
 test *ARGS: (setup "build")

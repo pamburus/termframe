@@ -4,10 +4,20 @@
 # Possible values: [auto, dark, light].
 mode = "auto"
 
+#
 # Terminal settings.
+#
+# Width and height define restrictions on number of columns and rows respectively.
+# Can be specified as `auto`, as a single number or as a range with min and max values.
+# If the detected size is outside of the specified range, it will be clamped to the nearest limit.
+# Examples
+# - `width = "auto"` - automatically detect terminal width based on the command output.
+# - `width = { min = 80 }` - use at least 80 columns, automatically detected based on the command output.
+# - `height = 30` - use exactly 30 rows.
+# - `height = { min = 20, max = 50, step = 10 }` - use between 20 and 50 rows, rounded to the nearest multiple of 10.
 [terminal]
-width = 80  # Number of terminal columns.
-height = 24 # Number of terminal rows.
+width = { min = 80, max = 240, step = 4 } # Number of terminal columns.
+height = { min = 24, max = 60, step = 4 } # Number of terminal rows.
 
 # Environment variables.
 [env]

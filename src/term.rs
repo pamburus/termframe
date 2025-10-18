@@ -151,6 +151,32 @@ impl Terminal {
         Ok(())
     }
 
+    pub fn used_size(&self) -> (u16, u16) {
+        let mut max_row = 0;
+        let mut max_col = 0;
+        let dimensions = self.surface.dimensions();
+
+        // Iterate through the surface to find the last non-blank cell
+        for row in 0..dimensions.1 {
+            let line = &self.surface.screen_lines()[row];
+            for cell in line.visible_cells() {
+                let text = cell.str();
+                if !text.trim().is_empty() {
+                    max_row = max_row.max(row as u16 + 1);
+                    max_col = max_col.max(cell.cell_index() as u16 + 1);
+                }
+            }
+        }
+
+        (max_col, max_row)
+    }
+
+    pub fn resize(&mut self, cols: u16, rows: u16) {
+        self.surface.resize(cols as usize, rows as usize);
+        self.size.cols = cols;
+        self.size.rows = rows;
+    }
+
     /// Applies an action to the terminal's surface and state, and writes output to the writer.
     fn apply_action(
         surface: &mut Surface,

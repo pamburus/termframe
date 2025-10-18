@@ -129,8 +129,8 @@ impl App {
         let window = WindowStyleConfig::load_hybrid(&settings.window.style)?.window;
 
         let mut terminal = Terminal::new(term::Options {
-            cols: Some(opt.width),
-            rows: Some(opt.height),
+            cols: opt.width.max().or(Some(240)),
+            rows: opt.height.max().or(Some(1024)),
             background: Some(theme.bg.convert()),
             foreground: Some(theme.fg.convert()),
             env: settings.env.clone(),
@@ -148,6 +148,17 @@ impl App {
             }
 
             terminal.feed(io::BufReader::new(io::stdin()), io::sink())?;
+        }
+
+        if !matches!(
+            (opt.width, opt.height),
+            (cli::Dimension::Fixed(_), cli::Dimension::Fixed(_))
+        ) {
+            let (w, h) = terminal.used_size();
+            let w = opt.width.fit(w);
+            let h = opt.height.fit(h);
+            log::info!("used terminal size: {w}x{h}");
+            terminal.resize(w, h);
         }
 
         let content = terminal.surface().screen_chars_to_string();

@@ -2866,7 +2866,7 @@ dependencies = [
 
 [[package]]
 name = "termframe"
-version = "0.6.8"
+version = "0.6.9-alpha.1"
 dependencies = [
  "allsorts",
  "anyhow",

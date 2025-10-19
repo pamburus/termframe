@@ -6,14 +6,14 @@ use serde::Deserialize;
 
 // sub-modules
 pub mod dimension;
-pub mod dimension_with_default;
+pub mod dimension_with_initial;
 pub mod range;
 pub mod snap;
 pub mod stepped_range;
 
 // re-exports
 pub use dimension::Dimension;
-pub use dimension_with_default::DimensionWithDefault;
+pub use dimension_with_initial::DimensionWithInitial;
 
 /// This type is needed to workaround issues with loading integer types as float in TOML format.
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq)]

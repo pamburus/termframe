@@ -137,7 +137,7 @@ fn create_test_opt() -> impl Patch {
 #[test]
 fn test_dimension_with_default_parse_range_default() {
     use termframe::config::{self};
-    let dim: config::DimensionWithDefault<u16> = "80..240:4@160".parse().unwrap();
+    let dim: config::DimensionWithInitial<u16> = "80..240:4@160".parse().unwrap();
     // Check constraints
     match *dim {
         config::Dimension::Limited(sr) => {
@@ -148,22 +148,22 @@ fn test_dimension_with_default_parse_range_default() {
         _ => panic!("expected Limited range"),
     }
     // Check default
-    assert_eq!(dim.default, Some(160));
+    assert_eq!(dim.initial, Some(160));
 }
 
 #[test]
 fn test_dimension_with_default_parse_auto_default() {
     use termframe::config::{self};
-    let dim: config::DimensionWithDefault<u16> = "@160".parse().unwrap();
+    let dim: config::DimensionWithInitial<u16> = "@160".parse().unwrap();
     // With no left side, it is treated as Auto with a default
     assert!(matches!(*dim, config::Dimension::Auto));
-    assert_eq!(dim.default, Some(160));
+    assert_eq!(dim.initial, Some(160));
 }
 
 #[test]
 fn test_dimension_with_default_parse_no_default() {
     use termframe::config::{self};
-    let dim: config::DimensionWithDefault<u16> = "80..240:4".parse().unwrap();
+    let dim: config::DimensionWithInitial<u16> = "80..240:4".parse().unwrap();
     // No default specified
     match *dim {
         config::Dimension::Limited(sr) => {
@@ -173,14 +173,14 @@ fn test_dimension_with_default_parse_no_default() {
         }
         _ => panic!("expected Limited range"),
     }
-    assert_eq!(dim.default, None);
+    assert_eq!(dim.initial, None);
 }
 
 #[test]
 fn test_dimension_with_default_parse_fixed_with_default() {
     use termframe::config::{self};
-    let dim: config::DimensionWithDefault<u16> = "120@100".parse().unwrap();
+    let dim: config::DimensionWithInitial<u16> = "120@100".parse().unwrap();
     // Fixed dimension with a default
     assert!(matches!(*dim, config::Dimension::Fixed(120)));
-    assert_eq!(dim.default, Some(100));
+    assert_eq!(dim.initial, Some(100));
 }

@@ -23,10 +23,10 @@ pub mod winstyle;
 
 // re-exports
 pub use load::Load;
-pub use types::{Dimension, DimensionWithDefault, Number};
+pub use types::{Dimension, DimensionWithInitial, Number};
 
-impl<T> From<types::DimensionWithDefault<T>> for types::Dimension<T> {
-    fn from(v: types::DimensionWithDefault<T>) -> Self {
+impl<T> From<types::DimensionWithInitial<T>> for types::Dimension<T> {
+    fn from(v: types::DimensionWithInitial<T>) -> Self {
         v.current
     }
 }
@@ -220,8 +220,8 @@ pub struct FontFaceFallback {
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Terminal {
-    pub width: DimensionWithDefault<u16>,
-    pub height: DimensionWithDefault<u16>,
+    pub width: DimensionWithInitial<u16>,
+    pub height: DimensionWithInitial<u16>,
 }
 
 /// Font settings structure.

@@ -84,6 +84,40 @@ PNG images: [sample-dark.png](https://github.com/user-attachments/assets/5fe3fcf
     echo "Hello, World" | termframe -o hello.svg
     ```
 
+* Use auto-sizing to determine optimal dimensions based on command output
+
+    ```sh
+    termframe --width auto --height auto -o output.svg -- command
+    ```
+
+* Constrain dimensions with ranges while allowing auto-sizing
+
+    ```sh
+    # Width between 80-120 columns, height auto-detected
+    termframe --width 80..120 --height auto -o output.svg -- command
+    
+    # Width with range constraints (CLI range syntax)
+    termframe --width 80..200 -o output.svg -- command
+    
+    # Note: JSON format with default values is only supported in configuration files
+    # CLI supports: auto, fixed numbers (80), and ranges (80..120)
+    ```
+
+### Dimension Configuration
+
+Terminal dimensions (width and height) support flexible configuration formats:
+
+* **Fixed size**: `--width 80` - Use exactly 80 columns
+* **Auto-sizing**: `--width auto` - Automatically detect optimal width from command output
+* **Range constraints**: `--width 80..120` - Auto-detect width within 80-120 column range
+
+**Note**: Advanced features like `step` and `default` values are only available in configuration files using TOML/JSON format. CLI supports `auto`, fixed numbers, and simple ranges.
+
+**Configuration File Features**: The `default` value (available in config files) serves as:
+- Initial size when no CLI override is provided
+- Fallback when auto-detection fails or produces unreasonable results  
+- Preferred size that gets clamped to min/max constraints if specified
+
 ## Configuration
 
 ### Configuration files
@@ -115,6 +149,42 @@ PNG images: [sample-dark.png](https://github.com/user-attachments/assets/5fe3fcf
 #### Default configuration file
 
 * [config.toml](assets/config.toml)
+
+#### Terminal Configuration
+
+The `[terminal]` section supports flexible dimension configuration with auto-sizing capabilities:
+
+```toml
+[terminal]
+# Simple fixed dimensions
+width = 80
+height = 24
+
+# Auto-detection
+width = "auto"
+height = "auto"
+
+# Range constraints with auto-detection
+width = { min = 80, max = 200 }
+height = { min = 24, max = 60 }
+
+# Step alignment (round to nearest multiple)
+width = { min = 80, max = 200, step = 10 }
+
+# Default values (preferred size with fallback to auto-detection)
+width = { default = 120 }
+height = { default = 30 }
+
+# Full specification with all options
+width = { min = 80, max = 240, step = 4, default = 180 }
+height = { min = 24, max = 60, default = 48 }
+```
+
+The `default` value in dimension configuration:
+- Serves as the initial/preferred size when no CLI override is provided
+- Acts as a fallback when auto-detection fails or produces unreasonable results
+- Gets clamped to `min`/`max` constraints if they are also specified
+- Enables consistent sizing across different commands and environments
 
 ### Custom Themes
 

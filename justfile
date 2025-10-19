@@ -91,7 +91,7 @@ help-for mode: (build "--locked")
         --title 'termframe --help' \
         --mode {{mode}} \
         -o doc/help-{{mode}}.svg \
-        -W 104 -H 51 \
+        -W 106 -H auto \
         -- ./target/debug/termframe --config - --help
 
 [doc('generate sample screenshots')]

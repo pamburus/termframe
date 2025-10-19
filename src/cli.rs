@@ -12,7 +12,7 @@ use enumset_ext::convert::str::EnumSet;
 
 // local imports
 use crate::config::{
-    self, DimensionWithDefault, FontFamilyOption, PaddingOption, Settings, ThemeSetting,
+    self, DimensionWithInitial, FontFamilyOption, PaddingOption, Settings, ThemeSetting,
 };
 
 const STYLES: Styles = Styles::styled()
@@ -28,13 +28,13 @@ pub struct Opt {
     #[command(flatten)]
     pub bootstrap: BootstrapArgs,
 
-    /// Width of the virtual terminal window.
-    #[arg(long, short = 'W', default_value_t = (*cfg().terminal.width).into(), overrides_with = "width", value_name = "COLUMNS")]
-    pub width: DimensionWithDefault<u16>,
+    /// Terminal width: N|auto|MIN..MAX[:STEP][@INIT].
+    #[arg(long, short = 'W', default_value_t = cfg().terminal.width, overrides_with = "width", value_name = "COLUMNS")]
+    pub width: DimensionWithInitial<u16>,
 
-    /// Height of the virtual terminal window.
-    #[arg(long, short = 'H', default_value_t = (*cfg().terminal.height).into(), overrides_with = "height", value_name = "LINES")]
-    pub height: DimensionWithDefault<u16>,
+    /// Terminal height: N|auto|MIN..MAX[:STEP][@INIT].
+    #[arg(long, short = 'H', default_value_t = cfg().terminal.height, overrides_with = "height", value_name = "LINES")]
+    pub height: DimensionWithInitial<u16>,
 
     /// Override padding for the inner text in font size units.
     #[arg(long, overrides_with = "padding", value_name = "EM")]

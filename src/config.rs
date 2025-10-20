@@ -498,3 +498,6 @@ impl SourceFile {
 pub trait Patch {
     fn patch(&self, settings: Settings) -> Settings;
 }
+
+#[cfg(test)]
+mod tests;

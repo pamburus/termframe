@@ -1,7 +1,5 @@
-use termframe::config::mode::Mode;
-use termframe::theme::AdaptiveTheme;
-
-// Skip tag tests as they require internal access to TagSet implementation
+use crate::config::mode::Mode;
+use crate::theme::AdaptiveTheme;
 
 #[test]
 fn test_adaptive_theme() {
@@ -15,7 +13,3 @@ fn test_adaptive_theme() {
     // Instead, verify they have different string representations
     assert!(format!("{:?}", light_theme) != format!("{:?}", dark_theme));
 }
-
-// Skip theme colors test as it requires internal access to ThemeData
-
-// Removing theme config loading test as it requires access to internal APIs

@@ -13,11 +13,12 @@ LLVM_BIN=$(rustc --print sysroot)/lib/rustlib/$(rustc -vV | sed -n 's|host: ||p'
 LLVM_PROFILE_PATTERN="target/coverage/test-*.profraw"
 PROFDATA_FILE="target/coverage.profdata"
 IGNORE=(
-    '/.cargo/git/checkouts/'
-    '/.cargo/registry/'
-    '/target/coverage/debug/'
-    'rustc/.*/library/'
+    # Standard Rust directories
+    '/.cargo/'
+    '/.rustup/'
+    # Generated code
     '_capnp\.rs$'
+    # Test files themselves (we want to measure what they test, not the test code)
     '/tests\.rs$'
 )
 

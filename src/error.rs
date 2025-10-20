@@ -221,20 +221,4 @@ const ERR_PREFIX: &str = "error:";
 const TIP_PREFIX: &str = "  tip:";
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    struct TestAppInfo;
-    impl AppInfoProvider for TestAppInfo {}
-
-    #[test]
-    fn test_log() {
-        let err = Error::Io(std::io::Error::other("test"));
-        let mut buf = Vec::new();
-        err.log_to(&mut buf, &TestAppInfo).unwrap();
-        assert_eq!(
-            String::from_utf8(buf).unwrap(),
-            "\u{1b}[1m\u{1b}[91merror:\u{1b}[39m\u{1b}[0m test\n"
-        );
-    }
-}
+mod tests;

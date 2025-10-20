@@ -383,3 +383,6 @@ fn trim(s: &str) -> Result<String, String> {
 fn cfg() -> &'static Settings {
     config::global::get()
 }
+
+#[cfg(test)]
+mod tests;

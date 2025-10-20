@@ -17,7 +17,8 @@ IGNORE=(
     '/.cargo/registry/'
     '/target/coverage/debug/'
     'rustc/.*/library/'
-    '_capnp.rs$'
+    '_capnp\.rs$'
+    '/tests\.rs$'
 )
 
 function executables() {
@@ -70,7 +71,7 @@ function test() {
         echo "test ${asset_name:?}"
         local golden=assets/test/output/${asset_name:?}.svg
         local tmp=${golden:?}.tmp
-        ${MAIN_EXECUTABLE:?} --config - --mode dark <"${asset:?}" -o "${tmp:?}"
+        ${MAIN_EXECUTABLE:?} --config - --mode dark -W 80 -H 24 <"${asset:?}" -o "${tmp:?}"
         diff "${golden:?}" "${tmp:?}"
         rm -f ${tmp:?}
     done

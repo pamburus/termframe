@@ -1755,7 +1755,7 @@ dependencies = [
  "miette-derive",
  "once_cell",
  "thiserror 1.0.69",
- "unicode-width",
+ "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -1841,6 +1841,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.106",
+]
+
+[[package]]
+name = "num-integer"
+version = "0.1.46"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]
@@ -2866,7 +2875,7 @@ dependencies = [
 
 [[package]]
 name = "termframe"
-version = "0.6.9-alpha.1"
+version = "0.7.0-alpha.1"
 dependencies = [
  "allsorts",
  "anyhow",
@@ -2893,6 +2902,7 @@ dependencies = [
  "itertools 0.14.0",
  "known-folders",
  "log",
+ "num-integer",
  "num-traits",
  "owo-colors",
  "portable-pty",
@@ -2910,6 +2920,7 @@ dependencies = [
  "thiserror 2.0.17",
  "tidy-themes",
  "toml",
+ "unicode-width 0.2.2",
  "ureq",
  "url",
  "voca_rs",
@@ -3219,6 +3230,12 @@ name = "unicode-width"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
+
+[[package]]
+name = "unicode-width"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
 
 [[package]]
 name = "untrusted"

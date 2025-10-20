@@ -84,6 +84,24 @@ PNG images: [sample-dark.png](https://github.com/user-attachments/assets/5fe3fcf
     echo "Hello, World" | termframe -o hello.svg
     ```
 
+* Use auto-sizing to determine optimal dimensions based on command output
+
+    ```sh
+    # Auto-detect both width and height
+    termframe --width auto --height auto -o output.svg -- command
+
+    # Width between 80 and 120 columns, height auto-detected
+    termframe -W 80..120 -H auto -o output.svg -- command
+
+    # Width between 80 and 200 columns, step of 4, initial 120
+    # Height auto-detected, initial 40
+    termframe -W 80..200:4@120 -H @40 -o output.svg -- command
+    ```
+
+> [!NOTE]
+> It is recommended to set proper initial values for commands that may use
+> terminal capabilities to scale their output or interface depending on the terminal size.
+
 ## Configuration
 
 ### Configuration files
@@ -116,6 +134,44 @@ PNG images: [sample-dark.png](https://github.com/user-attachments/assets/5fe3fcf
 
 * [config.toml](assets/config.toml)
 
+#### Terminal Configuration
+
+The `[terminal]` section supports flexible dimension configuration with auto-sizing capabilities:
+
+```toml
+[terminal]
+# Simple fixed dimensions
+width = 80
+height = 24
+
+# Auto-detection
+width = "auto"
+height = "auto"
+
+# Range constraints with auto-detection
+width = { min = 80, max = 200 }
+height = { min = 24, max = 60 }
+
+# Step alignment (round to nearest multiple)
+width = { min = 80, max = 200, step = 10 }
+
+# Initial values (preferred size with fallback to auto-detection)
+width = { initial = 120 }
+height = { initial = 30 }
+
+# Full specification with all options
+width = { min = 80, max = 240, step = 4, initial = 180 }
+height = { min = 24, max = 60, initial = 48 }
+```
+
+The `initial` value in dimension configuration:
+
+* Serves as the initial/preferred size when no CLI override is provided
+* Acts as a fallback when auto-detection fails or produces unreasonable results
+* Gets clamped to `min`/`max` constraints if they are also specified
+* Enables consistent sizing across different commands and environments
+  if the commands scale their output based on terminal size
+
 ### Custom Themes
 
 You can create custom themes by placing theme files in the `themes` subfolder of your configuration directory.
@@ -128,7 +184,7 @@ Create a `themes` folder in your configuration directory:
 | ------- | ----------------------------------------------------------------- |
 | macOS   | `~/.config/termframe/themes/`                                     |
 | Linux   | `~/.config/termframe/themes/`                                     |
-| Windows | `%USERPROFILE%\AppData\Roaming\termframe\themes\`               |
+| Windows | `%USERPROFILE%\AppData\Roaming\termframe\themes\`                 |
 
 #### Theme file formats
 

@@ -14,14 +14,16 @@ use serde::Deserialize;
 // local imports
 use crate::appdirs::AppDirs;
 
+// sub-modules
 pub mod load;
 pub mod mode;
 pub mod theme;
 pub mod types;
 pub mod winstyle;
 
+// re-exports
 pub use load::Load;
-pub use types::Number;
+pub use types::{Dimension, DimensionWithInitial, Number};
 
 pub const APP_NAME: &str = "termframe";
 
@@ -212,8 +214,8 @@ pub struct FontFaceFallback {
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Terminal {
-    pub width: u16,
-    pub height: u16,
+    pub width: DimensionWithInitial<u16>,
+    pub height: DimensionWithInitial<u16>,
 }
 
 /// Font settings structure.

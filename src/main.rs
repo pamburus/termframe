@@ -129,8 +129,20 @@ impl App {
         let window = WindowStyleConfig::load_hybrid(&settings.window.style)?.window;
 
         let mut terminal = Terminal::new(term::Options {
-            cols: Some(opt.width),
-            rows: Some(opt.height),
+            cols: Some(
+                settings
+                    .terminal
+                    .width
+                    .initial_or(opt.width.min().or_else(|| opt.width.max()).unwrap_or(240)),
+            ),
+            rows: Some(
+                settings.terminal.height.initial_or(
+                    opt.height
+                        .min()
+                        .or_else(|| opt.height.max())
+                        .unwrap_or(1024),
+                ),
+            ),
             background: Some(theme.bg.convert()),
             foreground: Some(theme.fg.convert()),
             env: settings.env.clone(),
@@ -148,6 +160,21 @@ impl App {
             }
 
             terminal.feed(io::BufReader::new(io::stdin()), io::sink())?;
+        }
+
+        if !matches!(
+            (opt.width.current, opt.height.current),
+            (cli::Dimension::Fixed(_), cli::Dimension::Fixed(_))
+        ) {
+            let width = terminal.recommended_width();
+            log::info!("recommended terminal width: {width}");
+            let width = opt.width.fit(width);
+            terminal.set_width(width);
+            let height = terminal.recommended_height();
+            log::info!("recommended terminal height: {height}");
+            let height = opt.height.fit(height);
+            terminal.set_height(height);
+            log::info!("resized terminal to {width}x{height}");
         }
 
         let content = terminal.surface().screen_chars_to_string();

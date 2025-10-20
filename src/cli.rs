@@ -1,5 +1,5 @@
 // std imports
-use std::fmt;
+use std::{fmt, str::FromStr};
 
 // third-party imports
 use clap::{
@@ -11,7 +11,9 @@ use clap_complete::Shell;
 use enumset_ext::convert::str::EnumSet;
 
 // local imports
-use crate::config::{self, FontFamilyOption, PaddingOption, Settings, ThemeSetting};
+use crate::config::{
+    self, DimensionWithInitial, FontFamilyOption, PaddingOption, Settings, ThemeSetting,
+};
 
 const STYLES: Styles = Styles::styled()
     .header(AnsiColor::Green.on_default().bold())
@@ -26,13 +28,13 @@ pub struct Opt {
     #[command(flatten)]
     pub bootstrap: BootstrapArgs,
 
-    /// Width of the virtual terminal window.
+    /// Terminal width: N|auto|MIN..MAX[:STEP][@INIT].
     #[arg(long, short = 'W', default_value_t = cfg().terminal.width, overrides_with = "width", value_name = "COLUMNS")]
-    pub width: u16,
+    pub width: DimensionWithInitial<u16>,
 
-    /// Height of the virtual terminal window.
+    /// Terminal height: N|auto|MIN..MAX[:STEP][@INIT].
     #[arg(long, short = 'H', default_value_t = cfg().terminal.height, overrides_with = "height", value_name = "LINES")]
-    pub height: u16,
+    pub height: DimensionWithInitial<u16>,
 
     /// Override padding for the inner text in font size units.
     #[arg(long, overrides_with = "padding", value_name = "EM")]
@@ -287,6 +289,7 @@ impl BootstrapOpt {
 }
 
 pub type ThemeTagSet = EnumSet<config::theme::Tag>;
+pub type Dimension<T> = config::Dimension<T>;
 
 /// Font weight option.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -316,7 +319,7 @@ impl From<FontWeight> for config::FontWeight {
     }
 }
 
-impl std::str::FromStr for FontWeight {
+impl FromStr for FontWeight {
     type Err = String;
 
     /// Parses a string into a `FontWeight`.

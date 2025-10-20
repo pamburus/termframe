@@ -55,8 +55,8 @@ fn test_font_weight_conversion() {
 fn test_opt_patch() {
     // Create base settings
     let mut settings = Settings::default();
-    settings.terminal.width = 80;
-    settings.terminal.height = 24;
+    settings.terminal.width.current = 80.into();
+    settings.terminal.height.current = 24.into();
     settings.font.family = FontFamilyOption::Single("Default".to_string());
     settings.theme = ThemeSetting::Fixed("default".to_string());
     settings.window.enabled = false;
@@ -68,8 +68,8 @@ fn test_opt_patch() {
     let patched = opt.patch(settings);
 
     // Verify patched settings
-    assert_eq!(patched.terminal.width, 100);
-    assert_eq!(patched.terminal.height, 50);
+    assert_eq!(patched.terminal.width.current, 100.into());
+    assert_eq!(patched.terminal.height.current, 50.into());
     assert!(matches!(patched.font.family, FontFamilyOption::Multiple(_)));
     if let FontFamilyOption::Multiple(families) = &patched.font.family {
         assert_eq!(families.len(), 2);
@@ -107,8 +107,8 @@ fn create_test_opt() -> impl Patch {
         fn patch(&self, settings: Settings) -> Settings {
             let mut settings = settings;
 
-            settings.terminal.width = self.width;
-            settings.terminal.height = self.height;
+            settings.terminal.width.current = self.width.into();
+            settings.terminal.height.current = self.height.into();
             if !self.font_family.is_empty() {
                 settings.font.family = FontFamilyOption::Multiple(self.font_family.clone());
             }

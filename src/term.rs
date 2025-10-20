@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, VecDeque},
     io::{self, BufRead, BufReader, BufWriter},
     mem,
     sync::{
@@ -22,8 +22,9 @@ use termwiz::{
         osc::{ColorOrQuery, DynamicColorNumber},
         parser::Parser,
     },
-    surface::{Change, Position, SEQ_ZERO, SequenceNo, Surface},
+    surface::{Change, Line, Position, SEQ_ZERO, SequenceNo, Surface, change::ChangeSequence},
 };
+use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
 /// Options for configuring the terminal.
 #[derive(Debug, Default)]
@@ -68,7 +69,7 @@ impl Terminal {
             env: options.env,
             surface: Surface::new(cols.into(), rows.into()),
             parser: Parser::new(),
-            state: State::new(background, foreground),
+            state: State::new(background, foreground, rows as usize),
             size,
         }
     }
@@ -96,11 +97,19 @@ impl Terminal {
                 return Ok(());
             }
 
-            self.parser.parse(buffer, |action| {
-                let seq =
-                    Self::apply_action(&mut self.surface, &mut self.state, &mut writer, action);
+            let mut actions = Vec::new();
+            self.parser
+                .parse(buffer, |action| action.append_to(&mut actions));
+
+            for action in actions {
+                let seq = Self::apply_action_with_autowrap(
+                    &mut self.surface,
+                    &mut self.state,
+                    &mut writer,
+                    action,
+                );
                 self.surface.flush_changes_older_than(seq);
-            });
+            }
 
             let len = buffer.len();
             reader.consume(len);
@@ -149,6 +158,325 @@ impl Terminal {
         })?;
 
         Ok(())
+    }
+
+    pub fn recommended_width(&self) -> u16 {
+        self.process_logical_lines_with_accumulator(0, |max_width, width| {
+            if width > *max_width {
+                *max_width = width;
+            }
+        }) as u16
+    }
+
+    /// Core logical line processor that handles the transcript iteration and logical line detection.
+    /// This unified implementation serves both reference-based (width calculation) and owned (line joining) use cases.
+    fn process_transcript_logical_lines<T, F>(&self, mut accumulator: T, mut processor: F) -> T
+    where
+        F: FnMut(&mut T, LogicalLineState),
+    {
+        let mut state = LogicalLineState::new();
+
+        // Process scrollback lines (already owned, borrow as &Line)
+        for line in &self.state.scrollback {
+            state.process_line(line, &mut accumulator, &mut processor);
+        }
+
+        // Process visible lines (as Cow references, avoid into_owned())
+        for cow_line in self.surface.screen_lines() {
+            let line = cow_line.as_ref();
+            state.process_line(line, &mut accumulator, &mut processor);
+        }
+
+        // Finalize any remaining logical line
+        state.finalize(&mut accumulator, &mut processor);
+
+        accumulator
+    }
+
+    /// Process logical lines from the transcript with a flexible accumulator pattern.
+    /// Iterates over transcript references without cloning for optimal performance.
+    fn process_logical_lines_with_accumulator<T, F>(&self, accumulator: T, mut callback: F) -> T
+    where
+        F: FnMut(&mut T, usize),
+    {
+        self.process_transcript_logical_lines(accumulator, |acc, state| {
+            if let Some(width) = state.logical_line_width {
+                callback(acc, width);
+            }
+        })
+    }
+
+    pub fn set_width(&mut self, width: u16) {
+        // Rewrap using keep-height strategy; do not change the viewport height here.
+        self.rewrap_surface(width as usize);
+        // Update only reported columns
+        self.size.cols = width;
+    }
+
+    pub fn recommended_height(&self) -> u16 {
+        let (width, _) = self.surface.dimensions();
+        let mut total_rows = 0;
+        let mut last_logical_empty = false;
+        let mut trailing_empty_rows = 0;
+
+        self.process_logical_lines_with_accumulator((), |_acc, logical_width| {
+            // Calculate rows needed for this logical line using ceiling division
+            let rows_needed = if logical_width == 0 {
+                1 // Empty logical lines still take one row
+            } else {
+                logical_width.div_ceil(width)
+            };
+
+            // Track if this logical line is empty (for trailing trimming)
+            let is_empty = logical_width == 0;
+            if is_empty {
+                trailing_empty_rows += rows_needed;
+            } else {
+                // Non-empty line found, reset trailing counter
+                total_rows += trailing_empty_rows + rows_needed;
+                trailing_empty_rows = 0;
+            }
+            last_logical_empty = is_empty;
+        });
+
+        // Don't count trailing empty logical lines
+        total_rows as u16
+    }
+
+    pub fn set_height(&mut self, height: u16) {
+        let w = self.surface.dimensions().0;
+        self.unscroll_to_window(w, height as usize);
+        self.size.rows = height;
+    }
+
+    /// Build owned transcript lines (scrollback + visible).
+    /// This clones data and is used when owned Lines are needed for operations
+    /// like wrapping. For read-only operations, consider transcript_line_refs().
+    fn transcript_lines(&self) -> Vec<Line> {
+        let mut out: Vec<Line> = Vec::new();
+        // append scrollback lines (chronological order)
+        for ln in &self.state.scrollback {
+            out.push(ln.clone());
+        }
+        // append current visible rows
+        for cow in self.surface.screen_lines() {
+            out.push(cow.into_owned());
+        }
+        out
+    }
+
+    fn trimmed_line_width(line: &Line) -> usize {
+        // Find rightmost non-empty cell by tracking the maximum position
+        let mut rightmost_end = 0;
+        for cell in line.visible_cells() {
+            if !cell.str().trim().is_empty() {
+                let end = cell.cell_index() + cell.width().max(1);
+                rightmost_end = rightmost_end.max(end);
+            }
+        }
+        rightmost_end
+    }
+
+    fn join_logical_lines(&self, lines: Vec<Line>) -> Vec<Line> {
+        self.join_logical_lines_from_iter(lines.into_iter())
+    }
+
+    /// Join logical lines from an iterator of owned Lines using the unified core processor.
+    fn join_logical_lines_from_iter<I>(&self, lines: I) -> Vec<Line>
+    where
+        I: Iterator<Item = Line>,
+    {
+        let seq = self.surface.current_seqno();
+        let mut result = Vec::new();
+
+        // Create a mock processor state for the line iterator
+        let mut state = LogicalLineState::new();
+        let mut current_line: Option<Line> = None;
+
+        for line in lines {
+            let this_wrapped = line.last_cell_was_wrapped();
+
+            if state.prev_wrapped {
+                // Continue the current logical line
+                if let Some(ref mut current) = current_line {
+                    current.append_line(line, seq);
+                }
+            } else {
+                // Finish previous logical line and start new one
+                if let Some(completed) = current_line.take() {
+                    result.push(completed);
+                }
+                current_line = Some(line);
+            }
+
+            state.prev_wrapped = this_wrapped;
+        }
+
+        // Push the final logical line
+        if let Some(final_line) = current_line {
+            result.push(final_line);
+        }
+
+        result
+    }
+
+    /// Unscroll and reflow the terminal to display content at a new width and height.
+    ///
+    /// This is the core reflow operation that reconstructs the full terminal transcript
+    /// from scrollback and visible content, reflows it to new dimensions, and updates
+    /// both the surface and internal state to match.
+    ///
+    /// # Process
+    /// 1. Reflow full transcript (scrollback + visible) to new width
+    /// 2. Determine which lines fit in the new window height
+    /// 3. Rebuild scrollback with lines above the visible window
+    /// 4. Apply visible window lines to the surface
+    /// 5. Update wrap flags to match the reflowed content
+    ///
+    /// # Use Cases
+    /// - Terminal resize (width and/or height changes)
+    /// - Manual reflow operations
+    /// - Switching between different display modes
+    ///
+    /// # Performance
+    /// - O(transcript_size) for reflow computation
+    /// - O(window_height) for surface updates
+    /// - Preserves all content attributes during reflow
+    fn unscroll_to_window(&mut self, new_width: usize, window_height: usize) {
+        let reflowed = self.reflow_transcript_to_width(new_width);
+        let window_start = reflowed.len().saturating_sub(window_height);
+
+        self.rebuild_scrollback_from_reflowed(&reflowed, window_start);
+        self.apply_reflowed_window_to_surface(&reflowed, window_start, new_width, window_height);
+    }
+
+    /// Reflow the complete terminal transcript to the specified width.
+    ///
+    /// Joins logical lines from the full transcript (scrollback + visible content),
+    /// wraps them to the new width, and trims trailing blank rows.
+    ///
+    /// # Returns
+    /// Vector of reflowed Lines ready for display or further processing.
+    /// Trailing empty rows are removed to avoid unnecessary blank space.
+    fn reflow_transcript_to_width(&self, new_width: usize) -> Vec<Line> {
+        let seq = self.surface.current_seqno();
+        let logicals = self.join_logical_lines(self.transcript_lines());
+
+        let mut reflowed: Vec<Line> = Vec::new();
+        for ln in logicals {
+            reflowed.extend(ln.wrap(new_width, seq));
+        }
+
+        // Trim trailing blank rows to avoid empty tail
+        while reflowed
+            .last()
+            .map(|ln| ln.visible_cells().all(|c| c.str().trim().is_empty()))
+            .unwrap_or(false)
+        // Empty reflowed vec means no trailing rows to trim
+        {
+            reflowed.pop();
+        }
+
+        reflowed
+    }
+
+    /// Rebuild the scrollback buffer from reflowed content above the visible window.
+    ///
+    /// Clears the current scrollback and repopulates it with lines that fall
+    /// above the visible window in the reflowed content. This maintains the
+    /// scrollback limit during the rebuild process.
+    fn rebuild_scrollback_from_reflowed(&mut self, reflowed: &[Line], window_start: usize) {
+        self.state.scrollback.clear();
+        for ln in reflowed.iter().take(window_start) {
+            self.state.push_scrollback_line(ln.clone());
+        }
+    }
+
+    /// Apply reflowed window content to the surface and update internal state.
+    ///
+    /// Resizes the surface to match the new dimensions, renders the visible
+    /// window lines, and updates wrap flags to match the reflowed content.
+    /// This ensures the surface and state remain synchronized.
+    fn apply_reflowed_window_to_surface(
+        &mut self,
+        reflowed: &[Line],
+        window_start: usize,
+        new_width: usize,
+        window_height: usize,
+    ) {
+        // Resize surface to the requested dimensions
+        self.surface.resize(new_width, window_height);
+
+        // Render the bottom window rows into the surface
+        for row in 0..window_height {
+            if let Some(ln) = reflowed.get(window_start + row) {
+                self.replace_row_with_line(row, ln);
+            }
+        }
+
+        // Update wrap flags for visible rows
+        self.state.ensure_height(window_height);
+        for row in 0..window_height {
+            if let Some(flag) = self.state.wrap_flags.get_mut(row) {
+                let wrapped = reflowed
+                    .get(window_start + row)
+                    .map(|ln| ln.last_cell_was_wrapped())
+                    .unwrap_or(false); // Missing reflowed line means not wrapped
+                *flag = wrapped;
+            }
+        }
+    }
+
+    /// Rewrap the whole surface to `new_width`, merging previously wrapped rows,
+    /// while keeping the current viewport height unchanged.
+    fn rewrap_surface(&mut self, new_width: usize) -> usize {
+        let (_, h) = self.surface.dimensions();
+        self.unscroll_to_window(new_width, h);
+        self.surface.current_seqno()
+    }
+
+    fn replace_row_with_line(&mut self, row: usize, ln: &Line) {
+        let (w, _) = self.surface.dimensions();
+        // Preserve current cursor position to avoid interfering with ongoing printing
+        let (cur_x, cur_y) = self.surface.cursor_position();
+
+        // Create a 1-row temp screen that contains exactly the desired line content.
+        let mut tmp = Surface::new(w, 1);
+
+        // Emit a compact stream of changes for ln into tmp.
+        let mut seq = ChangeSequence::new(1, w);
+        let mut last_attr = None;
+
+        for cell in ln.visible_cells() {
+            let x = cell.cell_index();
+
+            // Move cursor to the correct x for this run
+            seq.add(Change::CursorPosition {
+                x: Position::Absolute(x),
+                y: Position::Absolute(0),
+            });
+
+            // Update attributes only when they change
+            if last_attr.as_ref() != Some(cell.attrs()) {
+                seq.add(Change::AllAttributes(cell.attrs().clone()));
+                last_attr = Some(cell.attrs().clone());
+            }
+
+            // Append the grapheme(s)
+            seq.add(Change::Text(cell.str().to_owned()));
+        }
+
+        tmp.add_changes(seq.consume());
+
+        // Compute minimal diff for that single row and apply it to the real surface
+        let changes = self.surface.diff_region(0, row, w, 1, &tmp, 0, 0);
+        self.surface.add_changes(changes);
+
+        // Restore cursor position
+        self.surface.add_change(Change::CursorPosition {
+            x: Position::Absolute(cur_x),
+            y: Position::Absolute(cur_y),
+        });
     }
 
     /// Applies an action to the terminal's surface and state, and writes output to the writer.
@@ -436,21 +764,78 @@ impl Terminal {
     }
 }
 
-/// Represents the state of the terminal, including cursor positions and colors.
+/// Represents the internal state of the terminal emulator.
+///
+/// This structure maintains critical state information for proper terminal operation:
+/// - Scroll-aware wrap detection for accurate reflow behavior
+/// - Scrollback buffer to preserve content that scrolls off-screen
+/// - Color state for rendering
+///
+/// # Performance Characteristics
+/// - `wrap_flags`: O(1) access, O(height) space
+/// - `scrollback`: O(1) push/pop, O(scrollback_limit) space
+/// - Operations are optimized for streaming terminal output
 #[derive(Debug)]
 struct State {
+    /// Saved cursor positions (currently unused legacy field)
     positions: Vec<(usize, usize)>,
+    /// Default background color for the terminal
     background: SrgbaTuple,
+    /// Default foreground color for the terminal
     foreground: SrgbaTuple,
+    /// Per-row wrap flags indicating which physical rows are soft-wrapped.
+    /// Index corresponds to surface row, value indicates if that row wrapped to the next.
+    /// This is essential for accurate logical line reconstruction during reflow.
+    wrap_flags: Vec<bool>,
+    /// Scrollback buffer preserving lines that have scrolled off the visible surface.
+    /// Maintains full Line objects with attributes for proper transcript reconstruction.
+    /// Newest lines are at the back, oldest at the front.
+    scrollback: VecDeque<Line>,
+    /// Maximum number of lines to keep in scrollback before trimming oldest entries
+    scrollback_limit: usize,
 }
 
 impl State {
     /// Creates a new state with the given background and foreground colors.
-    fn new(background: SrgbaTuple, foreground: SrgbaTuple) -> Self {
+    fn new(background: SrgbaTuple, foreground: SrgbaTuple, height: usize) -> Self {
         Self {
             background,
             foreground,
             positions: Vec::new(),
+            wrap_flags: vec![false; height],
+            scrollback: VecDeque::new(),
+            scrollback_limit: 10_000,
+        }
+    }
+
+    /// Ensure the wrap ledger has the specified height, clearing new slots.
+    fn ensure_height(&mut self, height: usize) {
+        if self.wrap_flags.len() != height {
+            self.wrap_flags.resize(height, false);
+        }
+    }
+
+    /// Rotate the ledger upward by one row to mirror a screen scroll up.
+    /// The new bottom row is cleared (no wrap).
+    fn rotate_on_scroll(&mut self) {
+        if !self.wrap_flags.is_empty() {
+            self.wrap_flags.rotate_left(1);
+            if let Some(last) = self.wrap_flags.last_mut() {
+                *last = false;
+            }
+        }
+    }
+
+    /// Push a line into scrollback and enforce the limit.
+    fn push_scrollback_line(&mut self, line: Line) {
+        self.scrollback.push_back(line);
+        self.trim_scrollback_to_limit();
+    }
+
+    /// Ensure scrollback does not exceed the configured limit.
+    fn trim_scrollback_to_limit(&mut self) {
+        while self.scrollback.len() > self.scrollback_limit {
+            self.scrollback.pop_front();
         }
     }
 }
@@ -579,3 +964,317 @@ fn tabulate_back(pos: usize, n: usize) -> usize {
 }
 
 const TAB_STOP: usize = 8;
+
+/// State tracker for logical line processing that handles the wrap detection logic.
+/// This consolidates the logical line detection algorithm used by both width calculation
+/// and line joining operations.
+struct LogicalLineState {
+    logical_line_width: Option<usize>,
+    prev_wrapped: bool,
+}
+
+impl LogicalLineState {
+    fn new() -> Self {
+        Self {
+            logical_line_width: None,
+            prev_wrapped: false,
+        }
+    }
+
+    fn process_line<T, F>(&mut self, line: &Line, accumulator: &mut T, processor: &mut F)
+    where
+        F: FnMut(&mut T, LogicalLineState),
+    {
+        let this_wrapped = line.last_cell_was_wrapped();
+        let line_width = Terminal::trimmed_line_width(line);
+
+        if self.prev_wrapped {
+            // Continue the current logical line
+            self.logical_line_width = Some(self.logical_line_width.unwrap_or(0) + line_width);
+        } else {
+            // Finish previous logical line and start new one
+            if self.logical_line_width.is_some() {
+                processor(accumulator, *self);
+            }
+            self.logical_line_width = Some(line_width);
+        }
+
+        self.prev_wrapped = this_wrapped;
+    }
+
+    fn finalize<T, F>(&mut self, accumulator: &mut T, processor: &mut F)
+    where
+        F: FnMut(&mut T, LogicalLineState),
+    {
+        if self.logical_line_width.is_some() {
+            processor(accumulator, *self);
+        }
+    }
+}
+
+impl Copy for LogicalLineState {}
+
+impl Clone for LogicalLineState {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl Terminal {
+    /// Apply a terminal action while detecting and recording automatic line wrapping.
+    ///
+    /// This is the core terminal processing method that:
+    /// 1. Captures lines that will be scrolled out before applying scrolling actions
+    /// 2. Applies the action to the surface using termwiz's built-in processing
+    /// 3. Detects when automatic wrapping occurred by comparing cursor positions
+    /// 4. Marks wrapped rows in the wrap ledger for accurate reflow later
+    ///
+    /// # Autowrap Detection Algorithm
+    /// - For `Print(char)`: Uses character width to predict wrapping
+    /// - For `PrintString`: Estimates total wraps from display width
+    /// - For other actions: Handles scrolling effects
+    ///
+    /// # Performance
+    /// - O(1) for simple print operations
+    /// - O(N) for PrintString where N is string display width
+    /// - Minimizes row mutations to avoid mid-stream corruption
+    ///
+    /// # Returns
+    /// The sequence number from the surface after applying the action
+    fn apply_action_with_autowrap(
+        surface: &mut Surface,
+        st: &mut State,
+        mut writer: impl io::Write,
+        action: Action,
+    ) -> SequenceNo {
+        Self::apply_action_with_autowrap_internal(surface, st, &mut writer, action)
+    }
+
+    /// Internal implementation that takes a trait object to avoid recursion limits
+    fn apply_action_with_autowrap_internal(
+        surface: &mut Surface,
+        st: &mut State,
+        writer: &mut dyn io::Write,
+        action: Action,
+    ) -> SequenceNo {
+        // Cursor prior to applying the action
+        let (x0, y0) = surface.cursor_position();
+
+        // Capture scrolled-out rows (scrollback) before applying actions that will scroll
+        {
+            let (w, h) = surface.dimensions();
+            match &action {
+                Action::Print(ch) => {
+                    if *ch != '\n'
+                        && *ch != '\r'
+                        && let Some(ch_width) = UnicodeWidthChar::width(*ch)
+                        && ch_width > 0
+                    {
+                        let cap = w.saturating_sub(x0);
+                        if y0 == h.saturating_sub(1) && ch_width > cap {
+                            // one row will scroll out from the top
+                            if let Some(cow) = surface.screen_lines().first() {
+                                st.push_scrollback_line(cow.clone().into_owned());
+                            }
+                        }
+                    }
+                }
+                Action::PrintString(s) => {
+                    // For PrintString at bottom that would cause multiple scrolls, split it
+                    // into chunks where each chunk causes at most one scroll (like Print does).
+                    // This prevents scrolling out content we just wrote.
+                    let disp_width = UnicodeWidthStr::width(s.as_str());
+                    if disp_width > 0 {
+                        let cap = w.saturating_sub(x0);
+                        let total_wraps = if disp_width > cap {
+                            1 + (disp_width - cap - 1) / w
+                        } else {
+                            0
+                        };
+
+                        // Check if this would cause multiple bottom scrolls
+                        if total_wraps > 1 && y0 >= h.saturating_sub(1) {
+                            // Split into chunks that each cause at most one scroll
+                            // Each chunk: cap + w characters (fills current row + one more row)
+                            let chars: Vec<char> = s.chars().collect();
+                            let mut char_idx = 0;
+                            let mut chunk_cap = cap;
+
+                            while char_idx < chars.len() {
+                                let mut chunk_chars = 0;
+                                let mut chunk_width = 0;
+                                let max_chunk_width = chunk_cap + w; // One scroll's worth
+
+                                // Take characters up to max_chunk_width
+                                while char_idx + chunk_chars < chars.len() {
+                                    let ch = chars[char_idx + chunk_chars];
+                                    let ch_width = UnicodeWidthChar::width(ch).unwrap_or(1);
+                                    if chunk_width + ch_width > max_chunk_width {
+                                        break;
+                                    }
+                                    chunk_width += ch_width;
+                                    chunk_chars += 1;
+                                }
+
+                                if chunk_chars == 0 {
+                                    // Safety: avoid infinite loop if character is too wide
+                                    break;
+                                }
+
+                                let chunk: String =
+                                    chars[char_idx..char_idx + chunk_chars].iter().collect();
+                                char_idx += chunk_chars;
+
+                                // Apply this chunk with autowrap (includes scrollback capture)
+                                Self::apply_action_with_autowrap_internal(
+                                    surface,
+                                    st,
+                                    writer,
+                                    Action::PrintString(chunk),
+                                );
+
+                                // After first chunk, subsequent chunks start at column 0
+                                chunk_cap = w;
+                            }
+
+                            // All chunks processed, skip normal processing
+                            return surface.current_seqno();
+                        } else if total_wraps == 1 && y0 >= h.saturating_sub(1) {
+                            // Single bottom scroll: capture top row (standard behavior)
+                            if let Some(cow) = surface.screen_lines().first() {
+                                st.push_scrollback_line(cow.clone().into_owned());
+                            }
+                        }
+                    }
+                }
+                Action::Control(code) => {
+                    if matches!(
+                        code,
+                        ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
+                    ) && y0 == h.saturating_sub(1)
+                        && let Some(cow) = surface.screen_lines().first()
+                    {
+                        st.push_scrollback_line(cow.clone().into_owned());
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        // Apply the original action
+        let seq = Self::apply_action(surface, st, writer, action.clone());
+
+        // Keep the ledger height in sync with the surface.
+        let (w, h) = surface.dimensions();
+        st.ensure_height(h);
+
+        // If this was printing and we crossed rows, that indicates autowraps.
+        // Additionally, detect the bottom-scroll case where wrapping occurs but y doesn't change:
+        // when xpos exceeded width on entry (x0 >= width) and after printing we observed x1 < x0.
+        match action {
+            Action::Print(ch) => {
+                // Width-aware single-char wrap detection to mark/rotate the wrap ledger precisely.
+                if ch != '\n' && ch != '\r' {
+                    let ch_width = UnicodeWidthChar::width(ch).unwrap_or(0); // Control chars have 0 width
+                    if ch_width > 0 {
+                        let cap = w.saturating_sub(x0);
+                        if ch_width > cap {
+                            // This print will trigger a wrap
+                            if y0 < h.saturating_sub(1) {
+                                // Wrapped within buffer: mark current row y0
+                                if let Some(flag) = st.wrap_flags.get_mut(y0) {
+                                    *flag = true;
+                                }
+                                Self::mark_row_soft_wrapped(surface, y0, seq);
+                            } else {
+                                // Bottom scroll wrap: rotate ledger and mark h-2
+                                st.rotate_on_scroll();
+                                if h >= 2 {
+                                    let r = h - 2;
+                                    if let Some(flag) = st.wrap_flags.get_mut(r) {
+                                        *flag = true;
+                                    }
+                                    Self::mark_row_soft_wrapped(surface, r, seq);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Action::PrintString(ref s) => {
+                // Estimate wraps for this chunk using display width.
+                let disp_width = UnicodeWidthStr::width(s.as_str());
+                let cap = w.saturating_sub(x0);
+                if disp_width > 0 {
+                    let total_wraps = if disp_width > cap {
+                        1 + (disp_width - cap - 1) / w
+                    } else {
+                        0
+                    };
+                    if total_wraps > 0 {
+                        let rows_available = h.saturating_sub(1).saturating_sub(y0);
+                        let wraps_before_bottom = total_wraps.min(rows_available);
+                        let bottom_wraps = total_wraps.saturating_sub(wraps_before_bottom);
+                        // First, mark wraps within the buffer before hitting bottom.
+                        for r in y0..(y0 + wraps_before_bottom) {
+                            if let Some(flag) = st.wrap_flags.get_mut(r) {
+                                *flag = true;
+                            }
+                            Self::mark_row_soft_wrapped(surface, r, seq);
+                        }
+                        // Then, handle bottom scroll wraps by rotating the ledger and marking h-2.
+                        for _ in 0..bottom_wraps {
+                            st.rotate_on_scroll();
+                            if h >= 2 {
+                                let r = h - 2;
+                                if let Some(flag) = st.wrap_flags.get_mut(r) {
+                                    *flag = true;
+                                }
+                                Self::mark_row_soft_wrapped(surface, r, seq);
+                            }
+                        }
+                    }
+                }
+            }
+            Action::Control(code) => {
+                // For LF/VT/FF at bottom: a scroll up occurs and y may remain unchanged.
+                if matches!(
+                    code,
+                    ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
+                ) && y0 == h.saturating_sub(1)
+                {
+                    st.rotate_on_scroll();
+                }
+            }
+            _ => {}
+        }
+
+        seq
+    }
+
+    /// Mark a specific row as soft-wrapped by setting the wrapped bit on its last cell.
+    /// Writes the updated line back to the surface via a minimal diff.
+    fn mark_row_soft_wrapped(surface: &mut Surface, row: usize, _seq: SequenceNo) {
+        let (w, h) = surface.dimensions();
+        if row >= h || w == 0 {
+            return;
+        }
+
+        // In-place: mark the wrapped flag on the last visible cell in the row.
+        // First compute the last visible cell index without holding a mutable borrow.
+        let idx = surface
+            .screen_lines()
+            .get(row)
+            .and_then(|line| line.visible_cells().last().map(|c| c.cell_index()))
+            .unwrap_or(w.saturating_sub(1)); // Empty line wraps at last column
+
+        // Now take a mutable borrow and flip the bit in place.
+        let mut rows = surface.screen_cells();
+        let cells = &mut rows[row];
+
+        cells[idx].attrs_mut().set_wrapped(true);
+    }
+}
+
+#[cfg(test)]
+mod tests;

@@ -4,10 +4,31 @@
 # Possible values: [auto, dark, light].
 mode = "auto"
 
+#
 # Terminal settings.
+#
+# Width and height define restrictions on number of columns and rows respectively.
+# Can be specified as `auto`, as a single number or as a range with min/max/step/initial values.
+# If the detected size is outside of the specified range, it will be clamped to the nearest limit.
+# The `default` value is used as a preferred initial size when auto-sizing is enabled.
+#
+# Format options:
+# - `width = "auto"` - automatically detect terminal width based on the command output.
+# - `width = 80` - use exactly 80 columns.
+# - `width = { min = 80 }` - use at least 80 columns, auto-detected based on command output.
+# - `width = { max = 120 }` - use at most 120 columns, auto-detected based on command output.
+# - `width = { min = 80, max = 120 }` - use between 80-120 columns, auto-detected.
+# - `width = { min = 80, max = 120, step = 10 }` - use 80-120 columns, rounded to nearest multiple of 10.
+# - `width = { min = 80, max = 120, initial = 100 }` - prefer 100 columns, but allow 80-120 range.
+# - `width = { initial = 100 }` - prefer 100 columns, but allow auto-detection if needed.
+#
+# The `initial` value serves as:
+# - Initial size when no CLI override is provided
+# - Fallback when auto-detection fails or produces unreasonable results
+# - Preferred size that gets clamped to min/max constraints if specified
 [terminal]
-width = 80  # Number of terminal columns.
-height = 24 # Number of terminal rows.
+width = { min = 80, max = 240, step = 4, initial = 180 } # Number of terminal columns.
+height = { min = 24, max = 60, initial = 48 }  # Number of terminal rows.
 
 # Environment variables.
 [env]

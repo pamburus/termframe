@@ -6,8 +6,8 @@ use termframe::config::{
 fn test_default_settings() {
     // Test that default settings can be loaded
     let settings = Settings::default();
-    assert_eq!(settings.terminal.width, 80);
-    assert_eq!(settings.terminal.height, 24);
+    assert_eq!(settings.terminal.width.min(), 80.into());
+    assert_eq!(settings.terminal.height.min(), 24.into());
 }
 
 #[test]
@@ -128,15 +128,13 @@ fn test_padding_mul() {
 fn test_global_config() {
     // Initialize with custom settings
     let mut settings = Settings::default();
-    settings.terminal.width = 100;
-    settings.terminal.height = 40;
+    settings.terminal.width.current = 100.into();
+    settings.terminal.height.current = 40.into();
 
     config::global::initialize(settings.clone());
 
     // Get should return our custom settings
     let global_settings = config::global::get();
-    assert_eq!(global_settings.terminal.width, 100);
-    assert_eq!(global_settings.terminal.height, 40);
+    assert_eq!(global_settings.terminal.width.current, 100.into());
+    assert_eq!(global_settings.terminal.height.current, 40.into());
 }
-
-// Skip test_custom_source_loading as it requires access to internal FileFormat

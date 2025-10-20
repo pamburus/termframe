@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use termframe::cli::FontWeight;
-use termframe::config::{self, FontFamilyOption, PaddingOption, Patch, Settings, ThemeSetting};
+use crate::cli::FontWeight;
+use crate::config::{self, FontFamilyOption, PaddingOption, Patch, Settings, ThemeSetting};
 
 #[test]
 fn test_font_weight_from_str() {
@@ -89,8 +89,6 @@ fn test_opt_patch() {
         panic!("Expected uniform padding");
     }
 }
-
-// We can't implement Default for external types, so create wrapper types instead
 
 // Create a test-specific utility function to create a patching Opt
 fn create_test_opt() -> impl Patch {

@@ -48,3 +48,6 @@ impl FontFormat {
         }
     }
 }
+
+#[cfg(test)]
+mod tests;

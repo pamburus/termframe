@@ -169,3 +169,6 @@ impl<F> CharSetFn<F> {
         Self(f)
     }
 }
+
+#[cfg(test)]
+mod tests;

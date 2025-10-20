@@ -1,6 +1,4 @@
-use termframe::config::{
-    self, FontFamilyOption, FontWeight, Number, PaddingOption, Settings, ThemeSetting,
-};
+use crate::config::{FontFamilyOption, FontWeight, Number, PaddingOption, Settings, ThemeSetting};
 
 #[test]
 fn test_default_settings() {
@@ -32,7 +30,7 @@ fn test_padding_option_resolve() {
     assert_eq!(padding.right, Number::from(3.0));
 
     // Test asymmetric padding
-    let asymmetric = PaddingOption::Asymmetric(config::Padding {
+    let asymmetric = PaddingOption::Asymmetric(crate::config::Padding {
         top: Number::from(1.0),
         bottom: Number::from(2.0),
         left: Number::from(3.0),
@@ -79,16 +77,22 @@ fn test_font_family_option() {
 fn test_theme_setting_resolve() {
     // Test fixed theme
     let fixed = ThemeSetting::Fixed("dark".to_string());
-    assert_eq!(fixed.resolve(config::mode::Mode::Light), "dark");
-    assert_eq!(fixed.resolve(config::mode::Mode::Dark), "dark");
+    assert_eq!(fixed.resolve(crate::config::mode::Mode::Light), "dark");
+    assert_eq!(fixed.resolve(crate::config::mode::Mode::Dark), "dark");
 
     // Test adaptive theme
     let adaptive = ThemeSetting::Adaptive {
         light: "light-theme".to_string(),
         dark: "dark-theme".to_string(),
     };
-    assert_eq!(adaptive.resolve(config::mode::Mode::Light), "light-theme");
-    assert_eq!(adaptive.resolve(config::mode::Mode::Dark), "dark-theme");
+    assert_eq!(
+        adaptive.resolve(crate::config::mode::Mode::Light),
+        "light-theme"
+    );
+    assert_eq!(
+        adaptive.resolve(crate::config::mode::Mode::Dark),
+        "dark-theme"
+    );
 }
 
 #[test]
@@ -101,7 +105,7 @@ fn test_font_weight_display() {
 
 #[test]
 fn test_padding_mul() {
-    let padding = config::Padding {
+    let padding = crate::config::Padding {
         top: Number::from(1.0),
         bottom: Number::from(2.0),
         left: Number::from(3.0),
@@ -131,10 +135,10 @@ fn test_global_config() {
     settings.terminal.width.current = 100.into();
     settings.terminal.height.current = 40.into();
 
-    config::global::initialize(settings.clone());
+    crate::config::global::initialize(settings.clone());
 
     // Get should return our custom settings
-    let global_settings = config::global::get();
+    let global_settings = crate::config::global::get();
     assert_eq!(global_settings.terminal.width.current, 100.into());
     assert_eq!(global_settings.terminal.height.current, 40.into());
 }

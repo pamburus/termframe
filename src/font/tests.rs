@@ -1,5 +1,4 @@
-use termframe::font::Location;
-use termframe::fontformat::FontFormat;
+use crate::font::Location;
 
 #[test]
 fn test_font_location_from_str() {
@@ -26,24 +25,6 @@ fn test_font_location_from_str() {
 }
 
 #[test]
-fn test_font_format() {
-    // Test mime types
-    assert_eq!(FontFormat::Ttf.mime(), "font/ttf");
-    assert_eq!(FontFormat::Otf.mime(), "font/otf");
-    assert_eq!(FontFormat::Woff.mime(), "font/woff");
-    assert_eq!(FontFormat::Woff2.mime(), "font/woff2");
-
-    // We can also try parsing from extension but this requires proper public APIs
-    // which may not be available
-}
-
-// Mock font data for testing
-fn mock_font_data() -> Vec<u8> {
-    // This is not a real font, just a placeholder for testing
-    vec![0, 1, 2, 3, 4, 5]
-}
-
-#[test]
 fn test_font_metrics() {
     // Mock test for font metrics properties
     // In a real implementation, you would use a proper font file
@@ -58,25 +39,6 @@ fn test_font_metrics() {
         family: Option<String>,
         weight_val: u16,
     }
-
-    // We can't implement FontProperties directly since it's not exported
-    // Instead, let's test the properties directly
-
-    // MockFont struct would implement these methods if the trait were accessible:
-    // - width() -> f32
-    // - ascender() -> f32
-    // - descender() -> f32
-    // - family() -> Option<&str>
-    // - name() -> Option<&str>
-    // - has_italic_axis() -> bool
-    // - italic() -> bool
-    // - bold() -> bool
-    // - weight() -> u16
-    // - weight_axis() -> Option<(f32, f32)>
-    // - has_char(char) -> bool
-    // - subset(chars: impl Iterator<Item = char>) -> std::io::Result<Vec<u8>>
-
-    // This instance is not used anymore, remove it
 
     // For now, we'll just verify the mock structure works without checking methods
     // We would test the font properties if the trait were accessible
@@ -94,4 +56,10 @@ fn test_font_metrics() {
     assert_eq!(mock_font.descender, -0.2);
     assert_eq!(mock_font.family, Some("Test Font".to_string()));
     assert_eq!(mock_font.weight_val, 400);
+}
+
+// Mock font data for testing
+fn mock_font_data() -> Vec<u8> {
+    // This is not a real font, just a placeholder for testing
+    vec![0, 1, 2, 3, 4, 5]
 }

@@ -326,3 +326,6 @@ impl Font<'_> {
         if index == 0 { None } else { Some(index) }
     }
 }
+
+#[cfg(test)]
+mod tests;

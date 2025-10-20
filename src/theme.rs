@@ -297,3 +297,6 @@ impl Default for &Palette {
         &DEFAULT
     }
 }
+
+#[cfg(test)]
+mod tests;

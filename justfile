@@ -7,19 +7,19 @@ default:
     @just --list
 
 [doc('Build the project in debug mode')]
-build *ARGS: (setup "build")
+build *ARGS: (setup "cargo")
     cargo build {{ ARGS }}
 
 [doc('Build the project in release mode')]
-build-release *ARGS: (setup "build")
+build-release *ARGS: (setup "cargo")
     cargo build --locked --release {{ ARGS }}
 
 [doc('Run the application, example: `just run -- --help`')]
-run *ARGS: (setup "build")
+run *ARGS: (setup "cargo")
     cargo run {{ ARGS }}
 
 [doc('Install binary and man pages')]
-install: && install-man-pages
+install: && install-man-pages (setup "cargo")
     cargo install --locked --path .
 
 [doc('Build and publish new release')]
@@ -30,8 +30,12 @@ release type="patch": (setup "cargo-edit")
 bump type="alpha": (setup "cargo-edit")
     cargo set-version --package termframe --bump {{type}}
 
+[doc('Show current version')]
+version: (setup "cargo" "jq")
+    @cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "termframe") | .version'
+
 [doc('List changes since the previous release')]
-changes since="auto": (setup "git-cliff" "bat" "gh")
+changes since="auto": (setup "git-cliff" "bat" "gh" "jq" "cargo")
     #!/usr/bin/env bash
     set -euo pipefail
     since=$(if [ "{{since}}" = auto ]; then {{previous-tag}}; else echo "{{since}}"; fi)
@@ -49,7 +53,7 @@ previous-tag:
 ci: test lint coverage
 
 [doc('Run tests for all packages in the workspace')]
-test *ARGS: (setup "build")
+test *ARGS: (setup "cargo")
     cargo test --all-targets --all-features --workspace {{ ARGS }}
 
 [doc('Run the Rust linter (clippy)')]
@@ -60,11 +64,11 @@ clippy *ARGS: (setup "clippy")
     cargo clippy --all-targets --all-features {{ ARGS }}
 
 [doc('Update dependencies')]
-update *ARGS:
+update *ARGS: (setup "cargo")
     cargo update {{ ARGS }}
 
 [doc('Update themes')]
-update-themes *ARGS:
+update-themes *ARGS: (setup "cargo" "rsync")
     rm -fr "{{tmp-themes-dir}}"
     git clone -n --depth=1 --filter=tree:0 https://github.com/mbadolato/iTerm2-Color-Schemes.git "{{tmp-themes-dir}}"
     cd "{{tmp-themes-dir}}" && git sparse-checkout set --no-cone /termframe && git checkout
@@ -73,11 +77,11 @@ update-themes *ARGS:
     cargo tidy-themes
 
 [doc('Tidy themes')]
-tidy-themes *ARGS:
+tidy-themes *ARGS: (setup "cargo")
     cargo tidy-themes -- {{ ARGS }}
 
 [doc('Install man pages')]
-install-man-pages:
+install-man-pages: (setup "cargo")
     mkdir -p ~/share/man/man1
     cargo run --release --locked -- --config - --man-page >~/share/man/man1/termframe.1
     @echo $(tput bold)$(tput setaf 3)note:$(tput sgr0) ensure $(tput setaf 2)~/share/man$(tput sgr0) is added to $(tput setaf 2)MANPATH$(tput sgr0) environment variable
@@ -98,7 +102,7 @@ help-for mode: (build "--locked")
 sample: (sample-for "dark") (sample-for "light")
 
 [private]
-sample-for mode:
+sample-for mode: (setup "cargo")
     cargo run --locked -- \
         --config - \
         -W 79 -H 24 \
@@ -110,7 +114,7 @@ sample-for mode:
         ./scripts/sample {{mode}}
 
 [doc('Generate color table screenshot')]
-color-table theme mode:
+color-table theme mode: (setup "cargo")
     cargo run --locked -- \
         --config - \
         -W 80 -H 40 \

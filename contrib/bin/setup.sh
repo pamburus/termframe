@@ -200,6 +200,42 @@ setup_bat() {
     fi
 }
 
+setup_jq() {
+    if [ ! -x "$(command -v jq)" ]; then
+        if [ -x "$(command -v brew)" ]; then
+            brew install jq
+        elif [ -x "$(command -v apt-get)" ]; then
+            sudo apt-get install jq
+        elif [ -x "$(command -v yum)" ]; then
+            sudo yum install jq
+        elif [ -x "$(command -v pacman)" ]; then
+            sudo pacman -S jq
+        else
+            echo "Please install jq manually"
+            echo "See https://stedolan.github.io/jq/"
+            exit 1
+        fi
+    fi
+}
+
+setup_rsync() {
+    if [ ! -x "$(command -v rsync)" ]; then
+        if [ -x "$(command -v brew)" ]; then
+            brew install rsync
+        elif [ -x "$(command -v apt-get)" ]; then
+            sudo apt-get install rsync
+        elif [ -x "$(command -v yum)" ]; then
+            sudo yum install rsync
+        elif [ -x "$(command -v pacman)" ]; then
+            sudo pacman -S rsync
+        else
+            echo "Please install rsync manually"
+            echo "See https://rsync.samba.org/"
+            exit 1
+        fi
+    fi
+}
+
 # --- main ---
 
 while [ $# -gt 0 ]; do
@@ -225,6 +261,9 @@ while [ $# -gt 0 ]; do
         outdated)
             setup_cargo_outdated
             ;;
+        cargo)
+            setup_cargo
+            ;;
         cargo-edit)
             setup_cargo_edit
             ;;
@@ -239,6 +278,12 @@ while [ $# -gt 0 ]; do
             ;;
         schema)
             setup_taplo
+            ;;
+        jq)
+            setup_jq
+            ;;
+        rsync)
+            setup_rsync
             ;;
         *)
             echo "Unknown setup $1"

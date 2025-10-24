@@ -54,6 +54,7 @@ function test() {
     ${MAIN_EXECUTABLE:?} --config - --list-fonts > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --mode dark > /dev/null
 
+    mkdir -p target/coverage/tmp
     ${TIDY_THEMES_EXE:?} assets/themes target/coverage/tmp/.aliases.json
     diff -u assets/themes/.aliases.json target/coverage/tmp/.aliases.json
     mtime1=$(date -r assets/themes/.aliases.json +%s)

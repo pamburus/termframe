@@ -13,7 +13,12 @@ fn main() {
     };
 
     if let Err(e) = result {
-        eprintln!("Error: {}", e);
+        eprintln!("\x1b[31mError:\x1b[0m {}", e);
+        let mut source = e.source();
+        while let Some(err) = source {
+            eprintln!("\x1b[33mCaused by:\x1b[0m {}", err);
+            source = err.source();
+        }
         std::process::exit(1);
     }
 }

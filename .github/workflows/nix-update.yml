@@ -2,7 +2,7 @@ name: Update flake.lock
 
 on:
   schedule:
-    - cron: "30 16 * * FRI" # Every Friday at 16:30 UTC
+    - cron: "45 16 * * FRI" # Every Friday at 16:45 UTC
   workflow_dispatch:
 
 permissions:
@@ -10,64 +10,45 @@ permissions:
   pull-requests: write
   actions: write
 
-defaults:
-  run:
-    shell: bash -euo pipefail {0}
-
 jobs:
   update-lock:
-    name: Update flake.lock
     runs-on: ubuntu-latest
     steps:
-      - name: Generate GitHub App Token
-        id: generate-token
-        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: ${{ github.event.repository.name }}
-
-      - name: Generate Auto-Merge GitHub App Token
-        id: generate-automerge-token
-        uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
-        with:
-          app-id: ${{ secrets.AUTOMERGE_APP_ID }}
-          private-key: ${{ secrets.AUTOMERGE_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: ${{ github.event.repository.name }}
-
       - name: Checkout repository
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
+        uses: actions/checkout@v5
 
       - name: Install Nix
-        uses: cachix/install-nix-action@fd24c48048070c1be9acd18c9d369a83f0fe94d7 # v31.8.1
+        uses: cachix/install-nix-action@v31
 
       - name: Update flake.lock
         run: nix flake update
 
+      - name: Generate token
+        id: generate-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Create pull request for flake.lock update
         id: create-pr
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ steps.generate-token.outputs.token }}
           commit-message: "chore(deps): update nix flake dependencies"
           branch: update-flake-lock
           title: "chore(deps): update flake.lock"
           body: "This pull request updates the flake.lock file with the latest flake inputs."
-          author: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
-          committer: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
+          author: "GitHub Action <action@github.com>"
           labels: |
             dependencies
-            nix
+            automated
           delete-branch: true
 
       - name: Enable auto-merge
         id: enable-auto-merge
         if: steps.create-pr.outputs.pull-request-number
         run: |
-          gh pr merge --auto -ds ${{ steps.create-pr.outputs.pull-request-number }}
+          gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}

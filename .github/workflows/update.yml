@@ -72,9 +72,12 @@ jobs:
           delete-branch: true
 
       - name: Enable auto-merge
-        id: enable-auto-merge
         if: steps.create-pr.outputs.pull-request-number
         run: |
-          gh pr merge --auto -ds ${{ steps.create-pr.outputs.pull-request-number }}
+          gh api \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${{ github.repository }}/pulls/${{ steps.create-pr.outputs.pull-request-number }}/auto-merge" \
+            -f merge_method=squash
         env:
           GH_TOKEN: ${{ steps.generate-automerge-token.outputs.token }}

@@ -30,6 +30,13 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
+      - name: Generate auto-merge token
+        id: generate-automerge-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.AUTOMERGE_APP_ID }}
+          private_key: ${{ secrets.AUTOMERGE_APP_PRIVATE_KEY }}
+
       - name: Create pull request for flake.lock update
         id: create-pr
         uses: peter-evans/create-pull-request@v7
@@ -51,4 +58,4 @@ jobs:
         run: |
           gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }}
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ steps.generate-automerge-token.outputs.token }}

@@ -284,17 +284,13 @@ impl Default for FontWeights {
 /// Font weight enumeration.
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
+#[derive(Default)]
 pub enum FontWeight {
+    #[default]
     Normal,
     Bold,
     #[serde(untagged)]
     Fixed(u16),
-}
-
-impl Default for FontWeight {
-    fn default() -> Self {
-        Self::Normal
-    }
 }
 
 impl fmt::Display for FontWeight {

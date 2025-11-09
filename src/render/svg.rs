@@ -1087,9 +1087,21 @@ impl<'a> Subclusters<'a> {
     ///
     /// An `Option` containing a reference to the next cell.
     fn next_cell(&mut self) -> Option<CellRef<'a>> {
-        self.chars
+        let (i, _) = self.chars.next()?;
+        let initial_idx = self.cluster.byte_to_cell_idx(i);
+
+        // Skip consecutive indices that map to the same cell
+        while self
+            .chars
+            .clone()
             .next()
-            .and_then(|(i, _)| self.line.get_cell(self.cluster.byte_to_cell_idx(i)))
+            .map(|(i, _)| self.cluster.byte_to_cell_idx(i) == initial_idx)
+            .unwrap_or(false)
+        {
+            self.chars.next();
+        }
+
+        self.line.get_cell(initial_idx)
     }
 }
 impl<'a> Iterator for Subclusters<'a> {

@@ -97,10 +97,15 @@ pub struct WindowStyleConfig {
     pub window: Window,
 }
 
-impl WindowStyleConfig {
-    /// Returns the default window style configuration.
-    pub fn default(&self) -> Arc<Self> {
-        DEFAULT.clone()
+impl Default for WindowStyleConfig {
+    fn default() -> Self {
+        DEFAULT.as_ref().clone()
+    }
+}
+
+impl Default for &WindowStyleConfig {
+    fn default() -> Self {
+        &DEFAULT
     }
 }
 
@@ -118,18 +123,6 @@ impl Load for WindowStyleConfig {
 
     fn is_not_found_error(err: &Error) -> bool {
         matches!(err, Error::WindowStyleNotFound { .. })
-    }
-}
-
-impl Default for WindowStyleConfig {
-    fn default() -> Self {
-        DEFAULT.as_ref().clone()
-    }
-}
-
-impl Default for &WindowStyleConfig {
-    fn default() -> Self {
-        &DEFAULT
     }
 }
 

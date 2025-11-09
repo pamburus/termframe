@@ -1,5 +1,59 @@
 use super::*;
 
+use csscolorparser::Color;
+use itertools::Itertools;
+use termwiz::surface::Change;
+
+use crate::{
+    config::{
+        Number, PaddingOption, Settings,
+        mode::Mode,
+        winstyle::{
+            Font, SelectiveColor, Window, WindowBorder, WindowBorderColors, WindowButtons,
+            WindowHeader, WindowShadow, WindowStyleConfig, WindowTitle,
+        },
+    },
+    render::{FontMetrics, FontOptions, FontWeights, Options},
+};
+
+trait Sample {
+    fn sample() -> Self;
+}
+
+impl Sample for Options {
+    fn sample() -> Self {
+        Options {
+            settings: Default::default(),
+            font: FontOptions {
+                family: vec!["Monospace".to_string()],
+                size: 12.0,
+                metrics: FontMetrics {
+                    width: 0.6,
+                    ascender: 0.8,
+                    descender: -0.2,
+                },
+                faces: vec![],
+                weights: FontWeights {
+                    normal: FontWeight::Normal,
+                    bold: FontWeight::Bold,
+                    faint: FontWeight::Normal,
+                },
+            },
+            theme: Rc::new(Theme {
+                bg: Color::from_rgba8(255, 255, 255, 255),
+                fg: Color::from_rgba8(0, 0, 0, 255),
+                bright_fg: None,
+                palette: Default::default(),
+            }),
+            window: WindowStyleConfig::default().window,
+            title: Some("Sample Title".to_string()),
+            mode: Mode::Light,
+            background: None,
+            foreground: None,
+        }
+    }
+}
+
 #[test]
 fn test_estimate_char_width_narrow_chars() {
     // Very narrow characters
@@ -137,7 +191,7 @@ fn test_trim_text_to_width_mixed_widths() {
 #[test]
 fn test_calculate_available_width_no_buttons() {
     // No buttons configured
-    let button_cfg = crate::config::winstyle::WindowButtons {
+    let button_cfg = WindowButtons {
         position: WindowButtonsPosition::Right,
         shape: None,
         size: Number::from(0.0),
@@ -151,13 +205,13 @@ fn test_calculate_available_width_no_buttons() {
 #[test]
 fn test_calculate_available_width_with_buttons() {
     // With buttons on one side
-    use crate::config::Number;
-    let button_cfg = crate::config::winstyle::WindowButtons {
+    use Number;
+    let button_cfg = WindowButtons {
         position: WindowButtonsPosition::Right,
         shape: None,
         size: Number::from(10.0),
         roundness: None,
-        items: vec![crate::config::winstyle::WindowButton {
+        items: vec![WindowButton {
             offset: Number::from(10.0),
             fill: None,
             stroke: None,
@@ -173,21 +227,21 @@ fn test_calculate_available_width_with_buttons() {
 #[test]
 fn test_calculate_available_width_symmetrical_buttons() {
     // With buttons on both sides
-    use crate::config::Number;
-    let button_cfg = crate::config::winstyle::WindowButtons {
+    use Number;
+    let button_cfg = WindowButtons {
         position: WindowButtonsPosition::Left,
         shape: None,
         size: Number::from(10.0),
         roundness: None,
         items: vec![
-            crate::config::winstyle::WindowButton {
+            WindowButton {
                 offset: Number::from(10.0),
                 fill: None,
                 stroke: None,
                 stroke_width: None,
                 icon: None,
             },
-            crate::config::winstyle::WindowButton {
+            WindowButton {
                 offset: Number::from(30.0),
                 fill: None,
                 stroke: None,
@@ -229,12 +283,12 @@ fn test_title_rendering_with_long_title() {
 fn test_title_rendering_integration() {
     // Test the complete title rendering workflow:
     // 1. Calculate available width with buttons
-    let button_cfg = crate::config::winstyle::WindowButtons {
+    let button_cfg = WindowButtons {
         position: WindowButtonsPosition::Right,
         shape: None,
         size: Number::from(8.0),
         roundness: None,
-        items: vec![crate::config::winstyle::WindowButton {
+        items: vec![WindowButton {
             offset: Number::from(5.0),
             fill: None,
             stroke: None,
@@ -271,27 +325,27 @@ fn test_title_rendering_empty_after_trim() {
 #[test]
 fn test_title_rendering_with_multiple_button_styles() {
     // Test available width calculation with multiple buttons
-    let button_cfg = crate::config::winstyle::WindowButtons {
+    let button_cfg = WindowButtons {
         position: WindowButtonsPosition::Left,
         shape: None,
         size: Number::from(12.0),
         roundness: None,
         items: vec![
-            crate::config::winstyle::WindowButton {
+            WindowButton {
                 offset: Number::from(5.0),
                 fill: None,
                 stroke: None,
                 stroke_width: None,
                 icon: None,
             },
-            crate::config::winstyle::WindowButton {
+            WindowButton {
                 offset: Number::from(25.0),
                 fill: None,
                 stroke: None,
                 stroke_width: None,
                 icon: None,
             },
-            crate::config::winstyle::WindowButton {
+            WindowButton {
                 offset: Number::from(45.0),
                 fill: None,
                 stroke: None,
@@ -371,12 +425,12 @@ fn test_title_rendering_attributes() {
     assert_eq!(x_pos, 150.0);
 
     // Verify title fits in available space with buttons
-    let button_cfg = crate::config::winstyle::WindowButtons {
+    let button_cfg = WindowButtons {
         position: WindowButtonsPosition::Right,
         shape: None,
         size: Number::from(8.0),
         roundness: None,
-        items: vec![crate::config::winstyle::WindowButton {
+        items: vec![WindowButton {
             offset: Number::from(5.0),
             fill: None,
             stroke: None,
@@ -391,17 +445,11 @@ fn test_title_rendering_attributes() {
 
 #[test]
 fn test_make_window_integration_with_title() {
-    // Integration test for make_window with title rendering
-    // This exercises the title rendering code paths in make_window (lines 618-638)
-    use crate::config::Settings;
-    use crate::config::mode::Mode;
-    use crate::render::{FontMetrics, FontOptions, FontWeights, Theme};
-
     // Create a minimal screen element
     let screen = element::SVG::new();
 
     // Create minimal button configuration
-    let button_cfg = crate::config::winstyle::WindowButtons {
+    let button_cfg = WindowButtons {
         position: WindowButtonsPosition::Right,
         shape: None,
         size: Number::from(8.0),
@@ -410,53 +458,43 @@ fn test_make_window_integration_with_title() {
     };
 
     // Create window configuration with title
-    let window_config = crate::config::winstyle::Window {
-        margin: crate::config::PaddingOption::Uniform(Number::from(5.0)),
-        border: crate::config::winstyle::WindowBorder {
+    let window_config = Window {
+        margin: PaddingOption::Uniform(Number::from(5.0)),
+        border: WindowBorder {
             width: Number::from(1.0),
             radius: Number::from(4.0),
             gap: None,
-            colors: crate::config::winstyle::WindowBorderColors {
-                outer: crate::config::winstyle::SelectiveColor::Uniform(
-                    csscolorparser::Color::from_rgba8(0, 0, 0, 255),
-                ),
-                inner: crate::config::winstyle::SelectiveColor::Uniform(
-                    csscolorparser::Color::from_rgba8(100, 100, 100, 255),
-                ),
+            colors: WindowBorderColors {
+                outer: SelectiveColor::Uniform(Color::from_rgba8(0, 0, 0, 255)),
+                inner: SelectiveColor::Uniform(Color::from_rgba8(100, 100, 100, 255)),
             },
         },
-        header: crate::config::winstyle::WindowHeader {
+        header: WindowHeader {
             height: Number::from(24.0),
-            color: crate::config::winstyle::SelectiveColor::Uniform(
-                csscolorparser::Color::from_rgba8(200, 200, 200, 255),
-            ),
+            color: SelectiveColor::Uniform(Color::from_rgba8(200, 200, 200, 255)),
             border: None,
         },
-        title: crate::config::winstyle::WindowTitle {
-            color: crate::config::winstyle::SelectiveColor::Uniform(
-                csscolorparser::Color::from_rgba8(0, 0, 0, 255),
-            ),
-            font: crate::config::winstyle::Font {
+        title: WindowTitle {
+            color: SelectiveColor::Uniform(Color::from_rgba8(0, 0, 0, 255)),
+            font: Font {
                 family: vec!["Monospace".to_string()],
                 size: Number::from(12.0),
                 weight: Some("normal".to_string()),
             },
         },
         buttons: button_cfg,
-        shadow: crate::config::winstyle::WindowShadow {
+        shadow: WindowShadow {
             enabled: false,
             x: Number::from(0.0),
             y: Number::from(0.0),
             blur: Number::from(0.0),
-            color: crate::config::winstyle::SelectiveColor::Uniform(
-                csscolorparser::Color::from_rgba8(0, 0, 0, 100),
-            ),
+            color: SelectiveColor::Uniform(Color::from_rgba8(0, 0, 0, 100)),
         },
     };
 
     // Create Options with title
     let options = Options {
-        settings: Rc::new(Settings::default()),
+        settings: Default::default(),
         font: FontOptions {
             family: vec!["Monospace".to_string()],
             size: 12.0,
@@ -473,8 +511,8 @@ fn test_make_window_integration_with_title() {
             },
         },
         theme: Rc::new(Theme {
-            bg: csscolorparser::Color::from_rgba8(255, 255, 255, 255),
-            fg: csscolorparser::Color::from_rgba8(0, 0, 0, 255),
+            bg: Color::from_rgba8(255, 255, 255, 255),
+            fg: Color::from_rgba8(0, 0, 0, 255),
             bright_fg: None,
             palette: Default::default(),
         }),
@@ -497,15 +535,9 @@ fn test_make_window_integration_with_title() {
 
 #[test]
 fn test_make_window_integration_no_title() {
-    // Test make_window when title is None
-    // This exercises the else path (no title rendering)
-    use crate::config::Settings;
-    use crate::config::mode::Mode;
-    use crate::render::{FontMetrics, FontOptions, FontWeights, Theme};
-
     let screen = element::SVG::new();
 
-    let button_cfg = crate::config::winstyle::WindowButtons {
+    let button_cfg = WindowButtons {
         position: WindowButtonsPosition::Right,
         shape: None,
         size: Number::from(8.0),
@@ -513,47 +545,37 @@ fn test_make_window_integration_no_title() {
         items: vec![],
     };
 
-    let window_config = crate::config::winstyle::Window {
-        margin: crate::config::PaddingOption::Uniform(Number::from(5.0)),
-        border: crate::config::winstyle::WindowBorder {
+    let window_config = Window {
+        margin: PaddingOption::Uniform(Number::from(5.0)),
+        border: WindowBorder {
             width: Number::from(1.0),
             radius: Number::from(4.0),
             gap: None,
-            colors: crate::config::winstyle::WindowBorderColors {
-                outer: crate::config::winstyle::SelectiveColor::Uniform(
-                    csscolorparser::Color::from_rgba8(0, 0, 0, 255),
-                ),
-                inner: crate::config::winstyle::SelectiveColor::Uniform(
-                    csscolorparser::Color::from_rgba8(100, 100, 100, 255),
-                ),
+            colors: WindowBorderColors {
+                outer: SelectiveColor::Uniform(Color::from_rgba8(0, 0, 0, 255)),
+                inner: SelectiveColor::Uniform(Color::from_rgba8(100, 100, 100, 255)),
             },
         },
-        header: crate::config::winstyle::WindowHeader {
+        header: WindowHeader {
             height: Number::from(24.0),
-            color: crate::config::winstyle::SelectiveColor::Uniform(
-                csscolorparser::Color::from_rgba8(200, 200, 200, 255),
-            ),
+            color: SelectiveColor::Uniform(Color::from_rgba8(200, 200, 200, 255)),
             border: None,
         },
-        title: crate::config::winstyle::WindowTitle {
-            color: crate::config::winstyle::SelectiveColor::Uniform(
-                csscolorparser::Color::from_rgba8(0, 0, 0, 255),
-            ),
-            font: crate::config::winstyle::Font {
+        title: WindowTitle {
+            color: SelectiveColor::Uniform(Color::from_rgba8(0, 0, 0, 255)),
+            font: Font {
                 family: vec!["Monospace".to_string()],
                 size: Number::from(12.0),
                 weight: Some("bold".to_string()),
             },
         },
         buttons: button_cfg,
-        shadow: crate::config::winstyle::WindowShadow {
+        shadow: WindowShadow {
             enabled: false,
             x: Number::from(0.0),
             y: Number::from(0.0),
             blur: Number::from(0.0),
-            color: crate::config::winstyle::SelectiveColor::Uniform(
-                csscolorparser::Color::from_rgba8(0, 0, 0, 100),
-            ),
+            color: SelectiveColor::Uniform(Color::from_rgba8(0, 0, 0, 100)),
         },
     };
 
@@ -575,8 +597,8 @@ fn test_make_window_integration_no_title() {
             },
         },
         theme: Rc::new(Theme {
-            bg: csscolorparser::Color::from_rgba8(255, 255, 255, 255),
-            fg: csscolorparser::Color::from_rgba8(0, 0, 0, 255),
+            bg: Color::from_rgba8(255, 255, 255, 255),
+            fg: Color::from_rgba8(0, 0, 0, 255),
             bright_fg: None,
             palette: Default::default(),
         }),
@@ -590,4 +612,66 @@ fn test_make_window_integration_no_title() {
     let result = make_window(&options, 200.0, 150.0, screen);
     let svg_str = result.to_string();
     assert!(!svg_str.is_empty());
+}
+
+#[test]
+fn test_subclusters_plain() {
+    let mut surface = Surface::new(5, 2);
+    surface.add_change(Change::Text("a".into()));
+    let options = Options::sample();
+
+    let lines = surface.screen_lines();
+    let lines = lines.iter().collect_vec();
+    assert_eq!(lines.len(), 2);
+
+    let line = &lines[0];
+    assert_eq!(line.len(), 5);
+    assert_eq!(line.get_cell(0).unwrap().width(), 1);
+    assert_eq!(line.get_cell(0).unwrap().str(), "a");
+
+    let clusters = line.cluster(None);
+    assert_eq!(clusters.len(), 2);
+
+    let cluster = &clusters[0];
+    assert_eq!(cluster.width, 2);
+    assert_eq!(&cluster.text, "a ");
+    let subclusters = subdivide(line, cluster, &options).collect_vec();
+    assert_eq!(subclusters.len(), 1);
+    assert_eq!(subclusters[0].0, "a ");
+    assert_eq!(subclusters[0].1, 0..2);
+
+    let cluster = &clusters[1];
+    assert_eq!(cluster.width, 3);
+    assert_eq!(&cluster.text, "   ");
+    let subclusters = subdivide(line, cluster, &options).collect_vec();
+    assert_eq!(subclusters.len(), 1);
+    assert_eq!(subclusters[0].0, "   ");
+    assert_eq!(subclusters[0].1, 2..5);
+}
+
+#[test]
+fn test_subclusters_combining_characters() {
+    let mut surface = Surface::new(5, 2);
+    surface.add_change(Change::Text("◌́".into()));
+    let options = Options::sample();
+
+    let lines = surface.screen_lines();
+    let lines = lines.iter().collect_vec();
+    assert_eq!(lines.len(), 2);
+
+    let line = &lines[0];
+    assert_eq!(line.len(), 5);
+    assert_eq!(line.get_cell(0).unwrap().width(), 1);
+    assert_eq!(line.get_cell(0).unwrap().str(), "◌́");
+
+    let clusters = line.cluster(None);
+    assert_eq!(clusters.len(), 2);
+
+    let cluster = &clusters[0];
+    assert_eq!(cluster.width, 2);
+    assert_eq!(&cluster.text, "◌́ ");
+    let subclusters = subdivide(line, cluster, &options).collect_vec();
+    assert_eq!(subclusters.len(), 1);
+    assert_eq!(subclusters[0].0, "◌\u{301} ");
+    assert_eq!(subclusters[0].1, 0..2);
 }

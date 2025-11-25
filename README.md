@@ -108,8 +108,8 @@ PNG images: [sample-dark.png](https://github.com/user-attachments/assets/5fe3fcf
 
 * Configuration files are automatically loaded if found in predefined platform-specific locations.
 
-    | OS      | System-Wide Location                     | User Profile Location                                          |
-    | ------- | ---------------------------------------- |  ------------------------------------------------------- |
+    | OS      | System-Wide Location                            | User Profile Location                                           |
+    | ------- | ----------------------------------------------- |  -------------------------------------------------------------- |
     | macOS   | /etc/termframe/config.{yaml,toml,json}          | ~/.config/termframe/config.{yaml,toml,json}                     |
     | Linux   | /etc/termframe/config.{yaml,toml,json}          | ~/.config/termframe/config.{yaml,toml,json}                     |
     | Windows | %PROGRAMDATA%\termframe\config.{yaml,toml,json} | %USERPROFILE%\AppData\Roaming\termframe\config.{yaml,toml,json} |
@@ -207,7 +207,7 @@ Create a `window-styles` folder in your configuration directory:
 | ------- | ----------------------------------------------------------------- |
 | macOS   | `~/.config/termframe/window-styles/`                              |
 | Linux   | `~/.config/termframe/window-styles/`                              |
-| Windows | `%USERPROFILE%\AppData\Roaming\termframe\window-styles\`         |
+| Windows | `%USERPROFILE%\AppData\Roaming\termframe\window-styles\`          |
 
 #### Window style file formats
 

@@ -9,7 +9,7 @@ authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
 description = "Terminal output SVG screenshot tool"
 categories = ["command-line-utilities"]
 keywords = ["cli", "terminal", "screenshot", "svg"]
-version = "0.7.2"
+version = "0.7.3-alpha.1"
 edition = "2024"
 license = "MIT"
 build = "build/build.rs"
@@ -20,7 +20,7 @@ rust-version = "1.88.0"
 tidy-themes = { path = "tools/tidy-themes" }
 
 [dependencies]
-allsorts = "0.15"
+allsorts = "0.16"
 anyhow = "1"
 askama = "0.14"
 base64 = "0.22"

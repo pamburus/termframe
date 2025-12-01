@@ -43,7 +43,7 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Setup Rust cache
-        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
 
       - name: Install just
         uses: taiki-e/install-action@f79fe7514db78f0a7bdba3cb6dd9c1baa7d046d9 # v2.62.56

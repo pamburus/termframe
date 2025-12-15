@@ -61,14 +61,17 @@ jobs:
           toolchain: stable
           rustflags: ""
 
+      - name: Install cargo-quickinstall
+        run: cargo install cargo-quickinstall
+
       - name: Install cargo-edit
-        run: cargo install cargo-edit
+        run: cargo quickinstall cargo-edit
 
       - name: Update version in Cargo.toml
         id: update-version
         run: |
-          cargo set-version --package termframe --bump "${{ github.event.inputs.release-type }}"
-          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "termframe") | .version')
+          cargo set-version --package ${{ github.event.repository.name }} --bump "${{ github.event.inputs.release-type }}"
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "${{ github.event.repository.name }}") | .version')
           echo "version=${VERSION?}" >> $GITHUB_OUTPUT
 
       - name: Install git-cliff
@@ -165,7 +168,7 @@ jobs:
 
           # Get filtered assets and convert hex hashes to SRI format
           gh release view "${RELEASE_TAG:?}" --json assets --jq '.assets
-            | map(select(.name | test("^termframe-(linux-(x86_64|arm64)-musl|macos-(x86_64|arm64))\\.tar\\.gz$")))
+            | map(select(.name | test("^${{ github.event.repository.name }}-(linux-(x86_64|arm64)-musl|macos-(x86_64|arm64))\\.tar\\.gz$")))
             | .[] | .name + ":" + (.digest | ltrimstr("sha256:"))' | \
             while IFS=':' read -r name hex; do
               echo "${name:?}:sha256-$(echo -n "${hex:?}" | xxd -r -p | base64)"
@@ -242,8 +245,8 @@ jobs:
 
           if [[ "${IS_PRERELEASE:?}" == "false" ]]; then
             gh workflow run publish.yml \
-              --repo pamburus/action-hub \
-              --field package="termframe"
+              --repo "${{ github.repository_owner }}/action-hub" \
+              --field package="${{ github.event.repository.name }}"
           fi
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}

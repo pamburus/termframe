@@ -21,7 +21,7 @@
 <svg height="345.6" viewBox="0 0 47.4 28.8" width="568.8">
 <g stroke-width="0.025">
 <path d="M10.2,7.2 H22.8 V8.4 H10.2 Z" fill="#383a42" stroke="#383a42"/>
-<path d="M0,22.8 H6 V24 H0 Z" fill="#464b57" stroke="#464b57"/>
+<path d="M0,22.8 H6 V24 H0 Z" fill="#0f131e" stroke="#0f131e"/>
 <path d="M6,22.8 H10.8 V24 H6 Z" fill="#e45649" stroke="#e45649"/>
 <path d="M10.8,22.8 H16.8 V24 H10.8 Z" fill="#50a14f" stroke="#50a14f"/>
 <path d="M16.8,22.8 H23.4 V24 H16.8 Z" fill="#c18401" stroke="#c18401"/>
@@ -135,10 +135,10 @@
 <text xml:space="preserve" y="0.96em"><tspan fill="#383a42" font-weight="bold">Basic </tspan><tspan fill="#383a42" font-weight="bold">Foreground </tspan><tspan fill="#383a42" font-weight="bold">Colors:</tspan></text>
 </svg>
 <svg height="14.4" overflow="hidden" width="568.8" y="129.6">
-<text xml:space="preserve" y="0.96em"><tspan fill="#383a42">• </tspan><tspan fill="#383a42">Normal: </tspan><tspan fill="#464b57">Black</tspan><tspan fill="#e45649" x="9.6em">Red</tspan><tspan fill="#50a14f" x="12em">Green</tspan><tspan fill="#c18401" x="15.6em">Yellow</tspan><tspan fill="#0184bc" x="19.8em">Blue</tspan><tspan fill="#a626a4" x="22.8em">Magenta</tspan><tspan fill="#0997b3" x="27.6em">Cyan</tspan><tspan fill="#e8d9d9" x="30.6em">White</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan fill="#383a42">• </tspan><tspan fill="#383a42">Normal: </tspan><tspan fill="#0f131e">Black</tspan><tspan fill="#e45649" x="9.6em">Red</tspan><tspan fill="#50a14f" x="12em">Green</tspan><tspan fill="#c18401" x="15.6em">Yellow</tspan><tspan fill="#0184bc" x="19.8em">Blue</tspan><tspan fill="#a626a4" x="22.8em">Magenta</tspan><tspan fill="#0997b3" x="27.6em">Cyan</tspan><tspan fill="#e8d9d9" x="30.6em">White</tspan></text>
 </svg>
 <svg height="14.4" overflow="hidden" width="568.8" y="144">
-<text xml:space="preserve" y="0.96em"><tspan fill="#383a42">• </tspan><tspan fill="#383a42">Bright: </tspan><tspan fill="#0f131e">Black</tspan><tspan fill="#f24c2d" x="9.6em">Red</tspan><tspan fill="#3db637" x="12em">Green</tspan><tspan fill="#e09d00" x="15.6em">Yellow</tspan><tspan fill="#2e63d6" x="19.8em">Blue</tspan><tspan fill="#d21fd1" x="22.8em">Magenta</tspan><tspan fill="#06b1d8" x="27.6em">Cyan</tspan><tspan fill="#ffffff" x="30.6em">White</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan fill="#383a42">• </tspan><tspan fill="#383a42">Bright: </tspan><tspan fill="#797c83">Black</tspan><tspan fill="#f24c2d" x="9.6em">Red</tspan><tspan fill="#3db637" x="12em">Green</tspan><tspan fill="#e09d00" x="15.6em">Yellow</tspan><tspan fill="#2e63d6" x="19.8em">Blue</tspan><tspan fill="#d21fd1" x="22.8em">Magenta</tspan><tspan fill="#06b1d8" x="27.6em">Cyan</tspan><tspan fill="#ffffff" x="30.6em">White</tspan></text>
 </svg>
 <svg height="14.4" overflow="hidden" width="568.8" y="172.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#383a42" font-weight="bold">Mixed </tspan><tspan fill="#383a42" font-weight="bold">Styles </tspan><tspan fill="#383a42" font-weight="bold">with </tspan><tspan fill="#383a42" font-weight="bold">Colors:</tspan></text>

@@ -20,7 +20,7 @@ rust-version = "1.88.0"
 tidy-themes = { path = "tools/tidy-themes" }
 
 [dependencies]
-allsorts = "0.15"
+allsorts = "0.16"
 anyhow = "1"
 askama = "0.15"
 base64 = "0.22"

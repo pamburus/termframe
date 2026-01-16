@@ -6,8 +6,8 @@ use allsorts::{
     binary::read::{ReadScope, ReadScopeOwned},
     font::MatchingPresentation,
     font_data::{DynamicFontTableProvider, FontData},
-    subset::subset,
-    tables::{FontTableProvider, HeadTable, NameTable, os2::Os2},
+    subset::{CmapTarget, SubsetProfile, subset},
+    tables::{FontTableProvider, NameTable, os2::Os2},
     tag,
 };
 use anyhow::anyhow;
@@ -128,15 +128,11 @@ impl FontFile {
         let family = name_table.string_for_id(16);
 
         let inner = allsorts::Font::new(provider)?;
-        let Some(head) = inner.head_table()? else {
-            return Err(anyhow!("No head table found in the font"));
-        };
         let Some(os2) = inner.os2_table()? else {
             return Err(anyhow!("No os/2 table found in the font"));
         };
         Ok(Font {
             inner,
-            head,
             os2,
             format: self.format(),
             name,
@@ -201,7 +197,6 @@ impl From<&str> for Location {
 #[allow(dead_code)]
 pub struct Font<'a> {
     inner: allsorts::Font<DynamicFontTableProvider<'a>>,
-    head: HeadTable,
     os2: Os2,
     format: Option<FontFormat>,
     name: Option<String>,
@@ -259,12 +254,12 @@ impl Font<'_> {
 
     /// Check if the font is italic.
     pub fn italic(&self) -> bool {
-        self.head.is_italic()
+        self.inner.head_table.is_italic()
     }
 
     /// Check if the font is bold.
     pub fn bold(&self) -> bool {
-        self.head.is_bold()
+        self.inner.head_table.is_bold()
     }
 
     /// Get the weight axis range of the font.
@@ -283,7 +278,6 @@ impl Font<'_> {
     }
 
     /// Create a subset of the font containing only the specified characters.
-    #[allow(dead_code)]
     pub fn subset<C>(&mut self, chars: C) -> Result<Vec<u8>>
     where
         C: IntoIterator<Item = char>,
@@ -299,12 +293,17 @@ impl Font<'_> {
 
         let glyphs = glyphs.into_iter().collect::<Vec<_>>();
 
-        Ok(subset(&self.inner.font_table_provider, &glyphs)?)
+        Ok(subset(
+            &self.inner.font_table_provider,
+            &glyphs,
+            &SubsetProfile::Minimal,
+            CmapTarget::Unrestricted,
+        )?)
     }
 
     /// Get the units per em value of the font.
     fn em(&self) -> u16 {
-        self.head.units_per_em
+        self.inner.head_table.units_per_em
     }
 
     /// Get the range of a specific axis in the font.

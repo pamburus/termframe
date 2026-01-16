@@ -77,6 +77,10 @@ function test() {
         diff "${golden:?}" "${tmp:?}"
         rm -f ${tmp:?}
     done
+
+    echo "test font subsetting"
+    ${MAIN_EXECUTABLE:?} --config - --mode dark -W 80 -H 24 --embed-fonts true --subset-fonts true <assets/test/input/sample.ansi -o target/coverage/tmp/subset-test.svg
+    rm -f target/coverage/tmp/subset-test.svg
 }
 
 function merge() {

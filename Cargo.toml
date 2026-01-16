@@ -1,6 +1,6 @@
 [package]
 name = "termframe"
-version = "0.7.5-alpha.2"
+version = "0.7.5-alpha.3"
 edition = "2024"
 rust-version = "1.88.0"
 description = "Terminal output SVG screenshot tool"
@@ -24,7 +24,7 @@ name = "termframe"
 path = "src/main.rs"
 
 [dependencies]
-allsorts = "0.15"
+allsorts = "0.16"
 anyhow = "1"
 askama = "0.15"
 base64 = "0.22"

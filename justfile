@@ -172,6 +172,10 @@ color-table theme mode: (setup "cargo")
 coverage: (setup "coverage")
     build/ci/coverage.sh
 
+[doc('Show uncovered changed lines comparing to {{base}}')]
+uncovered base="origin/main": (setup "coverage")
+    @scripts/coverage-diff-analysis.py -q --ide-links {{ base }}
+
 [private]
 setup *tools:
     @contrib/bin/setup.sh {{ tools }}

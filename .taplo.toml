@@ -14,6 +14,5 @@ schema = { path = "./schema/json/window-style.schema.json", enabled = true }
 include = ["**/Cargo.toml"]
 
 [rule.formatting]
-indent = 4
 reorder_keys = false
 column_width = 160

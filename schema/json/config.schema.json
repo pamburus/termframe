@@ -1,62 +1,88 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/document",
-  "definitions": {
-    "document": {
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["auto", "dark", "light"]
+    },
+    "terminal": {
+      "$ref": "#/definitions/terminal"
+    },
+    "env": {
       "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "mode": {
-          "type": "string",
-          "enum": ["auto", "dark", "light"]
-        },
-        "terminal": {
-          "$ref": "#/definitions/terminal"
-        },
-        "env": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "propertyNames": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "font": {
-          "$ref": "#/definitions/font"
-        },
-        "padding": {
-          "$ref": "#/definitions/padding"
-        },
-        "theme": {
-          "$ref": "#/definitions/theme"
-        },
-        "window": {
-          "$ref": "#/definitions/window"
-        },
-        "rendering": {
-          "$ref": "#/definitions/rendering"
-        },
-        "fonts": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/font-item"
-          }
-        }
+      "additionalProperties": {
+        "type": "string"
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1
       }
     },
+    "font": {
+      "$ref": "#/definitions/font"
+    },
+    "padding": {
+      "$ref": "#/definitions/padding"
+    },
+    "theme": {
+      "$ref": "#/definitions/theme"
+    },
+    "window": {
+      "$ref": "#/definitions/window"
+    },
+    "rendering": {
+      "$ref": "#/definitions/rendering"
+    },
+    "fonts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/fontItem"
+      }
+    }
+  },
+  "definitions": {
     "terminal": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "width": {
-          "type": "number"
+          "$ref": "#/definitions/dimension"
         },
         "height": {
-          "type": "number"
+          "$ref": "#/definitions/dimension"
         }
       }
+    },
+    "dimension": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "enum": ["auto"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            },
+            "step": {
+              "type": "number"
+            },
+            "initial": {
+              "type": "number"
+            }
+          }
+        }
+      ]
     },
     "font": {
       "type": "object",
@@ -81,17 +107,17 @@
       "additionalProperties": false,
       "properties": {
         "normal": {
-          "$ref": "#/definitions/font-weight"
+          "$ref": "#/definitions/fontWeight"
         },
         "bold": {
-          "$ref": "#/definitions/font-weight"
+          "$ref": "#/definitions/fontWeight"
         },
         "faint": {
-          "$ref": "#/definitions/font-weight"
+          "$ref": "#/definitions/fontWeight"
         }
       }
     },
-    "font-weight": {
+    "fontWeight": {
       "type": "string",
       "enum": [
         "normal",
@@ -185,7 +211,7 @@
         }
       }
     },
-    "font-item": {
+    "fontItem": {
       "type": "object",
       "additionalProperties": false,
       "properties": {

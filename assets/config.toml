@@ -1,4 +1,4 @@
-#:schema https://raw.githubusercontent.com/pamburus/termframe/refs/heads/main/schema/json/config.schema.json
+#:schema ../schema/json/config.schema.json
 
 # Dark or light mode.
 # Possible values: [auto, dark, light].
@@ -28,7 +28,7 @@ mode = "auto"
 # - Preferred size that gets clamped to min/max constraints if specified
 [terminal]
 width = { min = 80, max = 240, step = 4, initial = 180 } # Number of terminal columns.
-height = { min = 24, max = 60, initial = 48 }  # Number of terminal rows.
+height = { min = 24, max = 60, initial = 48 }            # Number of terminal rows.
 
 # Environment variables.
 [env]

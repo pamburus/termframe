@@ -120,10 +120,10 @@ jobs:
           # Find all TOML files with schema references (both relative and absolute) and update them
           # Matches both:
           # - Relative: #:schema (../)+schema/...
-          # - Absolute: #:schema https://raw.githubusercontent.com/${{ github.repository_owner }}/${{ github.repository }}/[ref]/schema/...
+          # - Absolute: #:schema https://raw.githubusercontent.com/${{ github.repository }}/[ref]/schema/...
           find . -name "*.toml" -type f -exec grep -l "#:schema" {} \; | while read -r file; do
             echo "Updating schema reference in ${file}"
-            sed -i.bak -E 's|#:schema ((\.\./)+\|https://raw\.githubusercontent\.com/${{ github.repository_owner }}/${{ github.repository }}/[^/]+/)schema/|#:schema https://raw.githubusercontent.com/${{ github.repository_owner }}/${{ github.repository }}/v'"${VERSION}"'/schema/|g' "${file}"
+            sed -i.bak -E 's|#:schema ((\.\./)+\|https://raw\.githubusercontent\.com/${{ github.repository }}/[^/]+/)schema/|#:schema https://raw.githubusercontent.com/${{ github.repository }}/v'"${VERSION}"'/schema/|g' "${file}"
             rm -f "${file}.bak"
           done
 

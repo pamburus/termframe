@@ -24,11 +24,11 @@ install: && install-man-pages (setup "cargo")
 
 [doc('Build and publish new release')]
 release type="patch": (setup "cargo-edit")
-    gh workflow run -R pamburus/termframe release.yml --ref $(git branch --show-current) --field release-type={{type}}
+    gh workflow run -R pamburus/termframe release.yml --ref $(git branch --show-current) --field release-type={{ type }}
 
 [doc('Bump version')]
 bump type="alpha": (setup "cargo-edit")
-    cargo set-version --package termframe --bump {{type}}
+    cargo set-version --package termframe --bump {{ type }}
 
 [doc('Show current version')]
 version: (setup "cargo" "jq")
@@ -38,7 +38,7 @@ version: (setup "cargo" "jq")
 changes since="auto": (setup "git-cliff" "bat" "gh" "jq" "cargo")
     #!/usr/bin/env bash
     set -euo pipefail
-    since=$(if [ "{{since}}" = auto ]; then {{previous-tag}}; else echo "{{since}}"; fi)
+    since=$(if [ "{{ since }}" = auto ]; then {{ previous-tag }}; else echo "{{ since }}"; fi)
     version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "termframe") | .version')
     GITHUB_REPO=pamburus/termframe \
     GITHUB_TOKEN=$(gh auth token) \
@@ -47,10 +47,10 @@ changes since="auto": (setup "git-cliff" "bat" "gh" "jq" "cargo")
 
 [doc('Show previous release tag')]
 previous-tag:
-    @{{previous-tag}}
+    @{{ previous-tag }}
 
 [doc('Run all CI checks locally')]
-ci: test lint coverage
+ci: check-schema test lint coverage
 
 [doc('Run tests for all packages in the workspace')]
 test *ARGS: (setup "cargo")
@@ -63,17 +63,57 @@ lint *ARGS: (clippy ARGS)
 clippy *ARGS: (setup "clippy")
     cargo clippy --all-targets --all-features {{ ARGS }}
 
+[doc('Check schema validation')]
+check-schema: (setup "schema")
+    tombi lint
+    taplo check
+
+[doc('Format all Rust and Nix files')]
+fmt: fmt-rust fmt-nix fmt-toml
+    @echo "✓ All files formatted successfully"
+
+[doc('Format Rust code')]
+fmt-rust: (setup "build-nightly")
+    cargo +nightly fmt --all
+
+[doc('Format Nix files (if nix is installed)')]
+fmt-nix:
+    @if command -v nix > /dev/null; then \
+        echo "Formatting Nix files..."; \
+        nix fmt; \
+    else \
+        echo "Nix not found, skipping Nix formatting"; \
+    fi
+
+[doc('Format TOML files')]
+fmt-toml: (setup "schema")
+    tombi format
+
+[doc('Check formatting without applying changes (for CI)')]
+fmt-check: fmt-check-rust fmt-check-nix
+    @echo "✓ Formatting is correct"
+
+[doc('Check Rust formatting')]
+fmt-check-rust: (setup "build-nightly")
+    @cargo +nightly fmt --all --check
+
+[doc('Check Nix formatting')]
+fmt-check-nix:
+    @if command -v nix > /dev/null; then \
+        nix fmt --check; \
+    fi
+
 [doc('Update dependencies')]
 update *ARGS: (setup "cargo")
     cargo update {{ ARGS }}
 
 [doc('Update themes')]
-update-themes *ARGS: (setup "cargo" "rsync")
-    rm -fr "{{tmp-themes-dir}}"
-    git clone -n --depth=1 --filter=tree:0 https://github.com/mbadolato/iTerm2-Color-Schemes.git "{{tmp-themes-dir}}"
-    cd "{{tmp-themes-dir}}" && git sparse-checkout set --no-cone /termframe && git checkout
-    rsync -a --delete "{{tmp-themes-dir}}"/termframe/ assets/themes/ --exclude-from=assets/themes/.rsync-exclude
-    rm -fr "{{tmp-themes-dir}}"
+update-themes: (setup "cargo" "rsync")
+    rm -fr "{{ tmp-themes-dir }}"
+    git clone -n --depth=1 --filter=tree:0 https://github.com/mbadolato/iTerm2-Color-Schemes.git "{{ tmp-themes-dir }}"
+    cd "{{ tmp-themes-dir }}" && git sparse-checkout set --no-cone /termframe && git checkout
+    rsync -a --delete "{{ tmp-themes-dir }}"/termframe/ assets/themes/ --exclude-from=assets/themes/.rsync-exclude
+    rm -fr "{{ tmp-themes-dir }}"
     cargo tidy-themes
 
 [doc('Tidy themes')]
@@ -93,8 +133,8 @@ help: (help-for "dark") (help-for "light")
 help-for mode: (build "--locked")
     target/debug/termframe \
         --title 'termframe --help' \
-        --mode {{mode}} \
-        -o doc/help-{{mode}}.svg \
+        --mode {{ mode }} \
+        -o doc/help-{{ mode }}.svg \
         -W 106 -H auto \
         -- ./target/debug/termframe --config - --help
 
@@ -107,11 +147,11 @@ sample-for mode: (setup "cargo")
         --config - \
         -W 79 -H 24 \
         --embed-fonts true \
-        --font-family "{{fonts}}" \
-        --mode {{mode}} \
+        --font-family "{{ fonts }}" \
+        --mode {{ mode }} \
         --title "termframe sample" \
-        --output doc/sample-{{mode}}.svg \
-        ./scripts/sample {{mode}}
+        --output doc/sample-{{ mode }}.svg \
+        ./scripts/sample {{ mode }}
 
 [doc('Generate color table screenshot')]
 color-table theme mode: (setup "cargo")
@@ -119,19 +159,19 @@ color-table theme mode: (setup "cargo")
         --config - \
         -W 80 -H 40 \
         --embed-fonts true \
-        --font-family "{{fonts}}" \
-        --mode {{kebabcase(mode)}} \
-        --theme "{{kebabcase(theme)}}" \
+        --font-family "{{ fonts }}" \
+        --mode {{ kebabcase(mode) }} \
+        --theme "{{ kebabcase(theme) }}" \
         --bold-is-bright true \
         --bold-font-weight normal \
-        --title "{{theme}} ({{mode}})" \
-        --output doc/color-table-{{kebabcase(theme)}}-{{kebabcase(mode)}}.svg \
+        --title "{{ theme }} ({{ mode }})" \
+        --output doc/color-table-{{ kebabcase(theme) }}-{{ kebabcase(mode) }}.svg \
         ./scripts/color-table.sh
 
 [doc('Collect code coverage')]
 coverage: (setup "coverage")
-	build/ci/coverage.sh
+    build/ci/coverage.sh
 
 [private]
 setup *tools:
-    @contrib/bin/setup.sh {{tools}}
+    @contrib/bin/setup.sh {{ tools }}

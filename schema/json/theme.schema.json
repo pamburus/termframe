@@ -1,22 +1,19 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/document",
-  "definitions": {
-    "document": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "tags": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/tag"
-          }
-        },
-        "theme": {
-          "$ref": "#/definitions/theme"
-        }
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "tags": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/tag"
       }
     },
+    "theme": {
+      "$ref": "#/definitions/theme"
+    }
+  },
+  "definitions": {
     "theme": {
       "type": "object",
       "additionalProperties": false,
@@ -59,19 +56,19 @@
       "additionalProperties": false,
       "properties": {
         "background": {
-          "$ref": "#/definitions/hex-color"
+          "$ref": "#/definitions/hexColor"
         },
         "foreground": {
-          "$ref": "#/definitions/hex-color"
+          "$ref": "#/definitions/hexColor"
         },
         "bright-foreground": {
-          "$ref": "#/definitions/hex-color"
+          "$ref": "#/definitions/hexColor"
         },
         "palette": {
           "type": "object",
           "patternProperties": {
             "^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])$": {
-              "$ref": "#/definitions/hex-color"
+              "$ref": "#/definitions/hexColor"
             }
           },
           "additionalProperties": false
@@ -79,7 +76,7 @@
       },
       "required": ["background", "foreground"]
     },
-    "hex-color": {
+    "hexColor": {
       "type": "string",
       "pattern": "^#[0-9a-fA-F]{6}$"
     }

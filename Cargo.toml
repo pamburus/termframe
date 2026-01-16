@@ -1,23 +1,27 @@
-[workspace]
-members = [".", "tools/tidy-themes"]
-default-members = ["."]
-resolver = "2"
-
 [package]
 name = "termframe"
-authors = ["Pavel Ivanov <mr.pavel.ivanov@gmail.com>"]
-description = "Terminal output SVG screenshot tool"
-categories = ["command-line-utilities"]
-keywords = ["cli", "terminal", "screenshot", "svg"]
-version = "0.7.5-alpha.1"
+version = "0.7.5-alpha.2"
 edition = "2024"
+rust-version = "1.88.0"
+description = "Terminal output SVG screenshot tool"
 license = "MIT"
+keywords = ["cli", "screenshot", "svg", "terminal"]
+categories = ["command-line-utilities"]
 build = "build/build.rs"
 default-run = "termframe"
-rust-version = "1.88.0"
 
-[build-dependencies]
-tidy-themes = { path = "tools/tidy-themes" }
+[workspace]
+resolver = "2"
+members = [".", "tools/tidy-themes"]
+default-members = ["."]
+
+[lib]
+name = "termframe"
+path = "src/lib.rs"
+
+[[bin]]
+name = "termframe"
+path = "src/main.rs"
 
 [dependencies]
 allsorts = "0.15"
@@ -25,17 +29,20 @@ anyhow = "1"
 askama = "0.15"
 base64 = "0.22"
 cacache = "13"
-clap = { version = "4", features = ["wrap_help", "derive", "env", "string"] }
+clap = { version = "4", features = ["derive", "env", "string", "wrap_help"] }
 clap_complete = "4"
 clap_mangen = "0.2"
 closure = "0.3"
-config = { version = "0.15", features = ["yaml", "json", "toml"] }
+config = { version = "0.15", features = ["json", "toml", "yaml"] }
 csscolorparser = { version = "0.7", features = ["serde"] }
 dark-light = "2"
 dirs = "6"
 dirs-sys = "0.5"
 enumset = "1"
-enumset-ext = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28", features = ["serde", "clap"] }
+enumset-ext = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28", features = [
+    "clap",
+    "serde"
+] }
 enumset-serde = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28" }
 env_logger = "0.11"
 exponential-backoff = "2"
@@ -69,14 +76,12 @@ voca_rs = "1"
 wild = "2"
 yaml-peg = "1"
 
+[build-dependencies]
+anyhow = "1"
+sha2 = "0.10"
+tidy-themes = { path = "tools/tidy-themes" }
+ureq = "3"
+
 [patch.crates-io]
 pathfinder_simd = { git = "https://github.com/servo/pathfinder.git", rev = "8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd" }
 svg = { git = "https://github.com/pamburus/svg.git", rev = "f9ac3f53d6747d8af57f16d447a7336779ddb722" }
-
-[lib]
-name = "termframe"
-path = "src/lib.rs"
-
-[[bin]]
-name = "termframe"
-path = "src/main.rs"

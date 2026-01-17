@@ -24,6 +24,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Result, anyhow};
 use sha2::{Digest, Sha256};
+use ureq::tls;
 
 const ASSETS_DIR: &str = "assets";
 const JSON_SCHEMA_DIR: &str = "schema/json";
@@ -146,10 +147,13 @@ fn find_local_schema_file(filename: &str) -> Result<PathBuf> {
 /// Fetches content from a URL and returns its SHA256 hash.
 /// Uses a 10-second timeout for the HTTP request.
 fn fetch_and_hash_url(url: &str) -> Result<Hash> {
-    let agent = ureq::Agent::config_builder()
-        .timeout_global(Some(std::time::Duration::from_secs(10)))
-        .build()
-        .new_agent();
+    let agent = {
+        ureq::Agent::config_builder()
+            .timeout_global(Some(std::time::Duration::from_secs(10)))
+            .tls_config(tls_config())
+            .build()
+            .new_agent()
+    };
 
     let mut response = agent
         .get(url)
@@ -157,6 +161,20 @@ fn fetch_and_hash_url(url: &str) -> Result<Hash> {
         .map_err(|e| anyhow!("Failed to fetch URL {}: {}", url, e))?;
 
     text_reader_hash(std::io::BufReader::new(response.body_mut().as_reader()))
+}
+
+// On Windows, use native-tls to avoid ring/clang requirement
+#[cfg(target_os = "windows")]
+fn tls_config() -> tls::TlsConfig {
+    tls::TlsConfig::builder()
+        .provider(tls::TlsProvider::NativeTls)
+        .root_certs(tls::RootCerts::PlatformVerifier)
+        .build()
+}
+
+#[cfg(not(target_os = "windows"))]
+fn tls_config() -> tls::TlsConfig {
+    tls::TlsConfig::builder().build()
 }
 
 /// Computes the SHA256 hash of a text file.

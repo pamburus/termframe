@@ -81,6 +81,7 @@ impl App {
             ua = Some(
                 ureq::Agent::config_builder()
                     .middleware(ureqmw::cache::new(&dirs.cache_dir))
+                    .tls_config(tls_config())
                     .build()
                     .into(),
             );
@@ -445,6 +446,20 @@ fn list_assets(items: impl IntoIterator<Item = (String, ItemInfo)>) -> Result<()
 }
 
 /// Bootstraps the application settings
+// On Windows, use native-tls to avoid ring/clang requirement
+#[cfg(target_os = "windows")]
+fn tls_config() -> ureq::tls::TlsConfig {
+    ureq::tls::TlsConfig::builder()
+        .provider(ureq::tls::TlsProvider::NativeTls)
+        .root_certs(ureq::tls::RootCerts::PlatformVerifier)
+        .build()
+}
+
+#[cfg(not(target_os = "windows"))]
+fn tls_config() -> ureq::tls::TlsConfig {
+    ureq::tls::TlsConfig::builder().build()
+}
+
 fn bootstrap() -> Result<Settings> {
     if std::env::var(TERMFRAME_DEBUG_LOG).is_ok() {
         logger::Builder::from_env(TERMFRAME_DEBUG_LOG)

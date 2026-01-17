@@ -1,6 +1,6 @@
 [package]
 name = "termframe"
-version = "0.7.6"
+version = "0.7.7-alpha.1"
 edition = "2024"
 rust-version = "1.88.0"
 description = "Terminal output SVG screenshot tool"
@@ -70,7 +70,6 @@ termwiz = "0.23"
 thiserror = "2"
 toml = "0.9"
 unicode-width = "0.2"
-ureq = "3"
 url = "2"
 voca_rs = "1"
 wild = "2"
@@ -80,7 +79,21 @@ yaml-peg = "1"
 anyhow = "1"
 sha2 = "0.10"
 tidy-themes = { path = "tools/tidy-themes" }
+
+[target.'cfg(not(windows))'.dependencies]
 ureq = "3"
+
+[target.'cfg(not(windows))'.build-dependencies]
+ureq = "3"
+
+# Use native-tls on all Windows platforms to avoid ring/clang requirement
+# (especially important for ARM64, but simpler to use everywhere on Windows)
+# Use rustls (default) on all other platforms
+[target.'cfg(windows)'.dependencies]
+ureq = { version = "3", default-features = false, features = ["gzip", "native-tls", "platform-verifier"] }
+
+[target.'cfg(windows)'.build-dependencies]
+ureq = { version = "3", default-features = false, features = ["gzip", "native-tls", "platform-verifier"] }
 
 [patch.crates-io]
 pathfinder_simd = { git = "https://github.com/servo/pathfinder.git", rev = "8ccf6f7c2dd91f8e143998f91e55d1d24a4709bd" }

@@ -1,6 +1,24 @@
+# Common settings
+
 fonts := "JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace"
 tmp-themes-dir := ".tmp/themes"
 previous-tag := "git tag -l \"v*.*.*\" --merged HEAD --sort=-version:refname | head -1"
+
+# NixOS helpers
+
+nix-files := "."
+nix-docker-image := "termframe-nixos-helper"
+nix-docker-base := """
+    docker run --rm \
+        -t \
+        --platform=linux/$(uname -m) \
+        --security-opt seccomp=unconfined \
+        -v "$(pwd)":/etc/nixos \
+        -w /etc/nixos \
+        """
+nix-docker := nix-docker-base + nix-docker-image + " "
+
+# Recipes
 
 [private]
 default:
@@ -76,14 +94,8 @@ fmt: fmt-rust fmt-nix fmt-toml
 fmt-rust: (setup "build-nightly")
     cargo +nightly fmt --all
 
-[doc('Format Nix files (if nix is installed)')]
-fmt-nix:
-    @if command -v nix > /dev/null; then \
-        echo "Formatting Nix files..."; \
-        nix fmt; \
-    else \
-        echo "Nix not found, skipping Nix formatting"; \
-    fi
+[doc('Format Nix files')]
+fmt-nix: (run-nixfmt nix-files)
 
 [doc('Format TOML files')]
 fmt-toml: (setup "schema")
@@ -175,6 +187,34 @@ coverage: (setup "coverage")
 [doc('Show uncovered changed lines comparing to {{base}}')]
 uncovered base="origin/main": (setup "coverage")
     @scripts/coverage-diff-analysis.py -q --ide-links {{ base }}
+
+[doc('Update Nix flakes')]
+update-nix: (run-nix "flake" "update")
+
+# Helper function to run a command locally or in Docker if not installed
+[private]
+nix-run-local-or-docker docker cmd *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v {{ cmd }} >/dev/null 2>&1; then
+        {{ cmd }} {{ args }}
+    else
+        just build-nix-docker-image
+        {{ docker }} {{ cmd }} {{ args }}
+    fi
+
+# Helper function to run nix commands locally or in Docker
+[private]
+run-nix *args: (nix-run-local-or-docker nix-docker "nix" args)
+
+# Helper function to run nixfmt commands locally or in Docker
+[private]
+run-nixfmt *args: (nix-run-local-or-docker nix-docker "nixfmt" args)
+
+# Helper function to build NixOS docker image
+[private]
+build-nix-docker-image:
+    docker build -t {{ nix-docker-image }} build/docker/nix
 
 [private]
 setup *tools:

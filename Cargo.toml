@@ -1,6 +1,6 @@
 [package]
 name = "termframe"
-version = "0.7.7-alpha.1"
+version = "0.7.7-alpha.2"
 edition = "2024"
 rust-version = "1.88.0"
 description = "Terminal output SVG screenshot tool"
@@ -35,7 +35,7 @@ clap_mangen = "0.2"
 closure = "0.3"
 config = { version = "0.15", features = ["json", "toml", "yaml"] }
 csscolorparser = { version = "0.7", features = ["serde"] }
-dark-light = { git = "https://github.com/rust-dark-light/dark-light.git" }
+dark-light = { git = "https://github.com/pamburus/rust-dark-light.git", rev = "b44e3e93c9094d476212f36e43ac6be739d698c2" }
 dirs = "6"
 dirs-sys = "0.5"
 enumset = "1"

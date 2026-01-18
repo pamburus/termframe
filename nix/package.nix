@@ -1,10 +1,4 @@
-{
-  lib,
-  stdenv,
-  makeRustPlatform,
-  rust-bin,
-  installShellFiles,
-}:
+{ lib, stdenv, makeRustPlatform, rust-bin, installShellFiles, }:
 let
   cargoToml = builtins.fromTOML (builtins.readFile ../Cargo.toml);
   toolchain = rust-bin.fromRustupToolchainFile ../rust-toolchain.toml;
@@ -12,14 +6,11 @@ let
     cargo = toolchain;
     rustc = toolchain;
   };
-in
-rustPlatform.buildRustPackage {
+in rustPlatform.buildRustPackage {
   pname = cargoToml.package.name;
   version = cargoToml.package.version;
 
-  src = builtins.path {
-    path = ../.;
-  };
+  src = builtins.path { path = ../.; };
 
   cargoLock = {
     lockFile = ../Cargo.lock;
@@ -44,12 +35,10 @@ rustPlatform.buildRustPackage {
     homepage = cargoToml.package.repository;
     license = lib.licenses.mit;
     mainProgram = cargoToml.package.name;
-    maintainers = [
-      {
-        name = "Pavel Ivanov";
-        github = "pamburus";
-        email = "mr.pavel.ivanov@gmail.com";
-      }
-    ];
+    maintainers = [{
+      name = "Pavel Ivanov";
+      github = "pamburus";
+      email = "mr.pavel.ivanov@gmail.com";
+    }];
   };
 }

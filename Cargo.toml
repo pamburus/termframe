@@ -35,7 +35,7 @@ clap_mangen = "0.2"
 closure = "0.3"
 config = { version = "0.15", features = ["json", "toml", "yaml"] }
 csscolorparser = { version = "0.7", features = ["serde"] }
-dark-light = { git = "https://github.com/rust-dark-light/dark-light.git" }
+dark-light = "2"
 dirs = "6"
 dirs-sys = "0.5"
 enumset = "1"

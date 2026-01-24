@@ -1,4 +1,9 @@
-{ lib, stdenv, fetchurl, installShellFiles }:
+{
+  lib,
+  stdenv,
+  fetchurl,
+  installShellFiles,
+}:
 
 let
   # Get the current version from Cargo.toml (for metadata only)
@@ -11,31 +16,33 @@ let
   availableVersions = builtins.attrNames releaseHashes;
 
   # Fail if no versions are available in binary-hashes.nix
-  version = if availableVersions == [ ] then
-    throw
-    "No versions available in binary-hashes.nix - package configuration is inconsistent"
-  else
-    builtins.foldl'
-    (acc: v: if builtins.compareVersions v acc > 0 then v else acc)
-    (builtins.head availableVersions) availableVersions;
+  version =
+    if availableVersions == [ ] then
+      throw "No versions available in binary-hashes.nix - package configuration is inconsistent"
+    else
+      builtins.foldl' (
+        acc: v: if builtins.compareVersions v acc > 0 then v else acc
+      ) (builtins.head availableVersions) availableVersions;
 
   # Map Nix system to asset name
-  getAssetName = system:
+  getAssetName =
+    system:
     {
       "x86_64-linux" = "termframe-linux-x86_64-musl.tar.gz";
       "aarch64-linux" = "termframe-linux-arm64-musl.tar.gz";
       "x86_64-darwin" = "termframe-macos-x86_64.tar.gz";
       "aarch64-darwin" = "termframe-macos-arm64.tar.gz";
-    }.${system} or (throw "Unsupported system: ${system}");
+    }
+    .${system} or (throw "Unsupported system: ${system}");
 
   # Build the download URL
   assetName = getAssetName stdenv.hostPlatform.system;
-  downloadUrl =
-    "https://github.com/pamburus/termframe/releases/download/v${version}/${assetName}";
+  downloadUrl = "https://github.com/pamburus/termframe/releases/download/v${version}/${assetName}";
 
   # Get hash for the current version and asset
-  assetHash = releaseHashes.${version}.${assetName} or (throw
-    "No hash available for version ${version} and asset ${assetName} - package configuration is inconsistent");
+  assetHash =
+    releaseHashes.${version}.${assetName}
+      or (throw "No hash available for version ${version} and asset ${assetName} - package configuration is inconsistent");
 
   # Fetch the binary
   src = fetchurl {
@@ -43,7 +50,8 @@ let
     sha256 = assetHash;
   };
 
-in stdenv.mkDerivation {
+in
+stdenv.mkDerivation {
   pname = "termframe-bin";
   inherit version;
 
@@ -95,12 +103,18 @@ in stdenv.mkDerivation {
     license = lib.licenses.mit;
     changelog = "${cargoToml.workspace.package.repository}/releases";
     mainProgram = cargoToml.package.name;
-    maintainers = [{
-      name = "Pavel Ivanov";
-      github = "pamburus";
-      email = "mr.pavel.ivanov@gmail.com";
-    }];
-    platforms =
-      [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+    maintainers = [
+      {
+        name = "Pavel Ivanov";
+        github = "pamburus";
+        email = "mr.pavel.ivanov@gmail.com";
+      }
+    ];
+    platforms = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ];
   };
 }

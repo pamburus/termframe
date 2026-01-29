@@ -22,6 +22,7 @@ use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::BufRead;
 use std::path::{Path, PathBuf};
+use std::time::{Duration, Instant};
 
 use anyhow::{Result, anyhow};
 use sha2::{Digest, Sha256};
@@ -29,6 +30,8 @@ use ureq::tls;
 
 const ASSETS_DIR: &str = "assets";
 const JSON_SCHEMA_DIR: &str = "schema/json";
+const MAX_FETCH_ATTEMPTS: u32 = 3;
+const BASE_FETCH_TIMEOUT: Duration = Duration::from_secs(2);
 
 fn main() {
     if let Err(e) = run() {
@@ -52,7 +55,7 @@ fn run() -> Result<()> {
 /// Recursively processes all subdirectories.
 fn update_schema_directives() -> Result<()> {
     // Build middleware chain: cache wraps retry wraps fetch
-    let fetch_hash = with_cache(with_retry(fetch_and_hash_url, 5));
+    let fetch_hash = with_cache(with_retry(fetch_and_hash_url, MAX_FETCH_ATTEMPTS));
 
     update_toml_schema_urls_in_dir(Path::new(ASSETS_DIR), &fetch_hash)?;
     Ok(())
@@ -169,15 +172,15 @@ fn find_local_schema_file(filename: &str) -> Result<PathBuf> {
     }
 }
 
-/// Middleware that adds retry logic with exponential backoff.
+/// Middleware that adds retry logic with exponential backoff delay and timeout.
 fn with_retry<F>(fetch: F, max_attempts: u32) -> impl Fn(&str) -> Result<Hash>
 where
-    F: Fn(&str) -> Result<Hash>,
+    F: Fn(&str, u32) -> Result<Hash>,
 {
     move |url: &str| {
         let mut last_error = None;
         for attempt in 1..=max_attempts {
-            match fetch(url) {
+            match fetch(url, attempt) {
                 Ok(hash) => return Ok(hash),
                 Err(e) => {
                     if attempt < max_attempts {
@@ -186,7 +189,7 @@ where
                             "cargo:warning=retrying {}, attempt {}/{}, delay {}ms",
                             url, attempt, max_attempts, delay_ms
                         );
-                        std::thread::sleep(std::time::Duration::from_millis(delay_ms));
+                        std::thread::sleep(Duration::from_millis(delay_ms));
                     }
                     last_error = Some(e);
                 }
@@ -196,40 +199,68 @@ where
     }
 }
 
-/// Middleware that caches successful results by URL.
+/// Middleware that caches results (both successful and failed) by URL.
 fn with_cache<F>(fetch: F) -> impl Fn(&str) -> Result<Hash>
 where
     F: Fn(&str) -> Result<Hash>,
 {
-    let cache = std::sync::Mutex::new(HashMap::new());
+    let cache = std::sync::Mutex::new(HashMap::<String, Result<Hash, String>>::new());
     move |url: &str| {
         let mut cache = cache.lock().unwrap();
-        if let Some(&hash) = cache.get(url) {
-            Ok(hash)
-        } else {
-            let result = fetch(url);
-            if let Ok(hash) = result {
-                cache.insert(url.to_string(), hash);
-            }
-            result
+        if let Some(cached) = cache.get(url) {
+            return cached.clone().map_err(|e| anyhow!("{}", e));
         }
+        let result = fetch(url);
+        cache.insert(
+            url.to_string(),
+            result.as_ref().copied().map_err(|e| e.to_string()),
+        );
+        result
     }
 }
 
 /// Fetches content from a URL and returns its SHA256 hash.
-/// Uses a 10-second timeout for the HTTP request.
-fn fetch_and_hash_url(url: &str) -> Result<Hash> {
+/// Uses exponential timeout (2s, 4s, 8s) based on the attempt number.
+fn fetch_and_hash_url(url: &str, attempt: u32) -> Result<Hash> {
+    let timeout = BASE_FETCH_TIMEOUT * (1 << (attempt - 1));
+
+    eprintln!(
+        "termframe: fetching {} (timeout: {}s)",
+        url,
+        timeout.as_secs()
+    );
+
+    let start = Instant::now();
     let agent = {
         ureq::Agent::config_builder()
-            .timeout_global(Some(std::time::Duration::from_secs(10)))
+            .timeout_global(Some(timeout))
             .tls_config(tls_config())
             .build()
             .new_agent()
     };
 
-    let mut response = agent.get(url).call().map_err(|e| anyhow!("{}", e))?;
+    let result = agent.get(url).call();
+    let elapsed = start.elapsed();
 
-    text_reader_hash(std::io::BufReader::new(response.body_mut().as_reader()))
+    match result {
+        Ok(mut response) => {
+            eprintln!(
+                "termframe: fetched {} in {:.2}s",
+                url,
+                elapsed.as_secs_f64()
+            );
+            text_reader_hash(std::io::BufReader::new(response.body_mut().as_reader()))
+        }
+        Err(e) => {
+            eprintln!(
+                "termframe: failed to fetch {} in {:.2}s: {}",
+                url,
+                elapsed.as_secs_f64(),
+                e
+            );
+            Err(anyhow!("{}", e))
+        }
+    }
 }
 
 // On Windows, use native-tls to avoid ring/clang requirement

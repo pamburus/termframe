@@ -88,6 +88,8 @@ pub struct Settings {
     pub theme: ThemeSetting,
     pub font: Font,
     pub padding: PaddingOption,
+    pub command: Command,
+    pub syntax: Syntax,
     pub window: Window,
     pub env: HashMap<String, String>,
     pub rendering: Rendering,
@@ -136,6 +138,21 @@ impl Default for &'static Settings {
     fn default() -> Self {
         &DEFAULT_SETTINGS
     }
+}
+
+/// Command display settings structure.
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct Command {
+    pub show: bool,
+    pub prompt: String,
+}
+
+// Syntax highlighting settings structure.
+#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub struct Syntax {
+    pub theme: Option<String>,
 }
 
 /// Rendering settings structure.

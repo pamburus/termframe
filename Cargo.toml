@@ -1,8 +1,8 @@
 [package]
 name = "termframe"
-version = "0.8.0-alpha.1"
+version = "0.8.0-alpha.2"
 edition = "2024"
-rust-version = "1.88.0"
+rust-version = "1.91.0"
 description = "Terminal output SVG screenshot tool"
 license = "MIT"
 keywords = ["cli", "screenshot", "svg", "terminal"]
@@ -52,6 +52,7 @@ indexmap = "2"
 itertools = "0.14"
 known-folders = "1"
 log = "0.4"
+lumis = { version = "0.1", default-features = false, features = ["lang-bash"] }
 num-integer = "0.1"
 num-traits = "0.2"
 owo-colors = "4"

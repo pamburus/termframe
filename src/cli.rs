@@ -126,6 +126,35 @@ pub struct Opt {
     #[arg(long, overrides_with = "title", value_name = "TITLE")]
     pub title: Option<String>,
 
+    /// Show command.
+    ///
+    /// Show the executed command in the terminal output.
+    #[arg(
+        long,
+        num_args=0..=1,
+        default_value_t = cfg().command.show,
+        default_missing_value = "true",
+        overrides_with = "show_command",
+        value_name = "ENABLED"
+    )]
+    pub show_command: bool,
+
+    /// Command prompt to show before the executed command.
+    #[arg(
+        long,
+        default_value_t = cfg().command.prompt.clone(),
+        overrides_with = "command_prompt",
+        value_name = "PROMPT"
+    )]
+    pub command_prompt: String,
+
+    /// Syntax highlighting theme.
+    ///
+    /// When set, the command is highlighted.
+    /// Use --list-syntax-themes to see available themes.
+    #[arg(long, default_values = cfg().syntax.theme.iter(), overrides_with = "syntax_theme", value_name = "THEME")]
+    pub syntax_theme: Option<String>,
+
     /// Build CSS palette.
     ///
     /// Build palette using CSS variables for basic ANSI colors.
@@ -135,14 +164,8 @@ pub struct Opt {
     /// Output file.
     ///
     /// Use '-' for stdout.
-    #[arg(
-        long,
-        short = 'o',
-        default_value = "-",
-        overrides_with = "output",
-        value_name = "FILE"
-    )]
-    pub output: String,
+    #[arg(long, short = 'o', overrides_with = "output", value_name = "FILE")]
+    pub output: Option<String>,
 
     /// Command timeout.
     #[arg(
@@ -164,6 +187,18 @@ pub struct Opt {
         value_parser = ThemeTagSet::clap_parser(),
     )]
     pub list_themes: Option<Option<ThemeTagSet>>,
+
+    /// List syntax highlighting themes.
+    ///
+    /// Print available syntax highlighting themes and exit.
+    #[arg(
+        long,
+        num_args=0..=1,
+        value_name = "TAGS",
+        require_equals = true,
+        value_parser = ThemeTagSet::clap_parser(),
+    )]
+    pub list_syntax_themes: Option<Option<ThemeTagSet>>,
 
     /// List window styles.
     ///

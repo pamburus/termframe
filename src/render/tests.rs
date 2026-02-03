@@ -110,28 +110,3 @@ fn test_color_conversion() {
     let rgba8 = color.to_rgba8();
     assert_eq!((rgba8[0], rgba8[1], rgba8[2], rgba8[3]), (0, 255, 0, 255));
 }
-
-#[test]
-fn test_command_to_title() {
-    // Test command_to_title function
-    let command = Some("git");
-    let args = vec!["status", "-s"];
-    let title = crate::command_to_title(command, args);
-
-    assert!(title.is_some());
-    assert_eq!(title.unwrap(), "git status -s");
-
-    // Test with command containing special characters
-    let command = Some("echo");
-    let args = vec!["Hello, World!", "\"quoted\"", "$HOME"];
-    let title = crate::command_to_title(command, args);
-
-    assert!(title.is_some());
-
-    // The title should have properly escaped special characters
-    let title_str = title.as_ref().unwrap();
-    assert!(title_str.contains("echo"));
-    assert!(title_str.contains("Hello,") && title_str.contains("World"));
-    assert!(title_str.contains("quoted"));
-    assert!(title_str.contains("HOME"));
-}

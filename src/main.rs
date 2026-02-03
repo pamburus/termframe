@@ -28,12 +28,14 @@ use font::FontFile;
 use fontformat::FontFormat;
 use render::{CharSet, CharSetFn, svg::SvgRenderer};
 use term::Terminal;
+use termframe::syntax;
 use termwiz::color::SrgbaTuple;
 use theme::{AdaptiveTheme, Theme};
 
 // private modules
 mod appdirs;
 mod cli;
+mod command;
 mod config;
 mod error;
 mod font;
@@ -115,6 +117,9 @@ impl App {
         if let Some(tags) = opt.list_themes {
             return list_themes(tags);
         }
+        if let Some(tags) = opt.list_syntax_themes {
+            return list_syntax_themes(tags);
+        }
         if opt.list_window_styles {
             return list_window_styles();
         }
@@ -158,6 +163,24 @@ impl App {
         let timeout = Some(std::time::Duration::from_secs(opt.timeout));
 
         if let Some(command) = &opt.command {
+            if opt.show_command {
+                let theme: Option<syntax::Theme> = opt
+                    .syntax_theme
+                    .as_deref()
+                    .and_then(|name| {
+                        if !matches!(name, "-" | "") {
+                            Some(name)
+                        } else {
+                            None
+                        }
+                    })
+                    .map(|name| name.parse())
+                    .transpose()
+                    .map_err(|e: syntax::ThemeParseError| anyhow::anyhow!(e))?;
+                let command = command::to_terminal(&opt.command_prompt, command, &opt.args, theme);
+                terminal.feed(io::Cursor::new(command), io::sink())?;
+            }
+
             let mut command = CommandBuilder::new(command);
             command.args(&opt.args);
             terminal.run(command, timeout)?;
@@ -193,14 +216,19 @@ impl App {
             window,
             title: opt
                 .title
-                .or_else(|| command_to_title(opt.command, &opt.args)),
+                .or_else(|| command::to_title(opt.command, &opt.args)),
             mode,
             background: Some(terminal.background().convert()),
             foreground: Some(terminal.foreground().convert()),
         };
 
-        let mut output: Box<dyn io::Write> = if opt.output != "-" {
-            Box::new(std::fs::File::create(opt.output)?)
+        let output = opt
+            .output
+            .as_deref()
+            .and_then(|s| (!matches!(s, "-" | "")).then_some(s));
+
+        let mut output: Box<dyn io::Write> = if let Some(output) = output {
+            Box::new(std::fs::File::create(output)?)
         } else {
             Box::new(stdout())
         };
@@ -436,6 +464,40 @@ fn list_themes(tags: Option<cli::ThemeTagSet>) -> Result<()> {
     Ok(())
 }
 
+/// Lists available syntax highlighting themes optionally filtered by tags
+fn list_syntax_themes(tags: Option<cli::ThemeTagSet>) -> Result<()> {
+    let mut formatter = help::Formatter::new(stdout());
+
+    formatter.format_grouped_list(
+        syntax::available_themes()
+            .filter(|t| syntax_theme_matches_tags(t.appearance, tags))
+            .sorted_by_key(|t| (t.appearance.to_string(), t.name.clone()))
+            .chunk_by(|t| t.appearance)
+            .into_iter()
+            .map(|(appearance, group)| (appearance, group.map(|t| t.name.clone()))),
+    )?;
+    Ok(())
+}
+
+/// Checks if a syntax theme appearance matches the requested tag set.
+/// Returns true for all themes when no tags are specified.
+fn syntax_theme_matches_tags(
+    appearance: syntax::Appearance,
+    tags: Option<cli::ThemeTagSet>,
+) -> bool {
+    let Some(tags) = tags else {
+        return true;
+    };
+
+    use config::theme::Tag;
+    use syntax::Appearance;
+
+    match appearance {
+        Appearance::Dark => tags.contains(Tag::Dark),
+        Appearance::Light => tags.contains(Tag::Light),
+    }
+}
+
 /// Lists assets based on the provided items
 fn list_assets(items: impl IntoIterator<Item = (String, ItemInfo)>) -> Result<()> {
     let mut formatter = help::Formatter::new(stdout());
@@ -577,21 +639,4 @@ impl Convert<Color> for SrgbaTuple {
     fn convert(&self) -> Color {
         self.as_rgba_u8().into()
     }
-}
-
-/// Converts a command and its arguments into a title string
-fn command_to_title(
-    command: Option<impl AsRef<str>>,
-    args: impl IntoIterator<Item = impl AsRef<str>>,
-) -> Option<String> {
-    use shell_escape::escape;
-
-    Some(
-        std::iter::once(escape(command?.as_ref().into()))
-            .chain(
-                args.into_iter()
-                    .map(|arg| escape(arg.as_ref().to_owned().into())),
-            )
-            .join(" "),
-    )
 }

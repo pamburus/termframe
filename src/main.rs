@@ -165,9 +165,11 @@ impl App {
 
         if let Some(command) = &opt.command {
             if opt.show_command {
-                let theme: Option<syntax::Theme> = opt
-                    .syntax_theme
-                    .as_deref()
+                let theme: Option<syntax::Theme> = settings
+                    .syntax
+                    .theme
+                    .as_ref()
+                    .map(|t| t.resolve(mode))
                     .and_then(|name| {
                         if !matches!(name, "-" | "") {
                             Some(name)
@@ -178,6 +180,9 @@ impl App {
                     .map(|name| name.parse())
                     .transpose()
                     .map_err(|e: syntax::ThemeParseError| anyhow::anyhow!(e))?;
+                if let Some(theme) = &theme {
+                    log::debug!("use syntax theme {:?}", theme.display_name());
+                }
                 let command = command::to_terminal(&opt.command_prompt, command, &opt.args, theme);
                 terminal.feed(io::Cursor::new(command), io::sink())?;
             }

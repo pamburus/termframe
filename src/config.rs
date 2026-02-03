@@ -152,7 +152,7 @@ pub struct Command {
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub struct Syntax {
-    pub theme: Option<String>,
+    pub theme: Option<ThemeSetting>,
 }
 
 /// Rendering settings structure.

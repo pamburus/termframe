@@ -11,7 +11,9 @@ use clap_complete::Shell;
 use enumset_ext::convert::str::EnumSet;
 
 // local imports
-use crate::config::{self, DimensionWithInitial, FontFamilyOption, PaddingOption, Settings};
+use crate::config::{
+    self, DimensionWithInitial, FontFamilyOption, PaddingOption, Settings, ThemeSetting,
+};
 
 const STYLES: Styles = Styles::styled()
     .header(AnsiColor::Green.on_default().bold())
@@ -126,7 +128,7 @@ pub struct Opt {
 
     /// Color theme.
     #[arg(long, default_value_t = cfg().theme.clone().normalized(), overrides_with = "theme")]
-    pub theme: config::ThemeSetting,
+    pub theme: ThemeSetting,
 
     /// Enable window.
     #[arg(long,
@@ -186,12 +188,12 @@ pub struct Opt {
     )]
     pub command_prompt: String,
 
-    /// Syntax highlighting theme.
+    /// Syntax theme.
     ///
     /// When set, the command is highlighted.
     /// Use --list-syntax-themes to see available themes.
-    #[arg(long, default_values = cfg().syntax.theme.iter(), overrides_with = "syntax_theme", value_name = "THEME")]
-    pub syntax_theme: Option<String>,
+    #[arg(long, default_values = cfg().syntax.theme.clone().map(|t| t.normalized().to_string()), overrides_with = "syntax_theme", value_name = "THEME")]
+    pub syntax_theme: Option<ThemeSetting>,
 
     /// Build CSS palette.
     ///
@@ -315,6 +317,9 @@ impl config::Patch for Opt {
         settings.rendering.line_height = self.line_height.into();
         settings.rendering.bold_is_bright = self.bold_is_bright;
         settings.theme = self.theme.clone();
+        if let Some(theme) = &self.syntax_theme {
+            settings.syntax.theme = Some(theme.clone());
+        }
         if let Some(padding) = self.padding {
             settings.padding = PaddingOption::Uniform(padding.into());
         }

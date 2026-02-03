@@ -1,4 +1,4 @@
-#:schema https://raw.githubusercontent.com/pamburus/termframe/v0.7.7/schema/json/window-style.schema.json
+#:schema https://raw.githubusercontent.com/pamburus/termframe/v0.8.0/schema/json/window-style.schema.json
 
 [window.margin]
 left = 32

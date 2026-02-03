@@ -11,9 +11,7 @@ use clap_complete::Shell;
 use enumset_ext::convert::str::EnumSet;
 
 // local imports
-use crate::config::{
-    self, DimensionWithInitial, FontFamilyOption, PaddingOption, Settings, ThemeSetting,
-};
+use crate::config::{self, DimensionWithInitial, FontFamilyOption, PaddingOption, Settings};
 
 const STYLES: Styles = Styles::styled()
     .header(AnsiColor::Green.on_default().bold())
@@ -127,8 +125,8 @@ pub struct Opt {
     pub mode: config::mode::ModeSetting,
 
     /// Color theme.
-    #[arg(long, overrides_with = "theme")]
-    pub theme: Option<String>,
+    #[arg(long, default_value_t = cfg().theme.clone().normalized(), overrides_with = "theme")]
+    pub theme: config::ThemeSetting,
 
     /// Enable window.
     #[arg(long,
@@ -316,9 +314,7 @@ impl config::Patch for Opt {
         settings.rendering.faint_opacity = self.faint_opacity.into();
         settings.rendering.line_height = self.line_height.into();
         settings.rendering.bold_is_bright = self.bold_is_bright;
-        if let Some(theme) = &self.theme {
-            settings.theme = ThemeSetting::Fixed(theme.clone());
-        }
+        settings.theme = self.theme.clone();
         if let Some(padding) = self.padding {
             settings.padding = PaddingOption::Uniform(padding.into());
         }

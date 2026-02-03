@@ -1,6 +1,6 @@
 [package]
 name = "termframe"
-version = "0.8.0-alpha.3"
+version = "0.8.0-alpha.4"
 edition = "2024"
 rust-version = "1.91.0"
 description = "Terminal output SVG screenshot tool"

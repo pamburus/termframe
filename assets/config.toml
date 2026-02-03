@@ -93,8 +93,9 @@ prompt = "❯ " # Command prompt string.
 #
 # Syntax highlighting settings.
 #
-[syntax]
-theme = "rosepine-dawn" # Color theme for the syntax highlighting.
+[syntax.theme]
+dark = "rosepine-moon"  # Syntax highlighting theme for dark mode.
+light = "rosepine-dawn" # Syntax highlighting theme for light mode.
 
 #
 # Rendering settings.

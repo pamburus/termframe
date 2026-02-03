@@ -96,6 +96,62 @@ fn test_theme_setting_resolve() {
 }
 
 #[test]
+fn test_theme_setting_normalized() {
+    let fixed = ThemeSetting::Fixed("dark".to_string());
+    let normalized = fixed.normalized();
+    assert!(matches!(normalized, ThemeSetting::Fixed(ref s) if s == "dark"));
+
+    let adaptive = ThemeSetting::Adaptive {
+        light: "same".to_string(),
+        dark: "same".to_string(),
+    };
+    let normalized = adaptive.normalized();
+    assert!(matches!(normalized, ThemeSetting::Fixed(ref s) if s == "same"));
+
+    let adaptive = ThemeSetting::Adaptive {
+        light: "light-theme".to_string(),
+        dark: "dark-theme".to_string(),
+    };
+    let normalized = adaptive.normalized();
+    assert!(
+        matches!(normalized, ThemeSetting::Adaptive { ref light, ref dark } if light == "light-theme" && dark == "dark-theme")
+    );
+}
+
+#[test]
+fn test_theme_setting_display() {
+    let fixed = ThemeSetting::Fixed("my-theme".to_string());
+    assert_eq!(fixed.to_string(), "my-theme");
+
+    let adaptive = ThemeSetting::Adaptive {
+        light: "light-theme".to_string(),
+        dark: "dark-theme".to_string(),
+    };
+    assert_eq!(adaptive.to_string(), "dark:dark-theme,light:light-theme");
+}
+
+#[test]
+fn test_theme_setting_from_str() {
+    let fixed = ThemeSetting::from("my-theme");
+    assert!(matches!(fixed, ThemeSetting::Fixed(ref s) if s == "my-theme"));
+
+    let adaptive = ThemeSetting::from("dark:dark-theme,light:light-theme");
+    assert!(
+        matches!(adaptive, ThemeSetting::Adaptive { ref light, ref dark } if light == "light-theme" && dark == "dark-theme")
+    );
+
+    let adaptive = ThemeSetting::from("light:light-theme,dark:dark-theme");
+    assert!(
+        matches!(adaptive, ThemeSetting::Adaptive { ref light, ref dark } if light == "light-theme" && dark == "dark-theme")
+    );
+
+    let adaptive = ThemeSetting::from("dark:dark-theme,unknown:foo,light:light-theme");
+    assert!(
+        matches!(adaptive, ThemeSetting::Adaptive { ref light, ref dark } if light == "light-theme" && dark == "dark-theme")
+    );
+}
+
+#[test]
 fn test_font_weight_display() {
     assert_eq!(FontWeight::Normal.to_string(), "normal");
     assert_eq!(FontWeight::Bold.to_string(), "bold");

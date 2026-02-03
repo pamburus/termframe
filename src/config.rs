@@ -206,6 +206,51 @@ impl ThemeSetting {
             },
         }
     }
+
+    /// Normalize the theme setting by converting adaptive themes with identical light and dark themes to fixed themes.
+    pub fn normalized(self) -> Self {
+        match self {
+            Self::Fixed(theme) => Self::Fixed(theme),
+            Self::Adaptive { light, dark } => {
+                if light == dark {
+                    Self::Fixed(light)
+                } else {
+                    Self::Adaptive { light, dark }
+                }
+            }
+        }
+    }
+}
+
+impl fmt::Display for ThemeSetting {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Fixed(theme) => write!(f, "{theme}"),
+            Self::Adaptive { light, dark } => write!(f, "dark:{dark},light:{light}"),
+        }
+    }
+}
+
+impl From<&str> for ThemeSetting {
+    fn from(s: &str) -> Self {
+        let mut dark = None;
+        let mut light = None;
+
+        for part in s.split(',') {
+            if let Some((key, value)) = part.split_once(':') {
+                match key.trim() {
+                    "dark" => dark = Some(value.trim().to_string()),
+                    "light" => light = Some(value.trim().to_string()),
+                    _ => {}
+                }
+            }
+        }
+
+        match (dark, light) {
+            (Some(dark), Some(light)) => Self::Adaptive { light, dark },
+            _ => Self::Fixed(s.to_string()),
+        }
+    }
 }
 
 pub type Fonts = Vec<FontFace>;

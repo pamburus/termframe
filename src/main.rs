@@ -135,6 +135,7 @@ impl App {
         let theme = if theme == "-" {
             AdaptiveTheme::default().resolve(mode)
         } else {
+            log::debug!("use theme {:?}", theme);
             let cfg = ThemeConfig::load_hybrid(theme)?;
             Rc::new(Theme::from_config(cfg.theme.resolve(mode)))
         };

@@ -63,7 +63,15 @@ pub struct Opt {
     /// Embeds the font files into the SVG output if possible.
     ///
     /// Note: make sure the font license allows this type of redistribution.
-    #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.embed_fonts, overrides_with = "embed_fonts", value_name = "ENABLED")]
+    #[arg(
+        long,
+        num_args = 0..=1,
+        default_value_t = cfg().rendering.svg.embed_fonts,
+        default_missing_value = "true",
+        hide_possible_values = true,
+        overrides_with = "embed_fonts",
+        value_name = "ENABLED",
+    )]
     pub embed_fonts: bool,
 
     /// Subset fonts.
@@ -71,13 +79,29 @@ pub struct Opt {
     /// Subsetting fonts can significantly reduce the output SVG size, especially when using large font files with many glyphs.
     ///
     /// Experimental, known to have compatibility issues.
-    #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.subset_fonts, overrides_with = "subset_fonts", value_name = "ENABLED")]
+    #[arg(
+        long,
+        num_args = 0..=1,
+        default_value_t = cfg().rendering.svg.subset_fonts,
+        default_missing_value = "true",
+        hide_possible_values = true,
+        overrides_with = "subset_fonts",
+        value_name = "ENABLED",
+    )]
     pub subset_fonts: bool,
 
     /// Bright bold text.
     ///
     /// Use bright colors for bold text.
-    #[arg(long, num_args = 1, default_value_t = cfg().rendering.bold_is_bright, overrides_with = "bold_is_bright", value_name = "ENABLED")]
+    #[arg(
+        long,
+        num_args = 0..=1,
+        default_value_t = cfg().rendering.bold_is_bright,
+        default_missing_value = "true",
+        hide_possible_values = true,
+        overrides_with = "bold_is_bright",
+        value_name = "ENABLED",
+    )]
     pub bold_is_bright: bool,
 
     /// Bold text font weight.
@@ -107,11 +131,26 @@ pub struct Opt {
     pub theme: Option<String>,
 
     /// Enable window.
-    #[arg(long, num_args = 1, default_value_t = cfg().window.enabled, overrides_with = "window", value_name = "ENABLED")]
+    #[arg(long,
+        num_args = 0..=1,
+        default_value_t = cfg().window.enabled,
+        default_missing_value = "true",
+        hide_possible_values = true,
+        overrides_with = "window",
+        value_name = "ENABLED",
+    )]
     pub window: bool,
 
     /// Enable window shadow.
-    #[arg(long, num_args = 1, default_value_t = cfg().window.shadow, overrides_with = "window_shadow", value_name = "ENABLED")]
+    #[arg(
+        long,
+        num_args = 0..=1,
+        default_value_t = cfg().window.shadow,
+        default_missing_value = "true",
+        hide_possible_values = true,
+        overrides_with = "window_shadow",
+        value_name = "ENABLED",
+    )]
     pub window_shadow: bool,
 
     /// Override window margin.
@@ -131,9 +170,10 @@ pub struct Opt {
     /// Show the executed command in the terminal output.
     #[arg(
         long,
-        num_args=0..=1,
+        num_args = 0..=1,
         default_value_t = cfg().command.show,
         default_missing_value = "true",
+        hide_possible_values = true,
         overrides_with = "show_command",
         value_name = "ENABLED"
     )]
@@ -158,7 +198,15 @@ pub struct Opt {
     /// Build CSS palette.
     ///
     /// Build palette using CSS variables for basic ANSI colors.
-    #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.var_palette, overrides_with = "var_palette", value_name = "ENABLED")]
+    #[arg(
+        long,
+        num_args = 0..=1,
+        default_value_t = cfg().rendering.svg.var_palette,
+        default_missing_value = "true",
+        hide_possible_values = true,
+        overrides_with = "var_palette",
+        value_name = "ENABLED",
+    )]
     pub var_palette: bool,
 
     /// Output file.

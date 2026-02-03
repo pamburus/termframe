@@ -2,18 +2,19 @@
 
 // third-party imports
 use csscolorparser::Color;
-use itertools::Itertools;
 use termwiz::color::SrgbaTuple;
 
 // Public exports
 pub mod appdirs;
 pub mod cli;
+pub mod command;
 pub mod config;
 pub mod error;
 pub mod font;
 pub mod fontformat;
 pub mod help;
 pub mod render;
+pub mod syntax;
 pub mod term;
 pub mod theme;
 pub mod ureqmw;
@@ -58,21 +59,4 @@ impl Convert<Color> for SrgbaTuple {
     fn convert(&self) -> Color {
         self.as_rgba_u8().into()
     }
-}
-
-/// Converts a command and its arguments into a title string
-pub fn command_to_title(
-    command: Option<impl AsRef<str>>,
-    args: impl IntoIterator<Item = impl AsRef<str>>,
-) -> Option<String> {
-    use shell_escape::escape;
-
-    Some(
-        std::iter::once(escape(command?.as_ref().into()))
-            .chain(
-                args.into_iter()
-                    .map(|arg| escape(arg.as_ref().to_owned().into())),
-            )
-            .join(" "),
-    )
 }

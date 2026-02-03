@@ -1,142 +1,154 @@
-<svg height="682.4" width="846.4" xmlns="http://www.w3.org/2000/svg">
+<svg height="740" width="853.6" xmlns="http://www.w3.org/2000/svg">
 <g transform="translate(32,16)">
-<filter filterUnits="userSpaceOnUse" height="690.4" id="shadow" width="854.4" x="-32" y="-24">
+<filter filterUnits="userSpaceOnUse" height="748" id="shadow" width="861.6" x="-32" y="-24">
 <feGaussianBlur stdDeviation="12"/>
 </filter>
-<rect fill="#000000c0" filter="url(#shadow)" height="618.4" rx="10" ry="10" width="782.4" x="4" y="12"/>
-<rect fill="#282c34" height="618.4" rx="10" ry="10" width="782.4"/>
+<rect fill="#000000c0" filter="url(#shadow)" height="676" rx="10" ry="10" width="789.6" x="4" y="12"/>
+<rect fill="#282c34" height="676" rx="10" ry="10" width="789.6"/>
 <clipPath id="header">
-<rect height="28" width="782.4"/>
+<rect height="28" width="789.6"/>
 </clipPath>
-<rect clip-path="url(#header)" fill="#383837" height="56" rx="10" ry="10" width="782.4"/>
-<line stroke="#000000c0" stroke-width="0.5" x1="0" x2="782.4" y1="28" y2="28"/><text dominant-baseline="central" fill="#b3b3b3" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" x="391.2" y="14">termframe --help</text>
+<rect clip-path="url(#header)" fill="#383837" height="56" rx="10" ry="10" width="789.6"/>
+<line stroke="#000000c0" stroke-width="0.5" x1="0" x2="789.6" y1="28" y2="28"/><text dominant-baseline="central" fill="#b3b3b3" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" x="394.8" y="14">termframe --help</text>
 <g>
 <circle cx="14" cy="14" fill="#ff5f56" r="6" stroke="#ff5f56" stroke-width="0.5"/>
 <circle cx="34" cy="14" fill="#ffbd2e" r="6" stroke="#ffbd2e" stroke-width="0.5"/>
 <circle cx="54" cy="14" fill="#28c941" r="6" stroke="#28c941" stroke-width="0.5"/>
 </g>
-<svg class="terminal" font-family="JetBrains Mono, Fira Code, Source Code Pro, Cascadia Code, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace, Symbols Nerd Font Mono" font-size="12" height="590.4" width="782.4" y="28">
+<svg class="terminal" font-family="JetBrains Mono, Fira Code, Source Code Pro, Cascadia Code, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace, Symbols Nerd Font Mono" font-size="12" height="648" width="789.6" y="28">
 <svg fill="#dcdfe4" x="9.6" y="7.2">
 <g>
-<svg height="576" viewBox="0 0 63.6 48" width="763.2">
+<svg height="633.6" viewBox="0 0 64.2 52.8" width="770.4">
 <g stroke-width="0.025"/>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="0">
+<svg height="14.4" overflow="hidden" width="770.4" y="0">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">Terminal </tspan><tspan fill="#dcdfe4">output </tspan><tspan fill="#dcdfe4">SVG </tspan><tspan fill="#dcdfe4">screenshot </tspan><tspan fill="#dcdfe4">tool </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="28.8">
+<svg height="14.4" overflow="hidden" width="770.4" y="28.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#98c379" font-weight="bold">Usage:</tspan><tspan fill="#56b6c2" font-weight="bold" x="4.2em">termframe</tspan><tspan fill="#56b6c2" x="10.2em">[OPTIONS]</tspan><tspan fill="#56b6c2" x="16.2em">[COMMAND]</tspan><tspan fill="#56b6c2" x="22.2em">[ARGS]...</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="57.6">
+<svg height="14.4" overflow="hidden" width="770.4" y="57.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#98c379" font-weight="bold">Arguments:</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="72">
+<svg height="14.4" overflow="hidden" width="770.4" y="72">
 <text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" x="1.2em">[COMMAND]</tspan><tspan fill="#dcdfe4" x="7.8em">Command </tspan><tspan fill="#dcdfe4">to </tspan><tspan fill="#dcdfe4">run </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="86.4">
+<svg height="14.4" overflow="hidden" width="770.4" y="86.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" x="1.2em">[ARGS]...</tspan><tspan fill="#dcdfe4" x="7.8em">Arguments </tspan><tspan fill="#dcdfe4">provided </tspan><tspan fill="#dcdfe4">to </tspan><tspan fill="#dcdfe4">the </tspan><tspan fill="#dcdfe4">command </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="115.2">
+<svg height="14.4" overflow="hidden" width="770.4" y="115.2">
 <text xml:space="preserve" y="0.96em"><tspan fill="#98c379" font-weight="bold">Options:</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="129.6">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--config</tspan><tspan fill="#56b6c2" x="9em">&lt;FILE&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Configuration </tspan><tspan fill="#dcdfe4">file </tspan><tspan fill="#dcdfe4">path </tspan><tspan fill="#56b6c2" opacity="0.5">[env: </tspan><tspan fill="#56b6c2">TERMFRAME_CONFIG=</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="129.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--config</tspan><tspan fill="#56b6c2" x="9em">&lt;FILE&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Configuration </tspan><tspan fill="#dcdfe4">file </tspan><tspan fill="#dcdfe4">path </tspan><tspan fill="#56b6c2" opacity="0.5">[env: </tspan><tspan fill="#56b6c2">TERMFRAME_CONFIG=</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="144">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="1.2em">-W</tspan><tspan fill="#dcdfe4">, </tspan><tspan fill="#56b6c2" font-weight="bold">--width</tspan><tspan fill="#56b6c2" x="8.4em">&lt;COLUMNS&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Terminal </tspan><tspan fill="#dcdfe4">width: </tspan><tspan fill="#dcdfe4">N|auto|MIN..MAX[:STEP][@INIT] </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">80..240:4@180</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="144">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="1.2em">-W</tspan><tspan fill="#dcdfe4">, </tspan><tspan fill="#56b6c2" font-weight="bold">--width</tspan><tspan fill="#56b6c2" x="8.4em">&lt;COLUMNS&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Terminal </tspan><tspan fill="#dcdfe4">width: </tspan><tspan fill="#dcdfe4">N|auto|MIN..MAX[:STEP][@INIT] </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">80..240:4@180</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="158.4">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="1.2em">-H</tspan><tspan fill="#dcdfe4">, </tspan><tspan fill="#56b6c2" font-weight="bold">--height</tspan><tspan fill="#56b6c2" x="9em">&lt;LINES&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Terminal </tspan><tspan fill="#dcdfe4">height: </tspan><tspan fill="#dcdfe4">N|auto|MIN..MAX[:STEP][@INIT] </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">24..60@48</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="158.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="1.2em">-H</tspan><tspan fill="#dcdfe4">, </tspan><tspan fill="#56b6c2" font-weight="bold">--height</tspan><tspan fill="#56b6c2" x="9em">&lt;LINES&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Terminal </tspan><tspan fill="#dcdfe4">height: </tspan><tspan fill="#dcdfe4">N|auto|MIN..MAX[:STEP][@INIT] </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">24..60@48</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="172.8">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--padding</tspan><tspan fill="#56b6c2" x="9.6em">&lt;EM&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Override </tspan><tspan fill="#dcdfe4">padding </tspan><tspan fill="#dcdfe4">for </tspan><tspan fill="#dcdfe4">the </tspan><tspan fill="#dcdfe4">inner </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#dcdfe4">in </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">size </tspan><tspan fill="#dcdfe4">units </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="172.8">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--padding</tspan><tspan fill="#56b6c2" x="9.6em">&lt;EM&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Override </tspan><tspan fill="#dcdfe4">padding </tspan><tspan fill="#dcdfe4">for </tspan><tspan fill="#dcdfe4">the </tspan><tspan fill="#dcdfe4">inner </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#dcdfe4">in </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">size </tspan><tspan fill="#dcdfe4">units </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="187.2">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--font-family</tspan><tspan fill="#56b6c2" x="12em">&lt;NAME&gt;...</tspan><tspan fill="#dcdfe4" x="21.6em">Font </tspan><tspan fill="#dcdfe4">family </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="187.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--font-family</tspan><tspan fill="#56b6c2" x="12em">&lt;NAME&gt;...</tspan><tspan fill="#dcdfe4" x="22.2em">Font </tspan><tspan fill="#dcdfe4">family </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="201.6">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--font-size</tspan><tspan fill="#56b6c2" x="10.8em">&lt;SIZE&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Font </tspan><tspan fill="#dcdfe4">size </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">12</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="201.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--font-size</tspan><tspan fill="#56b6c2" x="10.8em">&lt;SIZE&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Font </tspan><tspan fill="#dcdfe4">size </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">12</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="216">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--font-weight</tspan><tspan fill="#56b6c2" x="12em">&lt;WEIGHT&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Normal </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">weight </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">normal</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="216">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--font-weight</tspan><tspan fill="#56b6c2" x="12em">&lt;WEIGHT&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Normal </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">weight </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">normal</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="230.4">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--embed-fonts</tspan><tspan fill="#56b6c2" x="12em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Embed </tspan><tspan fill="#dcdfe4">fonts </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="39em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="230.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--embed-fonts</tspan><tspan fill="#56b6c2" x="12em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Embed </tspan><tspan fill="#dcdfe4">fonts </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="39.6em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="244.8">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--subset-fonts</tspan><tspan fill="#56b6c2" x="12.6em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Subset </tspan><tspan fill="#dcdfe4">fonts </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="39.6em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="244.8">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--subset-fonts</tspan><tspan fill="#56b6c2" x="12.6em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Subset </tspan><tspan fill="#dcdfe4">fonts </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="40.2em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="259.2">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--bold-is-bright</tspan><tspan fill="#56b6c2" x="13.8em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Bright </tspan><tspan fill="#dcdfe4">bold </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="42em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="259.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--bold-is-bright</tspan><tspan fill="#56b6c2" x="13.8em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Bright </tspan><tspan fill="#dcdfe4">bold </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="42.6em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="273.6">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--bold-font-weight</tspan><tspan fill="#56b6c2" x="15em">&lt;WEIGHT&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Bold </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">weight </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">bold</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="273.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--bold-font-weight</tspan><tspan fill="#56b6c2" x="15em">&lt;WEIGHT&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Bold </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">weight </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">bold</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="288">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--faint-opacity</tspan><tspan fill="#56b6c2" x="13.2em">&lt;0..1&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Faint </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#dcdfe4">opacity </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">0.5</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="288">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--faint-opacity</tspan><tspan fill="#56b6c2" x="13.2em">&lt;0..1&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Faint </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#dcdfe4">opacity </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">0.5</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="302.4">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--faint-font-weight</tspan><tspan fill="#56b6c2" x="15.6em">&lt;WEIGHT&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Faint </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">weight </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">normal</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="302.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--faint-font-weight</tspan><tspan fill="#56b6c2" x="15.6em">&lt;WEIGHT&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Faint </tspan><tspan fill="#dcdfe4">text </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">weight </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">normal</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="316.8">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--line-height</tspan><tspan fill="#56b6c2" x="12em">&lt;FACTOR&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Line </tspan><tspan fill="#dcdfe4">height, </tspan><tspan fill="#dcdfe4">factor </tspan><tspan fill="#dcdfe4">of </tspan><tspan fill="#dcdfe4">the </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">size </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">1.2</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="316.8">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--line-height</tspan><tspan fill="#56b6c2" x="12em">&lt;FACTOR&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Line </tspan><tspan fill="#dcdfe4">height, </tspan><tspan fill="#dcdfe4">factor </tspan><tspan fill="#dcdfe4">of </tspan><tspan fill="#dcdfe4">the </tspan><tspan fill="#dcdfe4">font </tspan><tspan fill="#dcdfe4">size </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">1.2</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="331.2">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--mode</tspan><tspan fill="#56b6c2" x="7.8em">&lt;MODE&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Appearance </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">auto</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="37.8em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">auto</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">dark</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">light</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="331.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--mode</tspan><tspan fill="#56b6c2" x="7.8em">&lt;MODE&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Appearance </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">auto</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="38.4em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">auto</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">dark</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">light</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="345.6">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--theme</tspan><tspan fill="#56b6c2" x="8.4em">&lt;THEME&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Color </tspan><tspan fill="#dcdfe4">theme </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="345.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--theme</tspan><tspan fill="#56b6c2" x="8.4em">&lt;THEME&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Color </tspan><tspan fill="#dcdfe4">theme </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="360">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--window</tspan><tspan fill="#56b6c2" x="9em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Enable </tspan><tspan fill="#dcdfe4">window </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="39.6em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="360">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--window</tspan><tspan fill="#56b6c2" x="9em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Enable </tspan><tspan fill="#dcdfe4">window </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="40.2em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="374.4">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--window-shadow</tspan><tspan fill="#56b6c2" x="13.2em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Enable </tspan><tspan fill="#dcdfe4">window </tspan><tspan fill="#dcdfe4">shadow </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="43.8em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="374.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--window-shadow</tspan><tspan fill="#56b6c2" x="13.2em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Enable </tspan><tspan fill="#dcdfe4">window </tspan><tspan fill="#dcdfe4">shadow </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="44.4em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="388.8">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--window-margin</tspan><tspan fill="#56b6c2" x="13.2em">&lt;PIXELS&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Override </tspan><tspan fill="#dcdfe4">window </tspan><tspan fill="#dcdfe4">margin </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="388.8">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--window-margin</tspan><tspan fill="#56b6c2" x="13.2em">&lt;PIXELS&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Override </tspan><tspan fill="#dcdfe4">window </tspan><tspan fill="#dcdfe4">margin </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="403.2">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--window-style</tspan><tspan fill="#56b6c2" x="12.6em">&lt;NAME&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Window </tspan><tspan fill="#dcdfe4">style </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="403.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--window-style</tspan><tspan fill="#56b6c2" x="12.6em">&lt;NAME&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Window </tspan><tspan fill="#dcdfe4">style </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="417.6">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--title</tspan><tspan fill="#56b6c2" x="8.4em">&lt;TITLE&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Window </tspan><tspan fill="#dcdfe4">title </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="417.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--title</tspan><tspan fill="#56b6c2" x="8.4em">&lt;TITLE&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Window </tspan><tspan fill="#dcdfe4">title </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="432">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--var-palette</tspan><tspan fill="#56b6c2" x="12em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Build </tspan><tspan fill="#dcdfe4">CSS </tspan><tspan fill="#dcdfe4">palette </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="42.6em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="432">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--show-command</tspan><tspan fill="#56b6c2" x="12.6em">[&lt;ENABLED&gt;]</tspan><tspan fill="#dcdfe4" x="22.2em">Show </tspan><tspan fill="#dcdfe4">command </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="40.2em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="446.4">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="1.2em">-o</tspan><tspan fill="#dcdfe4">, </tspan><tspan fill="#56b6c2" font-weight="bold">--output</tspan><tspan fill="#56b6c2" x="9em">&lt;FILE&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Output </tspan><tspan fill="#dcdfe4">file </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">-</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="446.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--command-prompt</tspan><tspan fill="#56b6c2" x="13.8em">&lt;PROMPT&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Command </tspan><tspan fill="#dcdfe4">prompt </tspan><tspan fill="#dcdfe4">to </tspan><tspan fill="#dcdfe4">show </tspan><tspan fill="#dcdfe4">before </tspan><tspan fill="#dcdfe4">the </tspan><tspan fill="#dcdfe4">executed </tspan><tspan fill="#dcdfe4">command </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">"❯ </tspan><tspan fill="#56b6c2">"</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="460.8">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--timeout</tspan><tspan fill="#56b6c2" x="9.6em">&lt;SECONDS&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Command </tspan><tspan fill="#dcdfe4">timeout </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">5</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="460.8">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--syntax-theme</tspan><tspan fill="#56b6c2" x="12.6em">&lt;THEME&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Syntax </tspan><tspan fill="#dcdfe4">highlighting </tspan><tspan fill="#dcdfe4">theme </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">rosepine-dawn</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="475.2">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--list-themes</tspan><tspan fill="#56b6c2">[=&lt;TAGS&gt;]</tspan><tspan fill="#dcdfe4" x="21.6em">List </tspan><tspan fill="#dcdfe4">themes </tspan><tspan fill="#56b6c2" opacity="0.5">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">dark</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">light</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="475.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--var-palette</tspan><tspan fill="#56b6c2" x="12em">&lt;ENABLED&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Build </tspan><tspan fill="#dcdfe4">CSS </tspan><tspan fill="#dcdfe4">palette </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan><tspan fill="#56b6c2" opacity="0.5" x="43.2em">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">true</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">false</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="489.6">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--list-window-styles</tspan><tspan fill="#dcdfe4" x="21.6em">List </tspan><tspan fill="#dcdfe4">window </tspan><tspan fill="#dcdfe4">styles </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="489.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="1.2em">-o</tspan><tspan fill="#dcdfe4">, </tspan><tspan fill="#56b6c2" font-weight="bold">--output</tspan><tspan fill="#56b6c2" x="9em">&lt;FILE&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Output </tspan><tspan fill="#dcdfe4">file </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="504">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--list-fonts</tspan><tspan fill="#dcdfe4" x="21.6em">List </tspan><tspan fill="#dcdfe4">fonts </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="504">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--timeout</tspan><tspan fill="#56b6c2" x="9.6em">&lt;SECONDS&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Command </tspan><tspan fill="#dcdfe4">timeout </tspan><tspan fill="#56b6c2" opacity="0.5">[default: </tspan><tspan fill="#56b6c2">5</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="518.4">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--help</tspan><tspan fill="#56b6c2">[=&lt;VERBOSITY&gt;]</tspan><tspan fill="#dcdfe4" x="21.6em">Print </tspan><tspan fill="#dcdfe4">help </tspan><tspan fill="#56b6c2" opacity="0.5">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">short</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">long</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="518.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--list-themes</tspan><tspan fill="#56b6c2">[=&lt;TAGS&gt;]</tspan><tspan fill="#dcdfe4" x="22.2em">List </tspan><tspan fill="#dcdfe4">themes </tspan><tspan fill="#56b6c2" opacity="0.5">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">dark</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">light</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="532.8">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--shell-completions</tspan><tspan fill="#56b6c2" x="15.6em">&lt;SHELL&gt;</tspan><tspan fill="#dcdfe4" x="21.6em">Completions </tspan><tspan fill="#56b6c2" opacity="0.5">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">bash</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">elvish</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">fish</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">powershell</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">zsh</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="532.8">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--list-syntax-themes</tspan><tspan fill="#56b6c2">[=&lt;TAGS&gt;]</tspan><tspan fill="#dcdfe4" x="22.2em">List </tspan><tspan fill="#dcdfe4">syntax </tspan><tspan fill="#dcdfe4">highlighting </tspan><tspan fill="#dcdfe4">themes </tspan><tspan fill="#56b6c2" opacity="0.5">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">dark</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">light</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="547.2">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--man-page</tspan><tspan fill="#dcdfe4" x="21.6em">Print </tspan><tspan fill="#dcdfe4">man </tspan><tspan fill="#dcdfe4">page </tspan><tspan fill="#dcdfe4">and </tspan><tspan fill="#dcdfe4">exit </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="547.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--list-window-styles</tspan><tspan fill="#dcdfe4" x="22.2em">List </tspan><tspan fill="#dcdfe4">window </tspan><tspan fill="#dcdfe4">styles </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="763.2" y="561.6">
-<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="1.2em">-V</tspan><tspan fill="#dcdfe4">, </tspan><tspan fill="#56b6c2" font-weight="bold">--version</tspan><tspan fill="#dcdfe4" x="21.6em">Print </tspan><tspan fill="#dcdfe4">version </tspan></text>
+<svg height="14.4" overflow="hidden" width="770.4" y="561.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--list-fonts</tspan><tspan fill="#dcdfe4" x="22.2em">List </tspan><tspan fill="#dcdfe4">fonts </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="770.4" y="576">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--help</tspan><tspan fill="#56b6c2">[=&lt;VERBOSITY&gt;]</tspan><tspan fill="#dcdfe4" x="22.2em">Print </tspan><tspan fill="#dcdfe4">help </tspan><tspan fill="#56b6c2" opacity="0.5">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">short</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">long</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="770.4" y="590.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--shell-completions</tspan><tspan fill="#56b6c2" x="15.6em">&lt;SHELL&gt;</tspan><tspan fill="#dcdfe4" x="22.2em">Completions </tspan><tspan fill="#56b6c2" opacity="0.5">[possible </tspan><tspan fill="#56b6c2" opacity="0.5">values: </tspan><tspan fill="#56b6c2">bash</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">elvish</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">fish</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">powershell</tspan><tspan fill="#56b6c2" opacity="0.5">, </tspan><tspan fill="#56b6c2">zsh</tspan><tspan fill="#56b6c2" opacity="0.5">]</tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="770.4" y="604.8">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="3.6em">--man-page</tspan><tspan fill="#dcdfe4" x="22.2em">Print </tspan><tspan fill="#dcdfe4">man </tspan><tspan fill="#dcdfe4">page </tspan><tspan fill="#dcdfe4">and </tspan><tspan fill="#dcdfe4">exit </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="770.4" y="619.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#56b6c2" font-weight="bold" x="1.2em">-V</tspan><tspan fill="#dcdfe4">, </tspan><tspan fill="#56b6c2" font-weight="bold">--version</tspan><tspan fill="#dcdfe4" x="22.2em">Print </tspan><tspan fill="#dcdfe4">version </tspan></text>
 </svg>
 </g>
 </svg>
 </svg>
-<rect fill="none" height="618.4" rx="10" ry="10" stroke="#000000" stroke-width="0.5" width="782.4"/>
-<rect fill="none" height="616.4" rx="9" ry="9" stroke="#f0f0f080" stroke-width="0.5" width="780.4" x="1" y="1"/>
+<rect fill="none" height="676" rx="10" ry="10" stroke="#000000" stroke-width="0.5" width="789.6"/>
+<rect fill="none" height="674" rx="9" ry="9" stroke="#f0f0f080" stroke-width="0.5" width="787.6" x="1" y="1"/>
 </g>
 <style>
 @font-face {

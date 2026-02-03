@@ -29,6 +29,12 @@
     "theme": {
       "$ref": "#/definitions/theme"
     },
+    "command": {
+      "$ref": "#/definitions/command"
+    },
+    "syntax": {
+      "$ref": "#/definitions/syntax"
+    },
     "window": {
       "$ref": "#/definitions/window"
     },
@@ -153,6 +159,27 @@
           "type": "string"
         },
         "light": {
+          "type": "string"
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "show": {
+          "type": "boolean"
+        },
+        "prompt": {
+          "type": "string"
+        }
+      }
+    },
+    "syntax": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "theme": {
           "type": "string"
         }
       }

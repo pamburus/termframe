@@ -50,6 +50,8 @@ function test() {
     ${MAIN_EXECUTABLE:?} --config - --man-page > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --list-themes > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --list-themes=dark,light > /dev/null
+    ${MAIN_EXECUTABLE:?} --config - --list-syntax-themes > /dev/null
+    ${MAIN_EXECUTABLE:?} --config - --list-syntax-themes=dark,light > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --list-window-styles > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --list-fonts > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --mode dark > /dev/null

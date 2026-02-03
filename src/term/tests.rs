@@ -684,3 +684,57 @@ fn test_print_wrap_within_buffer() {
         "Row 0 should contain original content"
     );
 }
+
+fn make_term(cols: u16, rows: u16) -> Terminal {
+    Terminal::new(Options {
+        cols: Some(cols),
+        rows: Some(rows),
+        background: None,
+        foreground: None,
+        env: HashMap::new(),
+    })
+}
+
+fn feed(term: &mut Terminal, data: &[u8]) {
+    term.feed(Cursor::new(data), &mut Vec::new()).unwrap();
+}
+
+fn visible_line_text(term: &Terminal, row: usize) -> String {
+    term.surface().screen_lines()[row]
+        .visible_cells()
+        .map(|c| c.str().to_string())
+        .collect()
+}
+
+#[test]
+fn test_show_command_in_surface() {
+    let mut term = make_term(80, 5);
+
+    feed(&mut term, b"$ \x1b[1mgit status -s\x1b[0m\n");
+    feed(&mut term, b" M src/main.rs\n");
+
+    let line0 = visible_line_text(&term, 0);
+    assert!(line0.contains("$ "), "line 0 missing prompt: {line0:?}");
+    assert!(
+        line0.contains("git status -s"),
+        "line 0 missing command: {line0:?}"
+    );
+
+    let line1 = visible_line_text(&term, 1);
+    assert!(
+        line1.contains("M src/main.rs"),
+        "line 1 missing output: {line1:?}"
+    );
+}
+
+#[test]
+fn test_show_command_with_special_chars() {
+    let mut term = make_term(80, 3);
+
+    let cmd_line = crate::command::to_terminal("$ ", "echo", &["Hello, World!".to_string()], None);
+    feed(&mut term, &cmd_line);
+
+    let line0 = visible_line_text(&term, 0);
+    assert!(line0.contains("$ "), "line 0 missing prompt: {line0:?}");
+    assert!(line0.contains("echo"), "line 0 missing command: {line0:?}");
+}

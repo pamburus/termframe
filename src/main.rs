@@ -96,9 +96,15 @@ impl App {
 
         let opt = cli::Opt::parse_from(wild::args());
 
-        if opt.help {
-            return Ok(cli::Opt::command().print_help()?);
+        if let Some(verbosity) = opt.help {
+            let command = || cli::Opt::command();
+            match verbosity {
+                cli::HelpVerbosity::Short => command().print_help()?,
+                cli::HelpVerbosity::Long => command().print_long_help()?,
+            };
+            return Ok(());
         }
+
         if let Some(shell) = opt.shell_completions {
             print_shell_completions(shell);
             return Ok(());

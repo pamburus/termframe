@@ -3,7 +3,7 @@ use std::{fmt, str::FromStr};
 
 // third-party imports
 use clap::{
-    ArgAction, Args, Parser,
+    Args, Parser, ValueEnum,
     builder::{Styles, styling::AnsiColor},
     value_parser,
 };
@@ -19,7 +19,11 @@ const STYLES: Styles = Styles::styled()
     .header(AnsiColor::Green.on_default().bold())
     .usage(AnsiColor::Green.on_default().bold())
     .literal(AnsiColor::Cyan.on_default().bold())
-    .placeholder(AnsiColor::Cyan.on_default());
+    .placeholder(AnsiColor::Cyan.on_default())
+    .valid(AnsiColor::Green.on_default())
+    .invalid(AnsiColor::Yellow.on_default())
+    .context(AnsiColor::Cyan.on_default().dimmed())
+    .context_value(AnsiColor::Cyan.on_default());
 
 /// Terminal output SVG screenshot tool.
 #[derive(Parser)]
@@ -40,7 +44,9 @@ pub struct Opt {
     #[arg(long, overrides_with = "padding", value_name = "EM")]
     pub padding: Option<f32>,
 
-    /// Font family, multiple comma separated values can be provided.
+    /// Font family.
+    ///
+    /// Multiple comma separated values can be provided.
     #[arg(long, value_parser = trim, num_args = 1.., value_delimiter = ',', overrides_with = "font_family", value_name = "NAME")]
     pub font_family: Vec<String>,
 
@@ -52,14 +58,24 @@ pub struct Opt {
     #[arg(long, default_value_t = cfg().font.weights.normal.into(), overrides_with = "font_weight", value_name = "WEIGHT")]
     pub font_weight: FontWeight,
 
-    /// Embed fonts, if possible [note: make sure the font license allows this type of redistribution].
+    /// Embed fonts.
+    ///
+    /// Embeds the font files into the SVG output if possible.
+    ///
+    /// Note: make sure the font license allows this type of redistribution.
     #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.embed_fonts, overrides_with = "embed_fonts", value_name = "ENABLED")]
     pub embed_fonts: bool,
 
-    /// Subset fonts by removing unused characters [experimental, known to have compatibility issues].
+    /// Subset fonts.
+    ///
+    /// Subsetting fonts can significantly reduce the output SVG size, especially when using large font files with many glyphs.
+    ///
+    /// Experimental, known to have compatibility issues.
     #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.subset_fonts, overrides_with = "subset_fonts", value_name = "ENABLED")]
     pub subset_fonts: bool,
 
+    /// Bright bold text.
+    ///
     /// Use bright colors for bold text.
     #[arg(long, num_args = 1, default_value_t = cfg().rendering.bold_is_bright, overrides_with = "bold_is_bright", value_name = "ENABLED")]
     pub bold_is_bright: bool,
@@ -80,6 +96,8 @@ pub struct Opt {
     #[arg(long, default_value_t = cfg().rendering.line_height.into(), overrides_with = "line_height", value_name = "FACTOR")]
     pub line_height: f32,
 
+    /// Appearance.
+    ///
     /// Override dark or light mode.
     #[arg(long, value_enum, default_value_t = cfg().mode, overrides_with = "mode")]
     pub mode: config::mode::ModeSetting,
@@ -96,7 +114,7 @@ pub struct Opt {
     #[arg(long, num_args = 1, default_value_t = cfg().window.shadow, overrides_with = "window_shadow", value_name = "ENABLED")]
     pub window_shadow: bool,
 
-    /// Override window margin, in pixels.
+    /// Override window margin.
     #[arg(long, overrides_with = "window_margin", value_name = "PIXELS")]
     pub window_margin: Option<f32>,
 
@@ -108,11 +126,15 @@ pub struct Opt {
     #[arg(long, overrides_with = "title", value_name = "TITLE")]
     pub title: Option<String>,
 
+    /// Build CSS palette.
+    ///
     /// Build palette using CSS variables for basic ANSI colors.
     #[arg(long, num_args = 1, default_value_t = cfg().rendering.svg.var_palette, overrides_with = "var_palette", value_name = "ENABLED")]
     pub var_palette: bool,
 
-    /// Output file, by default prints to stdout.
+    /// Output file.
+    ///
+    /// Use '-' for stdout.
     #[arg(
         long,
         short = 'o',
@@ -122,7 +144,7 @@ pub struct Opt {
     )]
     pub output: String,
 
-    /// Timeout for the command to run, in seconds.
+    /// Command timeout.
     #[arg(
         long,
         overrides_with = "timeout",
@@ -131,7 +153,9 @@ pub struct Opt {
     )]
     pub timeout: u64,
 
-    /// Print available themes optionally filtered by tags.
+    /// List themes.
+    ///
+    /// Print available themes optionally filtered by tags and exit.
     #[arg(
         long,
         num_args=0..=1,
@@ -141,18 +165,30 @@ pub struct Opt {
     )]
     pub list_themes: Option<Option<ThemeTagSet>>,
 
+    /// List window styles.
+    ///
     /// Print available window styles and exit.
     #[arg(long)]
     pub list_window_styles: bool,
 
+    /// List fonts.
+    ///
     /// Print configured fonts and exit, any font not listed here cannot be embedded and may not be properly rendered.
     #[arg(long)]
     pub list_fonts: bool,
 
-    /// Print help and exit.
-    #[arg(long, default_value_t = false, action = ArgAction::SetTrue)]
-    pub help: bool,
+    /// Print help.
+    #[arg(
+        long,
+        num_args=0..=1,
+        value_name = "VERBOSITY",
+        default_missing_value = "short",
+        require_equals = true,
+    )]
+    pub help: Option<HelpVerbosity>,
 
+    /// Completions.
+    ///
     /// Print shell auto-completion script and exit.
     #[arg(long, value_parser = value_parser!(Shell), value_name = "SHELL")]
     pub shell_completions: Option<Shell>,
@@ -360,6 +396,12 @@ impl fmt::Display for FontWeight {
             Self::Fixed(weight) => write!(f, "{weight}"),
         }
     }
+}
+
+#[derive(ValueEnum, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HelpVerbosity {
+    Short,
+    Long,
 }
 
 /// Trims whitespace from a string.

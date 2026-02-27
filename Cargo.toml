@@ -64,7 +64,7 @@ serde_json = { version = "1" }
 serde_plain = "1"
 shell-escape = "0.1"
 strsim = "0.11"
-strum = { version = "0.27", features = ["derive"] }
+strum = { version = "0.28", features = ["derive"] }
 svg = "0.18"
 term_size = "0.3"
 termwiz = "0.23"

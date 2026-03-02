@@ -36,7 +36,7 @@ PNG images: [sample-dark.png](https://github.com/user-attachments/assets/5fe3fcf
 * Install using [homebrew](https://brew.sh) on macOS
 
   ```sh
-  brew install pamburus/tap/termframe
+  brew install termframe
   ```
 
 ### Linux

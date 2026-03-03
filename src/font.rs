@@ -156,14 +156,6 @@ impl Location {
             Err(_) => Self::File(PathBuf::from(s.as_ref())),
         }
     }
-
-    /// Get the URL if the location is a URL.
-    pub fn url(&self) -> Option<&Url> {
-        match self {
-            Self::Url(url) => Some(url),
-            Self::File(_) => None,
-        }
-    }
 }
 
 impl std::fmt::Display for Location {

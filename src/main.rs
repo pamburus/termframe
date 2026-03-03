@@ -283,8 +283,8 @@ impl App {
         let mut fonts = Vec::new();
 
         for (family, file) in &files {
-            let font = file.font().unwrap();
-            let url = file.location().url().unwrap().to_string();
+            let font = file.font()?;
+            let url = file.location().to_string();
             fonts.push((url, family, font));
         }
 

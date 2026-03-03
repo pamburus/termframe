@@ -265,6 +265,7 @@ impl SvgRenderer {
                             }
                         } else {
                             unresolved.insert(ch);
+                            text_length_needed = true;
                         }
                     }
 

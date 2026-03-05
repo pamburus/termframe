@@ -1,6 +1,6 @@
 [package]
 name = "termframe"
-version = "0.8.1"
+version = "0.8.2-alpha.1"
 edition = "2024"
 rust-version = "1.91.0"
 description = "Terminal output SVG screenshot tool"
@@ -28,6 +28,7 @@ allsorts = "0.16"
 anyhow = "1"
 askama = "0.15"
 base64 = "0.22"
+bitvec = "1.0.1"
 cacache = "13"
 clap = { version = "4", features = ["derive", "env", "string", "wrap_help"] }
 clap_complete = "4"

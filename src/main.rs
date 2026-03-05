@@ -10,6 +10,7 @@ use std::{
 // third-party imports
 use anyhow::Context;
 use base64::prelude::*;
+use bitvec::prelude::*;
 use clap::{CommandFactory, Parser};
 use csscolorparser::Color;
 use enumset_ext::EnumSetExt;
@@ -288,21 +289,21 @@ impl App {
             fonts.push((url, family, font));
         }
 
-        let mut used: HashMap<char, u64> = HashMap::new();
+        let mut used: HashMap<char, BitVec> = HashMap::new();
 
         for ch in chars {
             if used.contains_key(&ch) {
                 continue;
             }
 
-            let mut bitmap: u64 = 0;
+            let mut bitmap = BitVec::repeat(false, fonts.len());
             for (i, (_, _, font)) in fonts.iter_mut().enumerate() {
                 if font.has_char(ch) {
-                    bitmap |= 1 << i;
+                    bitmap.set(i, true);
                 }
             }
 
-            log::debug!("provided by fonts {bitmap:08x?}: char {ch:<2} {ch:?}");
+            log::debug!("provided by fonts {bitmap:?}: char {ch:<2} {ch:?}");
             used.insert(ch, bitmap);
         }
 
@@ -321,7 +322,9 @@ impl App {
 
             let used = used.clone();
             let chars = Rc::new(CharSetFn::new(move |ch| {
-                (used.get(&ch).copied().unwrap_or(0) & (1 << i) as u64) != 0
+                used.get(&ch)
+                    .and_then(|bitmap| bitmap.get(i).as_deref().copied())
+                    .unwrap_or(false)
             }));
 
             let face = make_font_face(family, url, font, chars, metrics_match);
@@ -371,7 +374,10 @@ impl App {
         if settings.rendering.svg.embed_fonts {
             for (i, (_, file)) in files.iter().enumerate() {
                 let data = if settings.rendering.svg.subset_fonts {
-                    let chars = used.iter().filter(|x| *x.1 & (1 << i) != 0).map(|x| *x.0);
+                    let chars = used
+                        .iter()
+                        .filter(|x| x.1.get(i).as_deref().copied().unwrap_or(false))
+                        .map(|x| *x.0);
                     let data = fonts[i].2.subset(chars)?;
                     faces[i].format = Some(FontFormat::Ttf);
                     Cow::Owned(data)

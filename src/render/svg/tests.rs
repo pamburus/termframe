@@ -675,3 +675,19 @@ fn test_subclusters_combining_characters() {
     assert_eq!(subclusters[0].0, "◌\u{301} ");
     assert_eq!(subclusters[0].1, 0..2);
 }
+
+#[test]
+fn test_render_with_unresolved_font() {
+    let mut surface = Surface::new(10, 1);
+    surface.add_change(Change::Text("test".into()));
+
+    let options = Options::sample();
+    let renderer = SvgRenderer::new(options);
+
+    let mut output = Vec::new();
+    renderer.render(&surface, &mut output).unwrap();
+
+    let svg = String::from_utf8(output).unwrap();
+    assert!(svg.contains("test"));
+    assert!(svg.contains("textLength"));
+}

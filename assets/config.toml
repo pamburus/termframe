@@ -60,6 +60,7 @@ family = [
     "DejaVu Sans Mono",
     "monospace",
     "Symbols Nerd Font Mono",
+    "Cascadia Mono",
 ]
 #
 # Font size in pixels.
@@ -163,6 +164,35 @@ family = "Fira Code"
 license = { type = "SIL Open Font License 1.1", link = "https://github.com/tonsky/FiraCode/blob/6.2/LICENSE" }
 files = [
     "https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/FiraCode/FiraCode-VF.woff2",
+]
+
+#
+# Font "Cascadia Mono".
+#
+[[fonts]]
+family = "Cascadia Mono"
+license = { type = "SIL Open Font License 1.1", link = "https://github.com/microsoft/cascadia-code/blob/v2407.24/LICENSE" }
+files = [
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcX10Xv02NxSQ7U.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcXfGTK_Et7QTbt8w.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcX30Xv02NxSQ7U.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcX1kXv02NxSQ7U.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcX0UXv02NxSQ7U.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcX0EXv02NxSQ7U.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcXaGTK_Et7QTbt8w.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcX3UXv02NxSQ7U.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcX3EXv02NxSQ7U.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZozw5pquJF3iuizJDZYqr1aZcX0kXv02NxSQ.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aZcn0E_o8WFBSA.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aTwG9WDA-2l5cTc.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aZ8n0E_o8WFBSA.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aZYn0E_o8WFBSA.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aZEn0E_o8WFBSA.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aZAn0E_o8WFBSA.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aSgG9WDA-2l5cTc.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aZ0n0E_o8WFBSA.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aZwn0E_o8WFBSA.woff2",
+    "https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aZIn0E_o8WE.woff2",
 ]
 
 #

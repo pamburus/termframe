@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Generate GitHub App Token
         id: generate-token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
@@ -30,7 +30,7 @@ jobs:
 
       - name: Generate Auto-Merge GitHub App Token
         id: generate-automerge-token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
         with:
           app-id: ${{ secrets.AUTOMERGE_APP_ID }}
           private-key: ${{ secrets.AUTOMERGE_APP_PRIVATE_KEY }}
@@ -43,10 +43,10 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Setup Rust cache
-        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2.8.2
+        uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
 
       - name: Install just
-        uses: taiki-e/install-action@a37010ded18ff788be4440302bd6830b1ae50d8b # v2.68.25
+        uses: taiki-e/install-action@cbb1dcaa26e1459e2876c39f61c1e22a1258aac5 # v2.68.33
         with:
           tool: just
 

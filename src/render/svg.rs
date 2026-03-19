@@ -163,7 +163,7 @@ impl SvgRenderer {
                 .set("y", format!("{tyo}em"))
                 .set("xml:space", "preserve");
 
-            let mut pos = 0;
+            let mut cursor = SpanCursor::new();
 
             for cluster in line.cluster(None) {
                 if cluster.text.trim().is_empty() {
@@ -178,8 +178,9 @@ impl SvgRenderer {
                     let mut span = element::TSpan::new(text);
 
                     let x = range.start;
-                    if x > pos {
-                        tl = tl.add(element::TSpan::new(" ".repeat(x - pos)));
+                    let padding = cursor.padding(x);
+                    if padding > 0 {
+                        tl = tl.add(element::TSpan::new(" ".repeat(padding)));
                     }
 
                     if line.get_cell(x).map(|cell| cell.width()).unwrap_or(0) > 1 {
@@ -284,13 +285,13 @@ impl SvgRenderer {
                         );
                         // Reset to 0 so space padding accounts for the full offset from
                         // the new text element's implicit x=0 start.
-                        pos = 0;
+                        cursor.reset();
                         tl = element::Text::new("")
                             .set("y", format!("{tyo}em"))
                             .set("xml:space", "preserve");
                     } else {
                         tl = tl.add(span);
-                        pos = x + range.len();
+                        cursor.advance(x, range.len());
                     }
                 }
             }
@@ -1513,6 +1514,43 @@ fn svg_weight(weight: FontWeight) -> String {
         FontWeight::Bold => "bold".into(),
         FontWeight::Fixed(w) => w.to_string(),
         FontWeight::Variable(_, max) => max.to_string(),
+    }
+}
+
+// ---
+
+/// Tracks the current column position within a text element and computes
+/// the number of space characters needed to pad to a target column.
+///
+/// Used during SVG rendering to position tspan elements via natural text flow
+/// (space padding) rather than explicit x-coordinate attributes, so that all
+/// text flows at the font's actual advance width regardless of metrics assumptions.
+struct SpanCursor {
+    pos: usize,
+}
+
+impl SpanCursor {
+    fn new() -> Self {
+        Self { pos: 0 }
+    }
+
+    /// Returns the number of padding spaces needed to reach column `x` from the current position.
+    fn padding(&self, x: usize) -> usize {
+        x.saturating_sub(self.pos)
+    }
+
+    /// Advances the cursor past a span of `len` columns starting at column `x`.
+    fn advance(&mut self, x: usize, len: usize) {
+        self.pos = x + len;
+    }
+
+    /// Resets the cursor to column 0 after a textLength break.
+    ///
+    /// After emitting a textLength-constrained text element, the next text element
+    /// starts at x=0, so the cursor must reset to account for the full offset
+    /// via space padding.
+    fn reset(&mut self) {
+        self.pos = 0;
     }
 }
 

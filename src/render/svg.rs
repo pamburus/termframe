@@ -178,12 +178,12 @@ impl SvgRenderer {
                     let mut span = element::TSpan::new(text);
 
                     let x = range.start;
-                    if x != pos {
-                        span.assign("x", format!("{}em", (x as f32 * fw).r2p(fp)));
+                    if x > pos {
+                        tl = tl.add(element::TSpan::new(" ".repeat(x - pos)));
                     }
 
                     if line.get_cell(x).map(|cell| cell.width()).unwrap_or(0) > 1 {
-                        // Make width invalid to force explicit x position attribute in the next span.
+                        // Make width invalid to force space padding before the next span.
                         // This is needed because characters with width > 1 are not monospaced and can overlap
                         // with the next character.
                         range.end = range.start + 1;
@@ -282,9 +282,10 @@ impl SvgRenderer {
                                 )
                                 .add(span),
                         );
-                        pos = x + range.len();
+                        // Reset to 0 so space padding accounts for the full offset from
+                        // the new text element's implicit x=0 start.
+                        pos = 0;
                         tl = element::Text::new("")
-                            .set("x", format!("{}em", (pos as f32 * fw).r2p(fp)))
                             .set("y", format!("{tyo}em"))
                             .set("xml:space", "preserve");
                     } else {

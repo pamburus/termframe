@@ -685,6 +685,25 @@ fn test_print_wrap_within_buffer() {
     );
 }
 
+#[test]
+fn test_recommended_width_counts_colored_spaces() {
+    // A line with background-colored spaces should contribute to recommended_width,
+    // even though the text content is just whitespace.
+    // ESC[48;2;255;0;0m sets red background, then "   " are colored spaces, then ESC[0m resets.
+    // The line ends at column 5 (2 regular chars + 3 colored spaces).
+    let mut term = make_term(20, 5);
+    feed(&mut term, b"ab\x1b[48;2;255;0;0m   \x1b[0m\n");
+    assert_eq!(term.recommended_width(), 5);
+}
+
+#[test]
+fn test_recommended_width_ignores_default_bg_spaces() {
+    // Trailing spaces with default background should not inflate the recommended width.
+    let mut term = make_term(20, 5);
+    feed(&mut term, b"ab   \n");
+    assert_eq!(term.recommended_width(), 2);
+}
+
 fn make_term(cols: u16, rows: u16) -> Terminal {
     Terminal::new(Options {
         cols: Some(cols),

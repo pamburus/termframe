@@ -677,6 +677,63 @@ fn test_subclusters_combining_characters() {
 }
 
 #[test]
+fn test_span_cursor_padding() {
+    let mut cursor = SpanCursor::new();
+    // At start, pos=0. Span at column 0 needs no padding.
+    assert_eq!(cursor.padding(0), 0);
+    // Span at column 5 needs 5 spaces of padding.
+    assert_eq!(cursor.padding(5), 5);
+
+    // Advance past a 3-char span starting at column 5.
+    cursor.advance(5, 3);
+    // Now pos=8. Span at column 8 needs no padding.
+    assert_eq!(cursor.padding(8), 0);
+    // Span at column 10 needs 2 spaces.
+    assert_eq!(cursor.padding(10), 2);
+}
+
+#[test]
+fn test_span_cursor_padding_after_wide_char() {
+    // Wide characters (width > 1) force range.end = range.start + 1,
+    // so pos can end up less than the next span's actual column.
+    // With the old `x != pos` check, this would also trigger explicit positioning
+    // even for contiguous spans. With `x > pos` and saturating_sub, it correctly
+    // returns 0 when pos > x (overlap from wide char adjustment).
+    let mut cursor = SpanCursor::new();
+    // Simulate: wide char at column 0, range forced to 0..1, so advance(0, 1).
+    cursor.advance(0, 1);
+    // Next span is at column 1 (contiguous). pos=1, x=1 → no padding.
+    assert_eq!(cursor.padding(1), 0);
+
+    // Simulate: advance with range.end = range.start + 1 for a wide char.
+    // Wide char at column 5 originally spans 5..7, but range forced to 5..6.
+    let mut cursor = SpanCursor::new();
+    cursor.advance(5, 1); // pos=6
+    // Next span at column 7 needs 1 space of padding.
+    assert_eq!(cursor.padding(7), 1);
+}
+
+#[test]
+fn test_span_cursor_reset_after_text_length_break() {
+    let mut cursor = SpanCursor::new();
+    cursor.advance(5, 3); // pos=8
+
+    // After a textLength break, reset to 0. The next text element starts at x=0,
+    // so space padding must account for the full offset.
+    cursor.reset();
+    assert_eq!(cursor.padding(0), 0);
+    assert_eq!(cursor.padding(10), 10);
+}
+
+#[test]
+fn test_span_cursor_gap_from_skipped_whitespace() {
+    // Whitespace-only clusters are skipped in the render loop, creating a gap.
+    // pos stays at 0, next span starts at column 5.
+    let cursor = SpanCursor::new();
+    assert_eq!(cursor.padding(5), 5);
+}
+
+#[test]
 fn test_render_with_unresolved_font() {
     let mut surface = Surface::new(10, 1);
     surface.add_change(Change::Text("test".into()));

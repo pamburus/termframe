@@ -1,4 +1,4 @@
-#:schema https://raw.githubusercontent.com/pamburus/termframe/v0.8.2/schema/json/theme.schema.json
+#:schema https://raw.githubusercontent.com/pamburus/termframe/v0.8.3/schema/json/theme.schema.json
 
 tags = ["dark", "light"]
 

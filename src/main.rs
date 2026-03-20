@@ -199,18 +199,30 @@ impl App {
             terminal.feed(io::BufReader::new(io::stdin()), io::sink())?;
         }
 
-        if !matches!(
-            (opt.width.current, opt.height.current),
-            (cli::Dimension::Fixed(_), cli::Dimension::Fixed(_))
-        ) {
+        let mut resized = false;
+        let width = if matches!(opt.width.current, cli::Dimension::Fixed(_)) {
+            terminal.surface().dimensions().0 as u16
+        } else {
             let width = terminal.recommended_width();
             log::info!("recommended terminal width: {width}");
-            let width = opt.width.fit(width);
+            opt.width.fit(width)
+        };
+        if terminal.surface().dimensions().0 as u16 != width {
             terminal.set_width(width);
+            resized = true;
+        }
+        let height = if matches!(opt.height.current, cli::Dimension::Fixed(_)) {
+            terminal.surface().dimensions().1 as u16
+        } else {
             let height = terminal.recommended_height();
             log::info!("recommended terminal height: {height}");
-            let height = opt.height.fit(height);
-            terminal.set_height(height);
+            opt.height.fit(height)
+        };
+        if terminal.surface().dimensions().1 as u16 != height {
+            resized = true;
+        }
+        terminal.set_height(height);
+        if resized {
             log::info!("resized terminal to {width}x{height}");
         }
 

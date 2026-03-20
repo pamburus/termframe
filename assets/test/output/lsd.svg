@@ -1,10 +1,10 @@
-<svg height="452" width="659.2" xmlns="http://www.w3.org/2000/svg">
+<svg height="495.2" width="659.2" xmlns="http://www.w3.org/2000/svg">
 <g transform="translate(32,16)">
-<filter filterUnits="userSpaceOnUse" height="460" id="shadow" width="667.2" x="-32" y="-24">
+<filter filterUnits="userSpaceOnUse" height="503.2" id="shadow" width="667.2" x="-32" y="-24">
 <feGaussianBlur stdDeviation="12"/>
 </filter>
-<rect fill="#000000c0" filter="url(#shadow)" height="388" rx="10" ry="10" width="595.2" x="4" y="12"/>
-<rect fill="#282c34" height="388" rx="10" ry="10" width="595.2"/>
+<rect fill="#000000c0" filter="url(#shadow)" height="431.2" rx="10" ry="10" width="595.2" x="4" y="12"/>
+<rect fill="#282c34" height="431.2" rx="10" ry="10" width="595.2"/>
 <clipPath id="header">
 <rect height="28" width="595.2"/>
 </clipPath>
@@ -15,123 +15,143 @@
 <circle cx="34" cy="14" fill="#ffbd2e" r="6" stroke="#ffbd2e" stroke-width="0.5"/>
 <circle cx="54" cy="14" fill="#28c941" r="6" stroke="#28c941" stroke-width="0.5"/>
 </g>
-<svg class="terminal" font-family="JetBrains Mono, Fira Code, Source Code Pro, Cascadia Code, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace, Symbols Nerd Font Mono, Cascadia Mono" font-size="12" height="360" width="595.2" y="28">
+<svg class="terminal" font-family="JetBrains Mono, Fira Code, Source Code Pro, Cascadia Code, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace, Symbols Nerd Font Mono, Cascadia Mono" font-size="12" height="403.2" width="595.2" y="28">
 <svg fill="#dcdfe4" x="9.6" y="7.2">
 <g>
-<svg height="345.6" viewBox="0 0 48 28.8" width="576">
+<svg height="388.8" viewBox="0 0 48 32.4" width="576">
 <g stroke-width="0.025"/>
 </svg>
 <svg height="14.4" overflow="hidden" width="576" y="0">
+<text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">864</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:51:55 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
+<text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">.</tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="14.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">704</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d787">Sun </tspan><tspan fill="#00d787">Apr </tspan><tspan> </tspan><tspan fill="#00d787">6 </tspan><tspan fill="#00d787">02:53:23 </tspan><tspan fill="#00d787">2025</tspan><tspan> </tspan></text>
+<text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">..</tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="28.8">
+<text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">544</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:43:22 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
+<text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">.git</tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="43.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">128</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sat </tspan><tspan fill="#00af87">Mar </tspan><tspan fill="#00af87">29 </tspan><tspan fill="#00af87">10:14:58 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
+<text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">.github</tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="57.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan>  </tspan><tspan fill="#ffffaf">96</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Mon </tspan><tspan fill="#00af87">Mar </tspan><tspan fill="#00af87">10 </tspan><tspan fill="#00af87">22:16:13 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">.vscode</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="14.4">
+<svg height="14.4" overflow="hidden" width="576" y="72">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">224</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:52:05 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">assets</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="28.8">
+<svg height="14.4" overflow="hidden" width="576" y="86.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">160</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:19:31 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">build</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="43.2">
+<svg height="14.4" overflow="hidden" width="576" y="100.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">128</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:18:45 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">contrib</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="57.6">
+<svg height="14.4" overflow="hidden" width="576" y="115.2">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">160</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:08:27 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">doc</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="72">
+<svg height="14.4" overflow="hidden" width="576" y="129.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan>  </tspan><tspan fill="#ffffaf">96</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sat </tspan><tspan fill="#00af87">Apr </tspan><tspan> </tspan><tspan fill="#00af87">5 </tspan><tspan fill="#00af87">10:16:26 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">nix</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="86.4">
+<svg height="14.4" overflow="hidden" width="576" y="144">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan>  </tspan><tspan fill="#ffffaf">96</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sat </tspan><tspan fill="#00af87">Apr </tspan><tspan> </tspan><tspan fill="#00af87">5 </tspan><tspan fill="#00af87">10:16:26 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">schema</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="100.8">
+<svg height="14.4" overflow="hidden" width="576" y="158.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">128</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sat </tspan><tspan fill="#00af87">Apr </tspan><tspan> </tspan><tspan fill="#00af87">5 </tspan><tspan fill="#00af87">10:44:02 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">scripts</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="115.2">
+<svg height="14.4" overflow="hidden" width="576" y="172.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">608</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:08:27 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">󱧼</tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">src</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="129.6">
+<svg height="14.4" overflow="hidden" width="576" y="187.2">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">320</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:23:25 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">target</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="144">
+<svg height="14.4" overflow="hidden" width="576" y="201.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold">d</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#e06c75">x</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan>  </tspan><tspan fill="#ffffaf">96</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sun </tspan><tspan fill="#00af87">Mar </tspan><tspan> </tspan><tspan fill="#00af87">9 </tspan><tspan fill="#00af87">22:46:23 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#61afef" font-weight="bold"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#61afef" font-weight="bold">templates</tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="158.4">
+<svg height="14.4" overflow="hidden" width="576" y="216">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan>  </tspan><tspan fill="#ffffaf">10</tspan><tspan> </tspan><tspan fill="#ffffaf">KB</tspan><tspan> </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:19:15 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">.DS_Store </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="172.8">
+<svg height="14.4" overflow="hidden" width="576" y="230.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan>  </tspan><tspan fill="#ffffaf">44</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sun </tspan><tspan fill="#00af87">Mar </tspan><tspan fill="#00af87">16 </tspan><tspan fill="#00af87">23:18:03 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">.gitignore </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="187.2">
+<svg height="14.4" overflow="hidden" width="576" y="244.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">137</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Mon </tspan><tspan fill="#00af87">Mar </tspan><tspan fill="#00af87">24 </tspan><tspan fill="#00af87">22:55:27 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">.markdownlint.json </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="201.6">
+<svg height="14.4" overflow="hidden" width="576" y="259.2">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">465</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sat </tspan><tspan fill="#00af87">Apr </tspan><tspan> </tspan><tspan fill="#00af87">5 </tspan><tspan fill="#00af87">10:17:00 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">.taplo.toml </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="216">
+<svg height="14.4" overflow="hidden" width="576" y="273.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan>  </tspan><tspan fill="#ffffaf">66</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sat </tspan><tspan fill="#00af87">Mar </tspan><tspan fill="#00af87">29 </tspan><tspan fill="#00af87">10:14:58 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">askama.toml </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="230.4">
+<svg height="14.4" overflow="hidden" width="576" y="288">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan>  </tspan><tspan fill="#ffffaf">99</tspan><tspan> </tspan><tspan fill="#ffffaf">KB</tspan><tspan> </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:08:27 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">Cargo.lock </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="244.8">
+<svg height="14.4" overflow="hidden" width="576" y="302.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">1.8</tspan><tspan> </tspan><tspan fill="#ffffaf">KB</tspan><tspan> </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:08:27 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">Cargo.toml </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="259.2">
+<svg height="14.4" overflow="hidden" width="576" y="316.8">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">2.4</tspan><tspan> </tspan><tspan fill="#ffffaf">KB</tspan><tspan> </tspan><tspan fill="#00d787">Sun </tspan><tspan fill="#00d787">Apr </tspan><tspan> </tspan><tspan fill="#00d787">6 </tspan><tspan fill="#00d787">12:21:42 </tspan><tspan fill="#00d787">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">flake.lock </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="273.6">
+<svg height="14.4" overflow="hidden" width="576" y="331.2">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">826</tspan><tspan> </tspan><tspan fill="#ffffaf">B</tspan><tspan>  </tspan><tspan fill="#00af87">Sun </tspan><tspan fill="#00af87">Feb </tspan><tspan fill="#00af87">23 </tspan><tspan fill="#00af87">14:12:42 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">flake.nix </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="288">
+<svg height="14.4" overflow="hidden" width="576" y="345.6">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">2.0</tspan><tspan> </tspan><tspan fill="#ffffaf">KB</tspan><tspan> </tspan><tspan fill="#00d700">Sun </tspan><tspan fill="#00d700">Apr </tspan><tspan> </tspan><tspan fill="#00d700">6 </tspan><tspan fill="#00d700">16:18:16 </tspan><tspan fill="#00d700">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">justfile </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="302.4">
+<svg height="14.4" overflow="hidden" width="576" y="360">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">1.0</tspan><tspan> </tspan><tspan fill="#ffffaf">KB</tspan><tspan> </tspan><tspan fill="#00af87">Fri </tspan><tspan fill="#00af87">Mar </tspan><tspan fill="#00af87">28 </tspan><tspan fill="#00af87">22:16:17 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">LICENSE </tspan></text>
 </svg>
-<svg height="14.4" overflow="hidden" width="576" y="316.8">
+<svg height="14.4" overflow="hidden" width="576" y="374.4">
 <text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">.</tspan><tspan fill="#98c379">r</tspan><tspan fill="#e5c07b">w</tspan><tspan fill="#8a8a8a">-</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan fill="#98c379">r</tspan><tspan fill="#8a8a8a">--</tspan><tspan> </tspan><tspan fill="#ffffd7">pamburus</tspan><tspan> </tspan><tspan fill="#d7d7af">staff</tspan><tspan> </tspan><tspan fill="#ffffaf">7.1</tspan><tspan> </tspan><tspan fill="#ffffaf">KB</tspan><tspan> </tspan><tspan fill="#00af87">Sat </tspan><tspan fill="#00af87">Apr </tspan><tspan> </tspan><tspan fill="#00af87">5 </tspan><tspan fill="#00af87">10:44:02 </tspan><tspan fill="#00af87">2025</tspan><tspan> </tspan></text>
 <text textLength="0.6em" x="34.8em" xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4"></tspan></text>
 <text xml:space="preserve" y="0.96em"><tspan>                                                            </tspan><tspan fill="#dcdfe4">README.md </tspan></text>
@@ -139,8 +159,8 @@
 </g>
 </svg>
 </svg>
-<rect fill="none" height="388" rx="10" ry="10" stroke="#000000" stroke-width="0.5" width="595.2"/>
-<rect fill="none" height="386" rx="9" ry="9" stroke="#f0f0f080" stroke-width="0.5" width="593.2" x="1" y="1"/>
+<rect fill="none" height="431.2" rx="10" ry="10" stroke="#000000" stroke-width="0.5" width="595.2"/>
+<rect fill="none" height="429.2" rx="9" ry="9" stroke="#f0f0f080" stroke-width="0.5" width="593.2" x="1" y="1"/>
 </g>
 <style>
 @font-face {
@@ -178,6 +198,12 @@
 	font-weight: normal;
 	font-style: normal;
 	src: url(https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s04.woff2) format('woff2');
+}
+@font-face {
+	font-family: Symbols Nerd Font Mono;
+	font-weight: normal;
+	font-style: normal;
+	src: url(https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/SymbolsNerdFontMono/nf-s03.woff2) format('woff2');
 }
 @font-face {
 	font-family: JetBrains Mono;

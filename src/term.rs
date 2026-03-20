@@ -15,7 +15,7 @@ use num_traits::FromPrimitive;
 use portable_pty::{ChildKiller, CommandBuilder, PtySize, native_pty_system};
 use termwiz::{
     cell::AttributeChange,
-    color::SrgbaTuple,
+    color::{ColorAttribute, SrgbaTuple},
     escape::{
         Action, CSI, ControlCode, OneBased, OperatingSystemCommand,
         csi::{Cursor, Sgr},
@@ -216,7 +216,6 @@ impl Terminal {
     pub fn recommended_height(&self) -> u16 {
         let (width, _) = self.surface.dimensions();
         let mut total_rows = 0;
-        let mut last_logical_empty = false;
         let mut trailing_empty_rows = 0;
 
         self.process_logical_lines_with_accumulator((), |_acc, logical_width| {
@@ -227,7 +226,6 @@ impl Terminal {
                 logical_width.div_ceil(width)
             };
 
-            // Track if this logical line is empty (for trailing trimming)
             let is_empty = logical_width == 0;
             if is_empty {
                 trailing_empty_rows += rows_needed;
@@ -236,7 +234,6 @@ impl Terminal {
                 total_rows += trailing_empty_rows + rows_needed;
                 trailing_empty_rows = 0;
             }
-            last_logical_empty = is_empty;
         });
 
         // Don't count trailing empty logical lines
@@ -266,10 +263,11 @@ impl Terminal {
     }
 
     fn trimmed_line_width(line: &Line) -> usize {
-        // Find rightmost non-empty cell by tracking the maximum position
+        // Find rightmost visually occupied cell — either non-whitespace text or
+        // a cell with a non-default background color (e.g. colored spaces).
         let mut rightmost_end = 0;
         for cell in line.visible_cells() {
-            if !cell.str().trim().is_empty() {
+            if !Self::is_blank_cell(&cell) {
                 let end = cell.cell_index() + cell.width().max(1);
                 rightmost_end = rightmost_end.max(end);
             }
@@ -364,20 +362,73 @@ impl Terminal {
 
         let mut reflowed: Vec<Line> = Vec::new();
         for ln in logicals {
-            reflowed.extend(ln.wrap(new_width, seq));
+            reflowed.extend(Self::wrap_line(ln, new_width, seq));
         }
 
         // Trim trailing blank rows to avoid empty tail
         while reflowed
             .last()
-            .map(|ln| ln.visible_cells().all(|c| c.str().trim().is_empty()))
+            .map(|ln| ln.visible_cells().all(|c| Self::is_blank_cell(&c)))
             .unwrap_or(false)
-        // Empty reflowed vec means no trailing rows to trim
         {
             reflowed.pop();
         }
 
         reflowed
+    }
+
+    /// Returns true if a cell is visually blank — a space with no non-default background color.
+    fn is_blank_cell(cell: &termwiz::surface::line::CellRef) -> bool {
+        cell.str().trim().is_empty() && cell.attrs().background() == ColorAttribute::Default
+    }
+
+    /// Wrap a logical line to the given width, preserving cells with non-default background
+    /// colors even when they contain only whitespace.
+    ///
+    /// termwiz's built-in `Line::wrap()` strips trailing space cells unconditionally,
+    /// which discards background-colored spaces (e.g. colored bar decorations). This
+    /// replacement uses the same splitting logic but keeps any trailing cell that has a
+    /// non-default background color.
+    fn wrap_line(line: Line, width: usize, seq: SequenceNo) -> Vec<Line> {
+        let cells: Vec<_> = line.visible_cells().collect();
+
+        // Find the rightmost cell that should be kept: non-whitespace text OR colored background.
+        let last_visible = cells.iter().rposition(|c| !Self::is_blank_cell(c));
+
+        let Some(end_idx) = last_visible else {
+            return vec![line];
+        };
+
+        let cells = &cells[..=end_idx];
+
+        let mut lines: Vec<Line> = vec![];
+        let mut delta = 0usize;
+
+        for cell in cells {
+            let need_new_line = lines
+                .last()
+                .map(|ln: &Line| ln.len() + cell.width() > width)
+                .unwrap_or(true);
+
+            if need_new_line {
+                if let Some(prev) = lines.last_mut() {
+                    prev.set_last_cell_was_wrapped(true, seq);
+                }
+                lines.push(Line::new(seq));
+                delta = cell.cell_index();
+            }
+
+            let ln = lines.last_mut().unwrap();
+            ln.set_cell_grapheme(
+                cell.cell_index() - delta,
+                cell.str(),
+                cell.width(),
+                (*cell.attrs()).clone(),
+                seq,
+            );
+        }
+
+        lines
     }
 
     /// Rebuild the scrollback buffer from reflowed content above the visible window.

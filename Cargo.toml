@@ -53,7 +53,7 @@ indexmap = "2"
 itertools = "0.14"
 known-folders = "1"
 log = "0.4"
-lumis = { version = "0.1", default-features = false, features = ["lang-bash"] }
+lumis = { version = "0.2", default-features = false, features = ["lang-bash"] }
 num-integer = "0.1"
 num-traits = "0.2"
 owo-colors = "4"

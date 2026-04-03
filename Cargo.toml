@@ -79,7 +79,7 @@ yaml-peg = "1"
 
 [build-dependencies]
 anyhow = "1"
-sha2 = "0.10"
+sha2 = "0.11"
 tidy-themes = { path = "tools/tidy-themes" }
 
 [target.'cfg(not(windows))'.dependencies]

@@ -1943,9 +1943,9 @@ dependencies = [
 
 [[package]]
 name = "lumis"
-version = "0.5.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "597699a6160daf1bfde08ca2932ecc6ea12849211e76252b82dede32cd6af331"
+checksum = "a969fb281b2979b133ecaecefa461bdebe97a34560edee8eca043b7ca78d26d7"
 dependencies = [
  "anyhow",
  "cc",

@@ -133,7 +133,7 @@ impl Highlighter {
     /// Formats the input text with syntax highlighting to the output.
     pub fn format(&self, input: &str, output: &mut Vec<u8>) -> Result<(), FormatError> {
         let mut builder = TerminalBuilder::new();
-        builder.lang(self.language);
+        builder.language(self.language);
         builder.theme(self.theme.clone());
 
         builder

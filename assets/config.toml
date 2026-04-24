@@ -1,4 +1,4 @@
-#:schema https://raw.githubusercontent.com/pamburus/termframe/v0.8.3/schema/json/config.schema.json
+#:schema https://raw.githubusercontent.com/pamburus/termframe/v0.8.4/schema/json/config.schema.json
 
 # Dark or light mode.
 # Possible values: [auto, dark, light].

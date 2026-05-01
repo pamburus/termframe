@@ -26,7 +26,7 @@ path = "src/main.rs"
 [dependencies]
 allsorts = "0.16"
 anyhow = "1"
-askama = "0.15"
+askama = "0.16"
 base64 = "0.22"
 bitvec = "1.0.1"
 cacache = "13"

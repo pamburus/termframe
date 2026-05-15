@@ -24,7 +24,7 @@ name = "termframe"
 path = "src/main.rs"
 
 [dependencies]
-allsorts = "0.16"
+allsorts = "0.17"
 anyhow = "1"
 askama = "0.16"
 base64 = "0.22"

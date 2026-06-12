@@ -1,8 +1,12 @@
 # Common settings
 
+set lazy
+
 fonts := "JetBrains Mono, Fira Code, Cascadia Code, Source Code Pro, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace"
 tmp-themes-dir := ".tmp/themes"
-previous-tag := "git tag -l \"v*.*.*\" --merged HEAD --sort=-version:refname | head -1"
+
+# Previous version tag
+previous-tag := shell("git tag -l \"v*.*.*\" --merged HEAD --sort=-version:refname | head -1")
 
 # NixOS helpers
 
@@ -53,10 +57,10 @@ version: (setup "cargo" "jq")
     @cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "termframe") | .version'
 
 [doc('List changes since the previous release')]
+[script]
 changes since="auto": (setup "git-cliff" "bat" "gh" "jq" "cargo")
-    #!/usr/bin/env bash
     set -euo pipefail
-    since=$(if [ "{{ since }}" = auto ]; then {{ previous-tag }}; else echo "{{ since }}"; fi)
+    since={{ if since == 'auto' { previous-tag } else { since } }}
     version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name == "termframe") | .version')
     GITHUB_REPO=pamburus/termframe \
     GITHUB_TOKEN=$(gh auth token) \

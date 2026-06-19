@@ -50,7 +50,7 @@ exponential-backoff = "2"
 hex = "0.4"
 http = "1"
 indexmap = "2"
-itertools = "0.14"
+itertools = "0.15"
 known-folders = "1"
 log = "0.4"
 lumis = { version = "0.10", default-features = false, features = ["lang-bash"] }

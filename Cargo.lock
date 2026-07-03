@@ -2008,9 +2008,9 @@ checksum = "b53f577698ec4ecb8d23b052ce0a6701ae4fc8cd315417bb77ec045c01f00caa"
 
 [[package]]
 name = "lumis-core"
-version = "2.0.0"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb3a07402769c248e89740f1497685ea399ce820406251e342766da3066888f0"
+checksum = "fbda3f6195577ab8e59d8c1f6506610ac817e01382f110666ab86db9f779fe4e"
 dependencies = [
  "derive_builder",
  "glob",

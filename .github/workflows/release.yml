@@ -62,10 +62,10 @@ jobs:
           rustflags: ""
 
       - name: Install cargo-quickinstall
-        run: cargo install --locked cargo-quickinstall
+        run: cargo install --locked "cargo-quickinstall@0.3.53"
 
       - name: Install cargo-edit
-        run: cargo quickinstall --force cargo-edit
+        run: cargo quickinstall --force "cargo-edit@0.13.13"
 
       - name: Update version in Cargo.toml
         id: update-version

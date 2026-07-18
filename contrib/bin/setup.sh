@@ -70,15 +70,18 @@ setup_cargo_nightly() {
     fi
 }
 
+CARGO_BINSTALL_VERSION="1.21.0"
+
 setup_cargo_binstall() {
     if [ -x "$(command -v cargo-binstall)" ]; then
         true
     elif [ -x "$(command -v scoop)" ]; then
         scoop install cargo-binstall
     elif [ -x "$(command -v curl)" ]; then
-        curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+        BINSTALL_VERSION="${CARGO_BINSTALL_VERSION}" \
+            curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
     elif [ -x "$(command -v cargo)" ]; then
-        cargo install --locked cargo-binstall
+        cargo install --locked "cargo-binstall@${CARGO_BINSTALL_VERSION}"
     else
         echo "Please install cargo-binstall"
         exit 1
@@ -88,28 +91,28 @@ setup_cargo_binstall() {
 setup_cargo_audit() {
     if [ ! -x "$(command -v cargo-audit)" ]; then
         setup_cargo_binstall
-        cargo binstall cargo-audit
+        cargo binstall "cargo-audit@0.22.2"
     fi
 }
 
 setup_cargo_edit() {
     if ! cargo set-version --help >/dev/null 2>&1; then
         setup_cargo_binstall
-        cargo binstall cargo-edit
+        cargo binstall "cargo-edit@0.13.13"
     fi
 }
 
 setup_cargo_outdated() {
     if [ ! -x "$(command -v cargo-outdated)" ]; then
         setup_cargo_binstall
-        cargo binstall cargo-outdated
+        cargo binstall "cargo-outdated@0.19.0"
     fi
 }
 
 setup_rustfilt() {
     if [ ! -x "$(command -v rustfilt)" ]; then
         setup_cargo_binstall
-        cargo binstall rustfilt
+        cargo binstall "rustfilt@0.2.1"
     fi
 }
 
@@ -161,7 +164,7 @@ setup_coverage_tools() {
 setup_taplo() {
     if [ ! -x "$(command -v taplo)" ]; then
         setup_cargo_binstall
-        cargo binstall taplo-cli --locked --features lsp
+        cargo binstall "taplo-cli@0.10.0" --locked --features lsp
     fi
 }
 
@@ -207,7 +210,7 @@ setup_git_cliff() {
             sudo pacman -S git-cliff
         else
             setup_cargo_binstall
-            cargo binstall git-cliff --locked
+            cargo binstall "git-cliff@2.13.1" --locked
         fi
     fi
 }
@@ -224,7 +227,7 @@ setup_bat() {
             sudo pacman -S bat
         else
             setup_cargo_binstall
-            cargo binstall bat --locked
+            cargo binstall "bat@0.26.1" --locked
         fi
     fi
 }

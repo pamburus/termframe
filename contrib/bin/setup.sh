@@ -76,7 +76,7 @@ setup_cargo_binstall() {
     elif [ -x "$(command -v scoop)" ]; then
         scoop install cargo-binstall
     elif [ -x "$(command -v cargo)" ]; then
-        cargo install cargo-binstall
+        cargo install --locked cargo-binstall
     else
         echo "Please install cargo-binstall"
         exit 1

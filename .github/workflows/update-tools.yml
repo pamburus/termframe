@@ -67,12 +67,12 @@ jobs:
           declare -A tool_versions
 
           while IFS= read -r line; do
-            if [[ "${line}" =~ \"([a-z_-]+)@([0-9]+\.[0-9]+\.[0-9]+)\" ]]; then
+            if [[ "${line}" =~ \"([a-z0-9_-]+)@([0-9]+\.[0-9]+\.[0-9]+)\" ]]; then
               crate="${BASH_REMATCH[1]}"
               version="${BASH_REMATCH[2]}"
               tool_versions["${crate}"]="${version}"
             fi
-          done < <(grep -rh '@[0-9]' .github/workflows/ | grep -v 'uses:')
+          done < <(grep -rh '"[a-z0-9_-]*@[0-9]' .github/workflows/ | grep -v 'uses:')
 
           for crate in "${!tool_versions[@]}"; do
             check_crate "${crate}" "${tool_versions[${crate}]}"
@@ -80,6 +80,11 @@ jobs:
 
           if [ -n "${updates}" ]; then
             echo "has-updates=true" >> "${GITHUB_OUTPUT}"
+            {
+              echo 'summary<<EOF'
+              echo -e "${summary}"
+              echo 'EOF'
+            } >> "${GITHUB_OUTPUT}"
             echo -e "${summary}" > /tmp/update-summary.txt
             echo -e "${updates}" > /tmp/updates.txt
           else

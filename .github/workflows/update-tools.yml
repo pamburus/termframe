@@ -1,0 +1,123 @@
+name: Update pinned tool versions
+
+on:
+  schedule:
+    - cron: "00 05 * * MON" # Every Monday at 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+defaults:
+  run:
+    shell: bash -euo pipefail {0}
+
+jobs:
+  update-tools:
+    name: Update pinned tool versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App Token
+        id: generate-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+
+      - name: Generate Auto-Merge GitHub App Token
+        id: generate-automerge-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.AUTOMERGE_APP_ID }}
+          private-key: ${{ secrets.AUTOMERGE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Check for tool updates
+        id: check-updates
+        run: |
+          updates=""
+          summary=""
+
+          check_crate() {
+            local crate="$1"
+            local current="$2"
+            local latest
+            latest=$(curl -sf "https://crates.io/api/v1/crates/${crate}" | jq -r '.crate.max_stable_version')
+            if [ -z "${latest}" ] || [ "${latest}" = "null" ]; then
+              echo "::warning::Failed to fetch latest version for ${crate}"
+              return
+            fi
+            if [ "${current}" != "${latest}" ]; then
+              updates="${updates}${crate}:${current}:${latest}\n"
+              summary="${summary}- ${crate}: ${current} → ${latest}\n"
+            fi
+          }
+
+          # Extract pinned versions from workflow files
+          declare -A tool_versions
+
+          while IFS= read -r line; do
+            if [[ "${line}" =~ \"([a-z_-]+)@([0-9]+\.[0-9]+\.[0-9]+)\" ]]; then
+              crate="${BASH_REMATCH[1]}"
+              version="${BASH_REMATCH[2]}"
+              tool_versions["${crate}"]="${version}"
+            fi
+          done < <(grep -rh '@[0-9]' .github/workflows/ | grep -v 'uses:')
+
+          for crate in "${!tool_versions[@]}"; do
+            check_crate "${crate}" "${tool_versions[${crate}]}"
+          done
+
+          if [ -n "${updates}" ]; then
+            echo "has-updates=true" >> "${GITHUB_OUTPUT}"
+            echo -e "${summary}" > /tmp/update-summary.txt
+            echo -e "${updates}" > /tmp/updates.txt
+          else
+            echo "has-updates=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Apply updates
+        if: steps.check-updates.outputs.has-updates == 'true'
+        run: |
+          while IFS=: read -r crate current latest; do
+            [ -z "${crate}" ] && continue
+            echo "Updating ${crate}: ${current} → ${latest}"
+            find .github/workflows/ -name '*.yml' -exec \
+              sed -i "s|\"${crate}@${current}\"|\"${crate}@${latest}\"|g" {} +
+          done < /tmp/updates.txt
+
+      - name: Create pull request
+        if: steps.check-updates.outputs.has-updates == 'true'
+        id: create-pr
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          commit-message: |
+            build(deps): update pinned tool versions
+
+            ${{ steps.check-updates.outputs.summary }}
+          branch: update-tools-${{ github.run_number }}-${{ github.run_id }}
+          title: "build(deps): update pinned tool versions"
+          body-path: /tmp/update-summary.txt
+          author: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
+          committer: "missionis[bot] <234988995+missionis[bot]@users.noreply.github.com>"
+          labels: |
+            dependencies
+          delete-branch: true
+
+      - name: Enable auto-merge
+        if: steps.create-pr.outputs.pull-request-number
+        run: |
+          gh pr merge --auto -ds ${{ steps.create-pr.outputs.pull-request-number }}
+        env:
+          GH_TOKEN: ${{ steps.generate-automerge-token.outputs.token }}

@@ -75,8 +75,10 @@ setup_cargo_binstall() {
         true
     elif [ -x "$(command -v scoop)" ]; then
         scoop install cargo-binstall
+    elif [ -x "$(command -v curl)" ]; then
+        curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
     elif [ -x "$(command -v cargo)" ]; then
-        cargo install cargo-binstall
+        cargo install --locked cargo-binstall
     else
         echo "Please install cargo-binstall"
         exit 1

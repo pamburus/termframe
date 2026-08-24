@@ -62,7 +62,7 @@ jobs:
 
       - name: Install cargo-edit
         if: steps.update-themes.outputs.updated == 'true'
-        run: cargo install cargo-edit
+        run: cargo install --locked "cargo-edit@0.13.13"
 
       - name: Update version in Cargo.toml
         if: steps.update-themes.outputs.updated == 'true'

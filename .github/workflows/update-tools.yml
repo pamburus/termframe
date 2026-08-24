@@ -52,7 +52,7 @@ jobs:
             local crate="$1"
             local current="$2"
             local latest
-            latest=$(curl -sf "https://crates.io/api/v1/crates/${crate}" | jq -r '.crate.max_stable_version')
+            latest=$(curl -sf -H "User-Agent: ${GITHUB_REPOSITORY} CI (https://github.com/${GITHUB_REPOSITORY})" "https://crates.io/api/v1/crates/${crate}" | jq -r '.crate.max_stable_version')
             if [ -z "${latest}" ] || [ "${latest}" = "null" ]; then
               echo "::warning::Failed to fetch latest version for ${crate}"
               return

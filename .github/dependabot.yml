@@ -17,6 +17,17 @@ updates:
     commit-message:
       prefix: "build"
       include: "scope"
+    groups:
+      codeql-action-sec:
+        applies-to: security-updates
+        patterns:
+          - "github/codeql-action"
+          - "github/codeql-action/*"
+      codeql-action-ver:
+        applies-to: version-updates
+        patterns:
+          - "github/codeql-action"
+          - "github/codeql-action/*"
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:

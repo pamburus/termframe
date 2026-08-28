@@ -1238,6 +1238,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "etcetera"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de48cc4d1c1d97a20fd819def54b890cadde72ed3ad0c614822a0a433361be96"
+dependencies = [
+ "cfg-if",
+ "windows-sys 0.61.2",
+]
+
+[[package]]
 name = "euclid"
 version = "0.22.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1587,6 +1597,11 @@ name = "hashbrown"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
+dependencies = [
+ "foldhash",
+ "serde",
+ "serde_core",
+]
 
 [[package]]
 name = "hashlink"
@@ -1764,6 +1779,8 @@ checksum = "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9"
 dependencies = [
  "equivalent",
  "hashbrown 0.17.1",
+ "serde",
+ "serde_core",
 ]
 
 [[package]]
@@ -1988,9 +2005,9 @@ dependencies = [
 
 [[package]]
 name = "lumis"
-version = "0.11.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ef2e6a5ce8ce17bccccdcbdbba3bf544ba55d98f7899723206604611455df7f"
+checksum = "2d6b4c3bc71722287436dc29c46a6a76da4f3f9b1f20e1ad94e96122d7d213b4"
 dependencies = [
  "anyhow",
  "cc",
@@ -1998,7 +2015,8 @@ dependencies = [
  "glob",
  "lumis-build",
  "lumis-core",
- "prettyplease 0.2.37",
+ "lumis-wasm-runtime",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "rayon",
@@ -2007,14 +2025,12 @@ dependencies = [
  "serde_json",
  "smol_str",
  "streaming-iterator",
- "syn 2.0.119",
+ "syn 3.0.4",
  "termcolor",
  "thiserror 2.0.20",
  "toml",
  "tree-sitter",
- "tree-sitter-bash",
  "tree-sitter-diff",
- "tree-sitter-highlight",
  "tree-sitter-language",
  "v_htmlescape",
  "xz2",
@@ -2034,7 +2050,7 @@ checksum = "50204bef53c7b17a14b41de745bf75aeec5feb3ffb25d48f82ca184420544123"
 dependencies = [
  "derive_builder",
  "glob",
- "prettyplease 0.3.0",
+ "prettyplease",
  "proc-macro2",
  "quote",
  "regex",
@@ -2044,6 +2060,24 @@ dependencies = [
  "toml",
  "typed-path",
  "v_htmlescape",
+]
+
+[[package]]
+name = "lumis-wasm-runtime"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "544a8809eefaab1402fbe0e3cfaacb93146bab95d968f3540a25a1f4054ba608"
+dependencies = [
+ "etcetera",
+ "semver",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "streaming-iterator",
+ "tempfile",
+ "thiserror 2.0.20",
+ "tree-sitter",
+ "wasmparser",
 ]
 
 [[package]]
@@ -2649,16 +2683,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d83eb9bc6d8e5cf568e7a1101d60ee05e81ed50ea106026f3d18deeb046d7661"
 dependencies = [
  "zerovec",
-]
-
-[[package]]
-name = "prettyplease"
-version = "0.2.37"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "479ca8adacdd7ce8f1fb39ce9ecccbfe93a3f1344b3d0d97f20bc0196208f62b"
-dependencies = [
- "proc-macro2",
- "syn 2.0.119",
 ]
 
 [[package]]
@@ -3772,16 +3796,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tree-sitter-bash"
-version = "0.25.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e5ec769279cc91b561d3df0d8a5deb26b0ad40d183127f409494d6d8fc53062"
-dependencies = [
- "cc",
- "tree-sitter-language",
-]
-
-[[package]]
 name = "tree-sitter-diff"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3789,18 +3803,6 @@ checksum = "dfe1e5ca280a65dfe5ba4205c1bcc84edf486464fed315db53dee6da9a335889"
 dependencies = [
  "cc",
  "tree-sitter-language",
-]
-
-[[package]]
-name = "tree-sitter-highlight"
-version = "0.26.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "662316ecd27166f79e18865429638c05194aee76a7bc374136d844f05d778f74"
-dependencies = [
- "regex",
- "streaming-iterator",
- "thiserror 2.0.20",
- "tree-sitter",
 ]
 
 [[package]]
@@ -4114,6 +4116,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ef64dbcc55df09c7e5a46182d181c2cfa3e925f3da937ea764728b4bbb9dcbf"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "wasmparser"
+version = "0.255.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8e329ef4b5d46e73b91d3ac6924417cad55a8cbbf869c199283383427c3320b"
+dependencies = [
+ "bitflags 2.13.1",
+ "hashbrown 0.17.1",
+ "indexmap",
+ "semver",
+ "serde",
 ]
 
 [[package]]

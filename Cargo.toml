@@ -27,7 +27,7 @@ path = "src/main.rs"
 allsorts = "0.17"
 anyhow = "1"
 askama = "0.16"
-base64 = "0.22"
+base64 = "0.23"
 bitvec = "1.0.1"
 cacache = "13"
 clap = { version = "4", features = ["derive", "env", "string", "wrap_help"] }

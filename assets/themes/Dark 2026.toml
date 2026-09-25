@@ -1,9 +1,9 @@
 tags = ["dark"]
 
 [theme.colors]
-background = "#1f1f1f"
+background = "#191a1b"
 foreground = "#cccccc"
-bright-foreground = "#ffffff"
+bright-foreground = "#cccccc"
 
 [theme.colors.palette]
 0 = "#000000"

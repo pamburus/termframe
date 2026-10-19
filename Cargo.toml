@@ -1,8 +1,8 @@
 [package]
 name = "termframe"
-version = "0.8.9-alpha.5"
+version = "0.8.9-alpha.6"
 edition = "2024"
-rust-version = "1.91.0"
+rust-version = "1.95.0"
 description = "Terminal output SVG screenshot tool"
 license = "MIT"
 keywords = ["cli", "screenshot", "svg", "terminal"]

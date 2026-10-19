@@ -5,8 +5,8 @@
 
 use std::fmt;
 
+use lumis::TerminalBuilder;
 pub use lumis::languages::Language;
-use lumis::{TerminalBuilder, formatter::Formatter};
 
 /// A syntax highlighting theme.
 ///
@@ -136,11 +136,8 @@ impl Highlighter {
         builder.language(self.language);
         builder.theme(self.theme.clone());
 
-        builder
-            .build()
-            .map_err(|e| FormatError(e.to_string()))?
-            .format(input, output)
-            .map_err(|e| FormatError(e.to_string()))
+        let formatter = builder.build().map_err(|e| FormatError(e.to_string()))?;
+        lumis::write_highlight(output, input, formatter).map_err(|e| FormatError(e.to_string()))
     }
 }
 

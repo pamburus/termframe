@@ -746,8 +746,7 @@ impl Terminal {
             }
             Action::OperatingSystemCommand(cmd) => match *cmd {
                 OperatingSystemCommand::ChangeDynamicColors(first_color, colors) => {
-                    let mut idx: u8 = first_color as u8;
-                    for color in colors {
+                    for (idx, color) in (first_color as u8..).zip(colors) {
                         let which_color: Option<DynamicColorNumber> = FromPrimitive::from_u8(idx);
                         log::debug!("ChangeDynamicColors({which_color:?}): {color:?}");
                         if let Some(which_color) = which_color {
@@ -783,7 +782,6 @@ impl Terminal {
                                 | DynamicColorNumber::TektronixCursorColor => unimplemented!(),
                             }
                         }
-                        idx += 1;
                     }
                     SEQ_ZERO
                 }
@@ -1223,30 +1221,28 @@ impl Terminal {
         // Additionally, detect the bottom-scroll case where wrapping occurs but y doesn't change:
         // when xpos exceeded width on entry (x0 >= width) and after printing we observed x1 < x0.
         match action {
-            Action::Print(ch) => {
-                // Width-aware single-char wrap detection to mark/rotate the wrap ledger precisely.
-                if ch != '\n' && ch != '\r' {
-                    let ch_width = UnicodeWidthChar::width(ch).unwrap_or(0); // Control chars have 0 width
-                    if ch_width > 0 {
-                        let cap = w.saturating_sub(x0);
-                        if ch_width > cap {
-                            // This print will trigger a wrap
-                            if y0 < h.saturating_sub(1) {
-                                // Wrapped within buffer: mark current row y0
-                                if let Some(flag) = st.wrap_flags.get_mut(y0) {
+            // Width-aware single-char wrap detection to mark/rotate the wrap ledger precisely.
+            Action::Print(ch) if ch != '\n' && ch != '\r' => {
+                let ch_width = UnicodeWidthChar::width(ch).unwrap_or(0); // Control chars have 0 width
+                if ch_width > 0 {
+                    let cap = w.saturating_sub(x0);
+                    if ch_width > cap {
+                        // This print will trigger a wrap
+                        if y0 < h.saturating_sub(1) {
+                            // Wrapped within buffer: mark current row y0
+                            if let Some(flag) = st.wrap_flags.get_mut(y0) {
+                                *flag = true;
+                            }
+                            Self::mark_row_soft_wrapped(surface, y0, seq);
+                        } else {
+                            // Bottom scroll wrap: rotate ledger and mark h-2
+                            st.rotate_on_scroll();
+                            if h >= 2 {
+                                let r = h - 2;
+                                if let Some(flag) = st.wrap_flags.get_mut(r) {
                                     *flag = true;
                                 }
-                                Self::mark_row_soft_wrapped(surface, y0, seq);
-                            } else {
-                                // Bottom scroll wrap: rotate ledger and mark h-2
-                                st.rotate_on_scroll();
-                                if h >= 2 {
-                                    let r = h - 2;
-                                    if let Some(flag) = st.wrap_flags.get_mut(r) {
-                                        *flag = true;
-                                    }
-                                    Self::mark_row_soft_wrapped(surface, r, seq);
-                                }
+                                Self::mark_row_soft_wrapped(surface, r, seq);
                             }
                         }
                     }
@@ -1287,15 +1283,14 @@ impl Terminal {
                     }
                 }
             }
-            Action::Control(code) => {
-                // For LF/VT/FF at bottom: a scroll up occurs and y may remain unchanged.
+            // For LF/VT/FF at bottom: a scroll up occurs and y may remain unchanged.
+            Action::Control(code)
                 if matches!(
                     code,
                     ControlCode::LineFeed | ControlCode::VerticalTab | ControlCode::FormFeed
-                ) && y0 == h.saturating_sub(1)
-                {
-                    st.rotate_on_scroll();
-                }
+                ) && y0 == h.saturating_sub(1) =>
+            {
+                st.rotate_on_scroll();
             }
             _ => {}
         }

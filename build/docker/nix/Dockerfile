@@ -1,4 +1,4 @@
-FROM nixos/nix:2.33.1
+FROM nixos/nix:2.35.3
 
 # Configure Nix to enable flakes and nix-command
 ENV NIX_CONFIG="experimental-features = nix-command flakes"

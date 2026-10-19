@@ -25,6 +25,11 @@ jobs:
   prepare-release:
     name: Prepare Release
     runs-on: ubuntu-latest
+    env:
+      # renovate: datasource=crate depName=cargo-quickinstall
+      CARGO_QUICKINSTALL_VERSION: "0.3.53"
+      # renovate: datasource=crate depName=cargo-edit
+      CARGO_EDIT_VERSION: "0.13.13"
     outputs:
       version: ${{ steps.update-version.outputs.version }}
       release-tag: ${{ steps.create-release.outputs.release-tag }}
@@ -62,10 +67,10 @@ jobs:
           rustflags: ""
 
       - name: Install cargo-quickinstall
-        run: cargo install cargo-quickinstall
+        run: cargo install --locked "cargo-quickinstall@${CARGO_QUICKINSTALL_VERSION:?}"
 
       - name: Install cargo-edit
-        run: cargo quickinstall --force cargo-edit
+        run: cargo quickinstall --force --version "${CARGO_EDIT_VERSION:?}" cargo-edit
 
       - name: Update version in Cargo.toml
         id: update-version

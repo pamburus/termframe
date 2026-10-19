@@ -18,6 +18,9 @@ jobs:
   update-themes:
     name: Update themes
     runs-on: ubuntu-latest
+    env:
+      # renovate: datasource=crate depName=cargo-edit
+      CARGO_EDIT_VERSION: "0.13.13"
     steps:
       - name: Generate GitHub App Token
         id: generate-token
@@ -62,7 +65,7 @@ jobs:
 
       - name: Install cargo-edit
         if: steps.update-themes.outputs.updated == 'true'
-        run: cargo install cargo-edit
+        run: cargo install --locked "cargo-edit@${CARGO_EDIT_VERSION:?}"
 
       - name: Update version in Cargo.toml
         if: steps.update-themes.outputs.updated == 'true'

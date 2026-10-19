@@ -29,6 +29,8 @@ jobs:
 
     env:
       CARGO: cargo
+      # renovate: datasource=crate depName=cross
+      CROSS_VERSION: "0.2.5"
 
     strategy:
       matrix:
@@ -124,7 +126,7 @@ jobs:
       - name: Install Cross
         if: matrix.cross
         run: |
-          cargo install cross
+          cargo install --locked "cross@${CROSS_VERSION:?}"
           echo "CARGO=cross" >> $GITHUB_ENV
 
       - name: Add Target

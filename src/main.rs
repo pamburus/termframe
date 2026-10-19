@@ -171,13 +171,7 @@ impl App {
                     .theme
                     .as_ref()
                     .map(|t| t.resolve(mode))
-                    .and_then(|name| {
-                        if !matches!(name, "-" | "") {
-                            Some(name)
-                        } else {
-                            None
-                        }
-                    })
+                    .filter(|&name| !matches!(name, "-" | ""))
                     .map(|name| name.parse())
                     .transpose()
                     .map_err(|e: syntax::ThemeParseError| anyhow::anyhow!(e))?;

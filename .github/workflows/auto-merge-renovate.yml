@@ -1,5 +1,5 @@
 ---
-name: Auto-merge Dependabot PRs
+name: Auto-merge Renovate PRs
 
 "on":
   pull_request_target:
@@ -12,7 +12,7 @@ permissions:
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    if: github.event.pull_request.user.login == 'renovate[bot]'
     permissions:
       contents: read
       pull-requests: write
@@ -26,7 +26,7 @@ jobs:
           owner: ${{ github.repository_owner }}
           repositories: ${{ github.event.repository.name }}
 
-      - name: Enable auto-merge for Dependabot PRs
+      - name: Enable auto-merge for Renovate PRs
         run: |
           gh pr merge --auto --squash ${{ github.event.pull_request.number }} --repo ${{ github.repository }}
           gh pr comment ${{ github.event.pull_request.number }} \

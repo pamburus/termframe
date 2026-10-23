@@ -14,6 +14,7 @@
 //!
 //! This replacement only occurs if:
 //! - The schema URL uses HTTP(S) protocol
+//! - The schema URL does not point to the version being built
 //! - A matching local schema file exists in schema/json/
 //! - The local schema file has a different SHA256 hash than the remote one
 //!   (or the remote fetch fails)
@@ -108,6 +109,12 @@ fn update_toml_schema_url(
         .trim();
 
     if !schema_url.starts_with("http://") && !schema_url.starts_with("https://") {
+        return Ok(());
+    }
+
+    // URL points to the version being built - during a release the tag does not exist yet,
+    // and it will be created from this very commit, so the remote schema matches the local one
+    if schema_url.contains(concat!("/v", env!("CARGO_PKG_VERSION"), "/")) {
         return Ok(());
     }
 

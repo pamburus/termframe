@@ -1,0 +1,5 @@
+# The cross image links through `aarch64-linux-musl-gcc.sh`, a workaround for Rust < 1.48
+# that runs with `set -x`; its trace output on stderr triggers the `linker_messages` lint.
+# Use the underlying linker directly.
+[target.aarch64-unknown-linux-musl.env]
+passthrough = ["CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-musl-gcc"]

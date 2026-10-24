@@ -88,6 +88,7 @@ jobs:
       fail-fast: false
       matrix:
         target:
+          - x86_64-unknown-linux-gnu
           - x86_64-unknown-linux-musl
           - aarch64-unknown-linux-gnu
           - aarch64-unknown-linux-musl
@@ -124,6 +125,19 @@ jobs:
         run: |
           if grep -E '^warning' build.log; then
             echo "::error::build produced warnings"
+            exit 1
+          fi
+
+      # Release binaries for glibc targets must run on older distributions
+      - name: Check required glibc version
+        if: endsWith(matrix.target, '-linux-gnu')
+        env:
+          MAX_GLIBC: "2.23"
+        run: |
+          REQUIRED=$(readelf -V --wide target/${{ matrix.target }}/release/termframe | grep -oE 'GLIBC_[0-9]+(\.[0-9]+)+' | sed 's/GLIBC_//' | sort -uV | tail -1)
+          echo "requires glibc ${REQUIRED:?}, allowed up to ${MAX_GLIBC:?}"
+          if [ "$(printf '%s\n' "${REQUIRED}" "${MAX_GLIBC}" | sort -V | tail -1)" != "${MAX_GLIBC}" ]; then
+            echo "::error::binary requires glibc ${REQUIRED}, newer than ${MAX_GLIBC}"
             exit 1
           fi
 

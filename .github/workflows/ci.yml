@@ -29,7 +29,7 @@ jobs:
       matrix:
         include:
           - platform: linux
-            os: ubuntu-24.04
+            os: ubuntu-26.04
           - platform: macos
             os: macos-26
           - platform: windows
@@ -83,7 +83,7 @@ jobs:
   # Builds the release targets that use cross, the way the release workflow does
   cross-build:
     name: cross-build (${{ matrix.target }})
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
       matrix:
@@ -142,7 +142,7 @@ jobs:
           fi
 
   coverage:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     env:
       # renovate: datasource=crate depName=rustfilt
@@ -176,7 +176,7 @@ jobs:
           use_oidc: true
 
   test-nix:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - name: Checkout repository

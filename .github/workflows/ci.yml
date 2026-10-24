@@ -72,6 +72,53 @@ jobs:
       - name: Run executable
         run: cargo run --locked
 
+  # Builds the release targets that use cross, the way the release workflow does
+  cross-build:
+    name: cross-build (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-gnu
+          - aarch64-unknown-linux-musl
+
+    env:
+      # renovate: datasource=crate depName=cross
+      CROSS_VERSION: "0.2.5"
+      CARGO_TERM_COLOR: never
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Install cross
+        uses: taiki-e/install-action@8cca0918f8471c33515202b73f56ab27f2bed283 # v2.87.29
+        with:
+          tool: cross@${{ env.CROSS_VERSION }}
+
+      - name: Point schema references to the current version
+        run: |
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "termframe") | .version')
+          build/ci/update-schema-refs.sh "${{ github.repository }}" "${VERSION:?}"
+
+      - name: Build
+        run: cross build --release --locked --target ${{ matrix.target }} 2>&1 | tee build.log
+
+      # Build script warnings do not fail the build, but they show up in release builds
+      - name: Check for warnings
+        run: |
+          if grep -E '^warning' build.log; then
+            echo "::error::build produced warnings"
+            exit 1
+          fi
+
   coverage:
     runs-on: ubuntu-latest
 

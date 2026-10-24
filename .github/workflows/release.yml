@@ -17,6 +17,11 @@ permissions:
   issues: read
   actions: read
 
+# Only one release at a time, so the cleanup below never touches a release in progress
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 defaults:
   run:
     shell: bash -euxo pipefail {0}
@@ -52,6 +57,28 @@ jobs:
           token: ${{ github.token }}
           fetch-depth: 0
           fetch-tags: true
+
+      # Removes leftovers of previous cancelled or failed runs. Draft releases have no tag until
+      # they are published, so a draft whose tag exists is left alone as a safety measure.
+      - name: Clean up leftovers of previous runs
+        run: |
+          gh release list --limit 100 --json tagName,isDraft --jq '.[] | select(.isDraft) | .tagName' | \
+            { grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' || true; } | \
+            while read -r tag; do
+              if git ls-remote --exit-code --tags origin "refs/tags/${tag:?}" > /dev/null; then
+                echo "Keeping draft release ${tag:?}, its tag exists"
+              else
+                echo "Deleting draft release ${tag:?}"
+                gh release delete "${tag:?}" --yes
+              fi
+            done
+          git ls-remote --heads origin 'refs/heads/release-prep-*' | cut -f2 | \
+            while read -r ref; do
+              echo "Deleting branch ${ref:?}"
+              git push origin --delete "${ref:?}"
+            done
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Create temporary branch
         id: create-temp-branch

@@ -15,9 +15,10 @@
 //! This replacement only occurs if:
 //! - The schema URL uses HTTP(S) protocol
 //! - The schema URL does not point to the version being built
-//! - A matching local schema file exists in schema/json/
 //! - The local schema file has a different SHA256 hash than the remote one
-//!   (or the remote fetch fails)
+//!
+//! If the remote schema cannot be fetched, a warning is emitted and the file is left unchanged.
+//! A missing local schema file in schema/json/ fails the build.
 
 use std::collections::HashMap;
 use std::fs::{self, File};

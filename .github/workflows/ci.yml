@@ -46,7 +46,7 @@ jobs:
         uses: uncenter/setup-taplo@b18c8c8302695fe63d6853bc004006215ac52b91 # v2
 
       - name: Setup tombi
-        uses: tombi-toml/setup-tombi@be97456589cb1f9c6c8a419bd7fe825b40a9df50 # v1.8.5
+        uses: tombi-toml/setup-tombi@21051476b3247828c08c3998efc3b508dc89a66a # v1.9.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

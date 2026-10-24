@@ -12,6 +12,20 @@
   "semanticCommits": "enabled",
   "semanticCommitType": "build",
   "semanticCommitScope": "deps",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "GitHub runner labels in matrix entries and expressions, which the github-actions manager does not handle",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/.+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "\\bos: (?<depName>ubuntu|macos|windows)-(?<currentValue>[0-9.]+)\\b",
+        "'(?<depName>ubuntu|macos|windows)-(?<currentValue>[0-9.]+)'"
+      ],
+      "datasourceTemplate": "github-runners"
+    }
+  ],
   "packageRules": [
     {
       "description": "GitHub Actions: weekly on Monday",

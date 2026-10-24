@@ -46,14 +46,14 @@ jobs:
           - windows-arm
         include:
           - name: linux-x86-gnu
-            os: ubuntu-latest
+            os: ubuntu-24.04
             family: linux
             arch: x86_64
             target: x86_64-unknown-linux-gnu
             archiver: tar.gz
             asset: termframe-linux-x86_64-gnu.tar.gz
           - name: linux-x86-musl
-            os: ubuntu-latest
+            os: ubuntu-24.04
             family: linux
             arch: x86_64
             target: x86_64-unknown-linux-musl
@@ -61,7 +61,7 @@ jobs:
             asset: termframe-linux-x86_64-musl.tar.gz
             cross: true
           - name: linux-arm-gnu
-            os: ubuntu-latest
+            os: ubuntu-24.04
             family: linux
             arch: aarch64
             target: aarch64-unknown-linux-gnu
@@ -69,7 +69,7 @@ jobs:
             asset: termframe-linux-arm64-gnu.tar.gz
             cross: true
           - name: linux-arm-musl
-            os: ubuntu-latest
+            os: ubuntu-24.04
             family: linux
             arch: aarch64
             target: aarch64-unknown-linux-musl
@@ -77,21 +77,21 @@ jobs:
             asset: termframe-linux-arm64-musl.tar.gz
             cross: true
           - name: macos-x86
-            os: macos-latest
+            os: macos-26
             family: macos
             arch: x86_64
             target: x86_64-apple-darwin
             archiver: tar.gz
             asset: termframe-macos-x86_64.tar.gz
           - name: macos-arm
-            os: macos-latest
+            os: macos-26
             family: macos
             arch: aarch64
             target: aarch64-apple-darwin
             archiver: tar.gz
             asset: termframe-macos-arm64.tar.gz
           - name: macos-universal
-            os: macos-latest
+            os: macos-26
             family: macos
             arch: "{aarch64,x86_64}"
             target: "{aarch64,x86_64}-apple-darwin"
@@ -99,14 +99,14 @@ jobs:
             asset: termframe-macos.tar.gz
             universal: true
           - name: windows-x86
-            os: windows-latest
+            os: windows-2025
             family: windows
             arch: x86_64
             target: x86_64-pc-windows-msvc
             archiver: 7z
             asset: termframe-windows.zip
           - name: windows-arm
-            os: windows-latest
+            os: windows-2025
             family: windows
             arch: aarch64
             target: aarch64-pc-windows-msvc

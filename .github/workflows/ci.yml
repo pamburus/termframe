@@ -22,10 +22,18 @@ defaults:
 
 jobs:
   test:
+    # Platform names keep required check names stable when runner versions change
+    name: test (${{ matrix.platform }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - platform: linux
+            os: ubuntu-24.04
+          - platform: macos
+            os: macos-26
+          - platform: windows
+            os: windows-2025
 
     steps:
       - name: Checkout repository
@@ -75,7 +83,7 @@ jobs:
   # Builds the release targets that use cross, the way the release workflow does
   cross-build:
     name: cross-build (${{ matrix.target }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -120,7 +128,7 @@ jobs:
           fi
 
   coverage:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       # renovate: datasource=crate depName=rustfilt
@@ -154,7 +162,7 @@ jobs:
           use_oidc: true
 
   test-nix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository

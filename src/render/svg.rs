@@ -64,12 +64,8 @@ impl SvgRenderer {
         let pad = (cfg.padding.resolve() * opt.font.size).r2p(fp); // padding in pixels
         let tyo = ((lh + opt.font.metrics.descender + opt.font.metrics.ascender) / 2.0).r2p(fp); // text y-offset in em
 
-        let mut palette = PaletteBuilder::new(
-            bg.clone(),
-            fg.clone(),
-            opt.theme.clone(),
-            cfg.rendering.svg.var_palette,
-        );
+        let mut palette =
+            PaletteBuilder::new(*bg, *fg, opt.theme.clone(), cfg.rendering.svg.var_palette);
 
         let background = element::Rectangle::new()
             .set("width", "100%")
@@ -232,7 +228,7 @@ impl SvgRenderer {
                         && let Some(mut color) = opt.theme.resolve(cluster.attrs.underline_color())
                     {
                         color.a = 1.0;
-                        span.assign("text-decoration-color", color.to_css_hex());
+                        span.assign("text-decoration-color", color.to_css_hex().to_string());
                     }
 
                     if cluster.attrs.underline() != Underline::None {
@@ -565,7 +561,10 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                     .set("height", height)
                     .set("x", (shadow.x).r2p(fp))
                     .set("y", (shadow.y).r2p(fp))
-                    .set("fill", shadow.color.resolve(opt.mode).to_css_hex())
+                    .set(
+                        "fill",
+                        shadow.color.resolve(opt.mode).to_css_hex().to_string(),
+                    )
                     .set("rx", border.radius.r2p(fp))
                     .set("ry", border.radius.r2p(fp))
                     .set("filter", "url(#shadow)"),
@@ -575,7 +574,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
     // background
     window = window.add(
         element::Rectangle::new()
-            .set("fill", opt.bg().to_css_hex())
+            .set("fill", opt.bg().to_css_hex().to_string())
             .set("rx", border.radius.r2p(fp))
             .set("ry", border.radius.r2p(fp))
             .set("width", width)
@@ -594,7 +593,10 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
         )
         .add(
             element::Rectangle::new()
-                .set("fill", header.color.resolve(opt.mode).to_css_hex())
+                .set(
+                    "fill",
+                    header.color.resolve(opt.mode).to_css_hex().to_string(),
+                )
                 .set("rx", border.radius.r2p(fp))
                 .set("ry", border.radius.r2p(fp))
                 .set("width", width)
@@ -608,7 +610,10 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("x2", width)
                 .set("y1", header.height.r2p(fp))
                 .set("y2", header.height.r2p(fp))
-                .set("stroke", border.color.resolve(opt.mode).to_css_hex())
+                .set(
+                    "stroke",
+                    border.color.resolve(opt.mode).to_css_hex().to_string(),
+                )
                 .set("stroke-width", border.width.r2p(fp)),
         );
     }
@@ -630,7 +635,7 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
             let mut title_elem = element::Text::new(&title)
                 .set("x", (width / 2.0).r2p(fp))
                 .set("y", (hh2).r2p(fp))
-                .set("fill", cfg.color.resolve(opt.mode).to_css_hex())
+                .set("fill", cfg.color.resolve(opt.mode).to_css_hex().to_string())
                 .set("font-size", cfg.font.size.r2p(fp))
                 .set("font-family", cfg.font.family.join(", "))
                 .set("text-anchor", "middle")
@@ -656,7 +661,15 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("width", (width + 0.0).r2p(fp))
                 .set("height", (height + 0.0).r2p(fp))
                 .set("fill", "none")
-                .set("stroke", border.colors.outer.resolve(opt.mode).to_css_hex())
+                .set(
+                    "stroke",
+                    border
+                        .colors
+                        .outer
+                        .resolve(opt.mode)
+                        .to_css_hex()
+                        .to_string(),
+                )
                 .set("stroke-width", border.width.r2p(fp))
                 .set("rx", (border.radius + 0.0).r2p(fp))
                 .set("ry", (border.radius + 0.0).r2p(fp)),
@@ -668,7 +681,15 @@ fn make_window(opt: &Options, width: f32, height: f32, screen: element::SVG) -> 
                 .set("x", gap.r2p(fp))
                 .set("y", gap.r2p(fp))
                 .set("fill", "none")
-                .set("stroke", border.colors.inner.resolve(opt.mode).to_css_hex())
+                .set(
+                    "stroke",
+                    border
+                        .colors
+                        .inner
+                        .resolve(opt.mode)
+                        .to_css_hex()
+                        .to_string(),
+                )
                 .set("stroke-width", border.width.r2p(fp))
                 .set("rx", (border.radius - gap).r2p(fp))
                 .set("ry", (border.radius - gap).r2p(fp)),
@@ -766,7 +787,10 @@ fn make_buttons(opt: &Options, width: f32) -> element::Group {
             };
 
             path.assign("fill", "none");
-            path.assign("stroke", icon.stroke.resolve(opt.mode).to_css_hex());
+            path.assign(
+                "stroke",
+                icon.stroke.resolve(opt.mode).to_css_hex().to_string(),
+            );
             if let Some(stroke_width) = icon.stroke_width {
                 path.assign("stroke-width", stroke_width.r2p(fp));
             }
@@ -799,13 +823,13 @@ fn set_button_style<N: svg::Node>(opt: &Options, cfg: &WindowButton, node: &mut 
     let fp = opt.settings.rendering.svg.precision; // floating point precision
 
     if let Some(fill) = &cfg.fill {
-        node.assign("fill", fill.resolve(opt.mode).to_css_hex());
+        node.assign("fill", fill.resolve(opt.mode).to_css_hex().to_string());
     } else {
         node.assign("fill", "none");
     }
 
     if let Some(stroke) = &cfg.stroke {
-        node.assign("stroke", stroke.resolve(opt.mode).to_css_hex());
+        node.assign("stroke", stroke.resolve(opt.mode).to_css_hex().to_string());
     }
 
     if let Some(stroke_width) = cfg.stroke_width {
@@ -1237,13 +1261,13 @@ impl PaletteBuilder {
         match attr {
             ColorAttribute::Default => {
                 if !self.var_palette {
-                    return ColorStyle::Custom(self.bg.clone());
+                    return ColorStyle::Custom(self.bg);
                 }
                 self.has_bg = true;
                 ColorStyleId::DefaultBackground.into()
             }
             ColorAttribute::PaletteIndex(i) => {
-                let bg = self.bg.clone();
+                let bg = self.bg;
                 let color = || self.theme.resolve(attr).unwrap_or(bg);
                 if !self.var_palette {
                     return ColorStyle::Custom(color());
@@ -1269,13 +1293,13 @@ impl PaletteBuilder {
         match attr {
             ColorAttribute::Default => {
                 if !self.var_palette {
-                    return ColorStyle::Custom(self.fg.clone());
+                    return ColorStyle::Custom(self.fg);
                 }
                 self.has_fg = true;
                 ColorStyleId::DefaultForeground.into()
             }
             ColorAttribute::PaletteIndex(i) => {
-                let fg = self.fg.clone();
+                let fg = self.fg;
                 let color = || self.theme.resolve(attr).unwrap_or(fg);
                 if !self.var_palette {
                     return ColorStyle::Custom(color());
@@ -1301,9 +1325,7 @@ impl PaletteBuilder {
         let attr = match attr {
             ColorAttribute::Default => {
                 if !self.var_palette {
-                    return ColorStyle::Custom(
-                        self.theme.bright_fg.as_ref().unwrap_or(&self.fg).clone(),
-                    );
+                    return ColorStyle::Custom(*self.theme.bright_fg.as_ref().unwrap_or(&self.fg));
                 }
                 self.has_br_fg = true;
                 return ColorStyleId::BrightForeground.into();
@@ -1328,13 +1350,13 @@ impl PaletteBuilder {
         if self.has_bg {
             vars.push((
                 ColorStyleId::DefaultBackground.name().into(),
-                self.bg.to_css_hex(),
+                self.bg.to_css_hex().to_string(),
             ));
         }
         if self.has_fg {
             vars.push((
                 ColorStyleId::DefaultForeground.name().into(),
-                self.fg.to_css_hex(),
+                self.fg.to_css_hex().to_string(),
             ));
         }
         if self.has_br_fg {
@@ -1344,11 +1366,15 @@ impl PaletteBuilder {
                     .bright_fg
                     .as_ref()
                     .unwrap_or(&self.fg)
-                    .to_css_hex(),
+                    .to_css_hex()
+                    .to_string(),
             ));
         }
         for (i, color) in &self.palette {
-            vars.push((ColorStyleId::Palette(*i).name().into(), color.to_css_hex()));
+            vars.push((
+                ColorStyleId::Palette(*i).name().into(),
+                color.to_css_hex().to_string(),
+            ));
         }
 
         styles::Theme {
@@ -1388,7 +1414,7 @@ impl ColorStyle {
     fn render(&self) -> Cow<'static, str> {
         match self {
             ColorStyle::Themed(id) => format!("var({id})").into(),
-            ColorStyle::Custom(color) => color.to_css_hex().into(),
+            ColorStyle::Custom(color) => color.to_css_hex().to_string().into(),
         }
     }
 }

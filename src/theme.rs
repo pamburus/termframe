@@ -91,7 +91,7 @@ impl Default for AdaptiveTheme {
         palette[13] = Color::from_rgba8(0xc6, 0x71, 0xeb, 0xff); // bright magenta
         palette[14] = Color::from_rgba8(0x69, 0xc6, 0xd1, 0xff); // bright cyan
         palette[15] = Color::from_rgba8(0xcc, 0xcc, 0xcc, 0xff); // bright white
-        let bright_fg = Some(palette[15].clone());
+        let bright_fg = Some(palette[15]);
         let dark = Theme {
             bg,
             fg,
@@ -119,7 +119,7 @@ impl Default for AdaptiveTheme {
         palette[13] = Color::from_rgba8(0xff, 0x76, 0xff, 0xff); // bright magenta
         palette[14] = Color::from_rgba8(0x5f, 0xfd, 0xff, 0xff); // bright cyan
         palette[15] = Color::from_rgba8(0xff, 0xfe, 0xff, 0xff); // bright white
-        let bright_fg = Some(palette[15].clone());
+        let bright_fg = Some(palette[15]);
         let light = Theme {
             bg,
             fg,
@@ -156,9 +156,9 @@ impl Theme {
     ///
     /// The created theme.
     pub fn from_config(cfg: &config::theme::Colors) -> Self {
-        let bg = cfg.background.clone();
-        let fg = cfg.foreground.clone();
-        let bright_fg = cfg.bright_foreground.clone();
+        let bg = cfg.background;
+        let fg = cfg.foreground;
+        let bright_fg = cfg.bright_foreground;
         let palette = Palette::from_config(&cfg.palette);
         Self {
             bg,
@@ -180,7 +180,7 @@ impl Theme {
     pub fn resolve(&self, attr: ColorAttribute) -> Option<Color> {
         match attr {
             ColorAttribute::Default => None,
-            ColorAttribute::PaletteIndex(idx) => Some(self.palette[idx as usize].clone()),
+            ColorAttribute::PaletteIndex(idx) => Some(self.palette[idx as usize]),
             ColorAttribute::TrueColorWithDefaultFallback(c)
             | ColorAttribute::TrueColorWithPaletteFallback(c, _) => {
                 Some(Color::new(c.0, c.1, c.2, c.3))
@@ -238,7 +238,7 @@ impl Palette {
         let mut colors = Self::make_default().0;
         for (i, c) in cfg.iter() {
             if let Some(i) = i.resolve() {
-                colors[i as usize] = c.clone();
+                colors[i as usize] = *c;
             }
         }
         Self::new(colors)

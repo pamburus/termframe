@@ -9,11 +9,12 @@ use crate::{
         Number, PaddingOption, Settings,
         mode::Mode,
         winstyle::{
-            Font, SelectiveColor, Window, WindowBorder, WindowBorderColors, WindowButtons,
-            WindowHeader, WindowShadow, WindowStyleConfig, WindowTitle,
+            Font, SelectiveColor, Window, WindowBorder, WindowBorderColors, WindowButtonIcon,
+            WindowButtons, WindowHeader, WindowShadow, WindowStyleConfig, WindowTitle,
         },
     },
     render::{FontMetrics, FontOptions, FontWeights, Options},
+    theme::Palette,
 };
 
 trait Sample {
@@ -747,4 +748,113 @@ fn test_render_with_unresolved_font() {
     let svg = String::from_utf8(output).unwrap();
     assert!(svg.contains("test"));
     assert!(svg.contains("textLength"));
+}
+
+#[test]
+fn test_render_underline_color() {
+    let mut attrs = CellAttributes::default();
+    attrs.set_underline(Underline::Single);
+    attrs.set_underline_color(ColorAttribute::TrueColorWithDefaultFallback(SrgbaTuple(
+        1.0, 0.0, 0.0, 0.5,
+    )));
+
+    let mut surface = Surface::new(10, 1);
+    surface.add_change(Change::AllAttributes(attrs));
+    surface.add_change(Change::Text("test".into()));
+
+    let renderer = SvgRenderer::new(Options::sample());
+    let mut output = Vec::new();
+    renderer.render(&surface, &mut output).unwrap();
+
+    let svg = String::from_utf8(output).unwrap();
+    assert!(svg.contains(r##"text-decoration-color="#ff0000""##));
+}
+
+#[test]
+fn test_make_buttons_icon_stroke() {
+    let mut options = Options::sample();
+    options.window.buttons = WindowButtons {
+        position: WindowButtonsPosition::Left,
+        shape: None,
+        size: Number::from(10.0),
+        roundness: None,
+        items: vec![WindowButton {
+            offset: Number::from(10.0),
+            fill: None,
+            stroke: None,
+            stroke_width: None,
+            icon: Some(WindowButtonIcon {
+                kind: WindowButtonIconKind::Maximize,
+                size: Number::from(6.0),
+                stroke: SelectiveColor::Uniform(Color::from_rgba8(0x12, 0x34, 0x56, 255)),
+                stroke_width: None,
+                stroke_linecap: None,
+                roundness: None,
+            }),
+        }],
+    };
+
+    let svg = make_buttons(&options, 100.0).to_string();
+    assert!(svg.contains(r##"stroke="#123456""##));
+}
+
+#[test]
+fn test_palette_builder_bright_fg_without_var_palette() {
+    let bg = Color::from_rgba8(255, 255, 255, 255);
+    let fg = Color::from_rgba8(0, 0, 0, 255);
+    let bright = Color::from_rgba8(0xaa, 0xbb, 0xcc, 255);
+
+    let theme = |bright_fg| {
+        Rc::new(Theme {
+            bg,
+            fg,
+            bright_fg,
+            palette: Default::default(),
+        })
+    };
+
+    let mut builder = PaletteBuilder::new(bg, fg, theme(Some(bright)), false);
+    assert_eq!(
+        builder.bright_fg(ColorAttribute::Default),
+        ColorStyle::Custom(bright)
+    );
+
+    let mut builder = PaletteBuilder::new(bg, fg, theme(None), false);
+    assert_eq!(
+        builder.bright_fg(ColorAttribute::Default),
+        ColorStyle::Custom(fg)
+    );
+}
+
+#[test]
+fn test_palette_builder_template_with_var_palette() {
+    let bg = Color::from_rgba8(0x11, 0x11, 0x11, 255);
+    let fg = Color::from_rgba8(0x22, 0x22, 0x22, 255);
+    let bright = Color::from_rgba8(0x33, 0x33, 0x33, 255);
+    let mut palette = Palette::default();
+    palette[1] = Color::from_rgba8(0x44, 0x44, 0x44, 255);
+
+    let theme = Rc::new(Theme {
+        bg,
+        fg,
+        bright_fg: Some(bright),
+        palette,
+    });
+
+    let mut builder = PaletteBuilder::new(bg, fg, theme, true);
+    builder.bg(ColorAttribute::Default);
+    builder.fg(ColorAttribute::Default);
+    builder.bright_fg(ColorAttribute::Default);
+    builder.fg(ColorAttribute::PaletteIndex(1));
+
+    let var = |id: ColorStyleId, hex: &str| (id.name().to_string(), hex.to_string());
+    assert_eq!(
+        builder.template("test").vars,
+        vec![
+            var(ColorStyleId::DefaultBackground, "#111111"),
+            var(ColorStyleId::DefaultForeground, "#222222"),
+            var(ColorStyleId::BrightForeground, "#333333"),
+            var(ColorStyleId::Palette(1), "#444444"),
+        ]
+    );
 }

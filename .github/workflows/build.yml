@@ -52,6 +52,7 @@ jobs:
             target: x86_64-unknown-linux-gnu
             archiver: tar.gz
             asset: termframe-linux-x86_64-gnu.tar.gz
+            cross: true
           - name: linux-x86-musl
             os: ubuntu-24.04
             family: linux

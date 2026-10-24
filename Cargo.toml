@@ -1,6 +1,6 @@
 [package]
 name = "termframe"
-version = "0.9.0-alpha.11"
+version = "0.9.0-alpha.12"
 edition = "2024"
 rust-version = "1.95.0"
 description = "Terminal output SVG screenshot tool"
@@ -35,7 +35,7 @@ clap_complete = "4"
 clap_mangen = "0.3"
 closure = "0.3"
 config = { version = "0.15", features = ["json", "toml", "yaml"] }
-csscolorparser = { version = "0.8", features = ["serde"] }
+csscolorparser = { version = "0.9", features = ["serde"] }
 dark-light = "3"
 dirs = "7"
 dirs-sys = "0.5"

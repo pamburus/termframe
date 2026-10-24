@@ -119,18 +119,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Update schema references in TOML files
-        run: |
-          VERSION=${{ steps.update-version.outputs.version }}
-
-          # Find all TOML files with schema references (both relative and absolute) and update them
-          # Matches both:
-          # - Relative: #:schema (../)+schema/...
-          # - Absolute: #:schema https://raw.githubusercontent.com/${{ github.repository }}/[ref]/schema/...
-          find . -name "*.toml" -type f -exec grep -l "#:schema" {} \; | while read -r file; do
-            echo "Updating schema reference in ${file}"
-            sed -i.bak -E 's|#:schema ((\.\./)+\|https://raw\.githubusercontent\.com/${{ github.repository }}/[^/]+/)schema/|#:schema https://raw.githubusercontent.com/${{ github.repository }}/v'"${VERSION}"'/schema/|g' "${file}"
-            rm -f "${file}.bak"
-          done
+        run: build/ci/update-schema-refs.sh "${{ github.repository }}" "${{ steps.update-version.outputs.version }}"
 
       - name: Commit version update
         run: |

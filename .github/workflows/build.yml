@@ -46,7 +46,7 @@ jobs:
           - windows-arm
         include:
           - name: linux-x86-gnu
-            os: ubuntu-24.04
+            os: ubuntu-26.04
             family: linux
             arch: x86_64
             target: x86_64-unknown-linux-gnu
@@ -54,7 +54,7 @@ jobs:
             asset: termframe-linux-x86_64-gnu.tar.gz
             cross: true
           - name: linux-x86-musl
-            os: ubuntu-24.04
+            os: ubuntu-26.04
             family: linux
             arch: x86_64
             target: x86_64-unknown-linux-musl
@@ -62,7 +62,7 @@ jobs:
             asset: termframe-linux-x86_64-musl.tar.gz
             cross: true
           - name: linux-arm-gnu
-            os: ubuntu-24.04
+            os: ubuntu-26.04
             family: linux
             arch: aarch64
             target: aarch64-unknown-linux-gnu
@@ -70,7 +70,7 @@ jobs:
             asset: termframe-linux-arm64-gnu.tar.gz
             cross: true
           - name: linux-arm-musl
-            os: ubuntu-24.04
+            os: ubuntu-26.04
             family: linux
             arch: aarch64
             target: aarch64-unknown-linux-musl

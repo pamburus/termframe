@@ -17,7 +17,7 @@ defaults:
 jobs:
   update-themes:
     name: Update themes
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     env:
       # renovate: datasource=crate depName=cargo-edit
       CARGO_EDIT_VERSION: "0.13.13"

@@ -122,6 +122,7 @@ jobs:
         with:
           toolchain: stable
           rustflags: ""
+          cache: false
 
       - name: Install Cross
         if: matrix.cross

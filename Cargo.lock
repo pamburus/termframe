@@ -1168,12 +1168,21 @@ dependencies = [
 
 [[package]]
 name = "enumset-ext"
-version = "0.2.0"
-source = "git+https://github.com/pamburus/hl.git?rev=9ba780e0d39288c0b412820599cc9816be980a28#9ba780e0d39288c0b412820599cc9816be980a28"
+version = "0.2.1"
+source = "git+https://github.com/pamburus/hl.git?rev=3aae7bc70c6519110cd579ac70479fbc2989c88b#3aae7bc70c6519110cd579ac70479fbc2989c88b"
 dependencies = [
  "clap",
  "enumset",
- "enumset-serde",
+ "enumset-serde 0.1.0 (git+https://github.com/pamburus/hl.git?rev=3aae7bc70c6519110cd579ac70479fbc2989c88b)",
+ "serde",
+]
+
+[[package]]
+name = "enumset-serde"
+version = "0.1.0"
+source = "git+https://github.com/pamburus/hl.git?rev=3aae7bc70c6519110cd579ac70479fbc2989c88b#3aae7bc70c6519110cd579ac70479fbc2989c88b"
+dependencies = [
+ "enumset",
  "serde",
 ]
 
@@ -3555,7 +3564,7 @@ dependencies = [
  "dirs-sys",
  "enumset",
  "enumset-ext",
- "enumset-serde",
+ "enumset-serde 0.1.0 (git+https://github.com/pamburus/hl.git?rev=9ba780e0d39288c0b412820599cc9816be980a28)",
  "env_logger",
  "exponential-backoff",
  "hex",

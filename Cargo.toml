@@ -40,7 +40,7 @@ dark-light = "3"
 dirs = "7"
 dirs-sys = "0.5"
 enumset = "1"
-enumset-ext = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28", features = [
+enumset-ext = { git = "https://github.com/pamburus/hl.git", rev = "3aae7bc70c6519110cd579ac70479fbc2989c88b", features = [
     "clap",
     "serde"
 ] }

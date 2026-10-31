@@ -78,8 +78,7 @@
         "cargo"
       ],
       "matchPackageNames": [
-        "enumset-ext",
-        "enumset-serde"
+        "https://github.com/pamburus/hl.git"
       ],
       "groupName": "hl crates"
     },

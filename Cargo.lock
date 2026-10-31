@@ -1168,8 +1168,8 @@ dependencies = [
 
 [[package]]
 name = "enumset-ext"
-version = "0.2.0"
-source = "git+https://github.com/pamburus/hl.git?rev=9ba780e0d39288c0b412820599cc9816be980a28#9ba780e0d39288c0b412820599cc9816be980a28"
+version = "0.2.1"
+source = "git+https://github.com/pamburus/hl.git?rev=3aae7bc70c6519110cd579ac70479fbc2989c88b#3aae7bc70c6519110cd579ac70479fbc2989c88b"
 dependencies = [
  "clap",
  "enumset",
@@ -1180,7 +1180,7 @@ dependencies = [
 [[package]]
 name = "enumset-serde"
 version = "0.1.0"
-source = "git+https://github.com/pamburus/hl.git?rev=9ba780e0d39288c0b412820599cc9816be980a28#9ba780e0d39288c0b412820599cc9816be980a28"
+source = "git+https://github.com/pamburus/hl.git?rev=3aae7bc70c6519110cd579ac70479fbc2989c88b#3aae7bc70c6519110cd579ac70479fbc2989c88b"
 dependencies = [
  "enumset",
  "serde",
@@ -3536,7 +3536,7 @@ dependencies = [
 
 [[package]]
 name = "termframe"
-version = "0.9.1-alpha.1"
+version = "0.9.1-alpha.2"
 dependencies = [
  "allsorts",
  "anyhow",

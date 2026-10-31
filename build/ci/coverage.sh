@@ -4,7 +4,7 @@ set -euo pipefail
 
 export RUSTFLAGS="-C instrument-coverage"
 export CARGO_TARGET_DIR="target/coverage"
-export LLVM_PROFILE_FILE="target/coverage/test-%m-%p.profraw"
+export LLVM_PROFILE_FILE="${PWD:?}/target/coverage/test-%m-%p.profraw"
 export MAIN_EXECUTABLE="target/coverage/debug/termframe"
 export TIDY_THEMES_EXE="target/coverage/debug/examples/tidy-themes"
 
@@ -71,6 +71,9 @@ function test() {
         echo "Theme aliases file has been modified without modifications in the source files"
         exit 1
     fi
+
+    ${TIDY_THEMES_EXE:?}
+    git diff --exit-code -- assets/themes
 
     for asset in $(ls assets/test/input/*.ansi); do
         local asset_name=$(basename "${asset:?}" .ansi)

@@ -7,6 +7,38 @@ use anyhow::{Context, Result};
 use voca_rs::case::kebab_case;
 
 const THEME_EXTENSION: &str = ".toml";
+const RESERVED_CHARS: [char; 9] = ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
+
+/// Renames theme files whose names cannot be checked out on Windows.
+pub fn sanitize_theme_file_names<P: AsRef<Path>>(theme_dir: P) -> Result<()> {
+    for entry in std::fs::read_dir(&theme_dir).with_context(|| {
+        format!(
+            "Failed to read theme directory {}",
+            theme_dir.as_ref().display()
+        )
+    })? {
+        let entry = entry.context("Failed to read directory entry")?;
+        let path = entry.path();
+        let name = path.file_name().unwrap().to_str().unwrap();
+        let sanitized = sanitize_file_name(name);
+        if path.is_file() && sanitized != name {
+            let target = path.with_file_name(&sanitized);
+            if target.exists() {
+                return Err(anyhow::anyhow!(
+                    "Conflicting theme file names for {name}: {sanitized}"
+                ));
+            }
+            std::fs::rename(&path, &target)
+                .with_context(|| format!("Failed to rename theme file {name} to {sanitized}"))?;
+        }
+    }
+
+    Ok(())
+}
+
+fn sanitize_file_name(name: &str) -> String {
+    name.replace(": ", " - ").replace(RESERVED_CHARS, "-")
+}
 
 pub fn update_theme_aliases<P: AsRef<Path>>(theme_dir: P, theme_aliases: P) -> Result<()> {
     let mut aliases = BTreeMap::<String, String>::new();
@@ -61,3 +93,10 @@ pub fn update_theme_aliases<P: AsRef<Path>>(theme_dir: P, theme_aliases: P) -> R
 pub fn update_theme_aliases_default() -> Result<()> {
     update_theme_aliases("assets/themes", "assets/themes/.aliases.json")
 }
+
+pub fn sanitize_theme_file_names_default() -> Result<()> {
+    sanitize_theme_file_names("assets/themes")
+}
+
+#[cfg(test)]
+mod tests;

@@ -44,7 +44,7 @@ enumset-ext = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d3928
     "clap",
     "serde"
 ] }
-enumset-serde = { git = "https://github.com/pamburus/hl.git", rev = "9ba780e0d39288c0b412820599cc9816be980a28" }
+enumset-serde = { git = "https://github.com/pamburus/hl.git", rev = "3aae7bc70c6519110cd579ac70479fbc2989c88b" }
 env_logger = "0.11"
 exponential-backoff = "2"
 hex = "0.4"

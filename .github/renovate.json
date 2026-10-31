@@ -73,6 +73,17 @@
       "groupName": "patch-updates"
     },
     {
+      "description": "Group crates pinned to the same pamburus/hl revision",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchPackageNames": [
+        "enumset-ext",
+        "enumset-serde"
+      ],
+      "groupName": "hl crates"
+    },
+    {
       "matchManagers": [
         "cargo"
       ],

@@ -21,7 +21,7 @@ rustPlatform.buildRustPackage {
 
   cargoLock = {
     lockFile = ../Cargo.lock;
-    outputHashes = import ./cargo-hashes.nix;
+    allowBuiltinFetchGit = true;
   };
 
   nativeBuildInputs = [ installShellFiles ];

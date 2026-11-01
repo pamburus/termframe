@@ -6,11 +6,10 @@ on:
   pull_request:
     branches: [main, release/**]
 
+# Pull requests run unreviewed action updates, so jobs get only what they need.
 permissions:
   contents: read
-  pull-requests: write
   actions: read
-  id-token: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -143,6 +142,10 @@ jobs:
 
   coverage:
     runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      actions: read
+      id-token: write # Codecov OIDC upload
 
     env:
       # renovate: datasource=crate depName=rustfilt
@@ -175,6 +178,27 @@ jobs:
         with:
           use_oidc: true
 
+  # Pull requests run unreviewed action updates, so this uses the key of a read-only app.
+  # Forks receive no secrets and skip this check.
+  app-token:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-26.04
+
+    steps:
+      - name: Generate GitHub App Token
+        id: generate-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ secrets.DRY_RUN_APP_ID }}
+          private-key: ${{ secrets.DRY_RUN_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+
+      - name: Check token
+        run: gh api "repos/${GITHUB_REPOSITORY:?}" --jq .full_name
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+
   test-nix:
     runs-on: ubuntu-26.04
 
@@ -189,7 +213,8 @@ jobs:
         uses: cachix/cachix-action@38b082610b782e7e93e209c35fd730d399dee866 # v17
         with:
           name: termframe
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          # Pull requests read the cache but cannot write to it.
+          authToken: ${{ github.event_name == 'push' && secrets.CACHIX_AUTH_TOKEN || '' }}
 
       - name: Setup Rust cache
         uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3

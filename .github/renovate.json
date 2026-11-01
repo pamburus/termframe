@@ -12,6 +12,10 @@
   "semanticCommits": "enabled",
   "semanticCommitType": "build",
   "semanticCommitScope": "deps",
+  "prConcurrentLimit": 1,
+  "schedule": [
+    "* */6 * * *"
+  ],
   "customManagers": [
     {
       "customType": "regex",
@@ -28,12 +32,9 @@
   ],
   "packageRules": [
     {
-      "description": "GitHub Actions: weekly on Saturday",
+      "description": "Label GitHub Actions updates",
       "matchManagers": [
         "github-actions"
-      ],
-      "schedule": [
-        "* * * * 6"
       ],
       "addLabels": [
         "github-actions"
@@ -51,12 +52,9 @@
       "groupName": "codeql-action"
     },
     {
-      "description": "Cargo: weekly on Friday",
+      "description": "Label Cargo updates",
       "matchManagers": [
         "cargo"
-      ],
-      "schedule": [
-        "* * * * 5"
       ],
       "addLabels": [
         "rust"
@@ -612,12 +610,28 @@
       "matchManagers": [
         "custom.regex"
       ],
-      "schedule": [
-        "* * * * 6"
-      ],
       "addLabels": [
         "github-actions"
       ]
+    },
+    {
+      "description": "Automerge all updates once required checks pass, after a release has had a week to be caught if compromised",
+      "matchPackageNames": [
+        "*"
+      ],
+      "automerge": true,
+      "automergeStrategy": "squash",
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "Crates pinned to a pamburus/hl revision are first-party and have no release timestamp, which would hold them back indefinitely",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchPackageNames": [
+        "https://github.com/pamburus/hl.git"
+      ],
+      "minimumReleaseAge": "0 days"
     },
     {
       "description": "Use `build` commit type for all updates, overriding the per-type defaults from `config:recommended`",

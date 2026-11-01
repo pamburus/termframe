@@ -1,0 +1,80 @@
+name: Prepare release
+description: Bumps the version and generates release notes in the working tree, without publishing anything
+
+inputs:
+  release-type:
+    description: "Release type"
+    required: true
+  github-token:
+    description: "Token for reading commit authors and contributors"
+    required: true
+
+outputs:
+  version:
+    description: "Version of the release"
+    value: ${{ steps.update-version.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Rust toolchain
+      uses: actions-rust-lang/setup-rust-toolchain@ecabd13d1c56bd1345c230e542e9144811ad706f # v2.0.0
+      with:
+        toolchain: stable
+        rustflags: ""
+        # Published releases must not depend on anything cached by earlier runs.
+        cache: false
+
+    - name: Install cargo-quickinstall
+      shell: bash -euxo pipefail {0}
+      env:
+        # renovate: datasource=crate depName=cargo-quickinstall
+        CARGO_QUICKINSTALL_VERSION: "0.3.53"
+      run: cargo install --locked "cargo-quickinstall@${CARGO_QUICKINSTALL_VERSION:?}"
+
+    - name: Install cargo-edit
+      shell: bash -euxo pipefail {0}
+      env:
+        # renovate: datasource=crate depName=cargo-edit
+        CARGO_EDIT_VERSION: "0.13.13"
+      run: cargo quickinstall --force --version "${CARGO_EDIT_VERSION:?}" cargo-edit
+
+    - name: Update version in Cargo.toml
+      id: update-version
+      shell: bash -euxo pipefail {0}
+      env:
+        PACKAGE: ${{ github.event.repository.name }}
+        RELEASE_TYPE: ${{ inputs.release-type }}
+      run: |
+        cargo set-version --package "${PACKAGE:?}" --bump "${RELEASE_TYPE:?}"
+        VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r --arg package "${PACKAGE:?}" '.packages[] | select(.name == $package) | .version')
+        echo "version=${VERSION:?}" >> $GITHUB_OUTPUT
+
+    - name: Install git-cliff
+      shell: bash -euxo pipefail {0}
+      env:
+        # renovate: datasource=github-releases depName=orhun/git-cliff extractVersion=^v(?<version>.+)$
+        GIT_CLIFF_VERSION: "2.14.2"
+      run: |
+        curl -sSfL "https://github.com/orhun/git-cliff/releases/download/v${GIT_CLIFF_VERSION:?}/git-cliff-${GIT_CLIFF_VERSION:?}-x86_64-unknown-linux-gnu.tar.gz" | tar -xz
+        sudo mv git-cliff-*/git-cliff /usr/local/bin/
+        git-cliff --version
+
+    - name: Generate release notes
+      shell: bash -euxo pipefail {0}
+      env:
+        VERSION: ${{ steps.update-version.outputs.version }}
+        GITHUB_REPO: ${{ github.repository }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        PREVIOUS_TAG=$(git tag -l "v*.*.*" --merged HEAD --sort=-version:refname | head -1 || echo "")
+        git-cliff --tag "v${VERSION:?}" --output RELEASE_NOTES.md --verbose "${PREVIOUS_TAG:?}..HEAD"
+        # The footer is the last part of the template, so it proves the whole template rendered
+        grep -q 'Full Changelog' RELEASE_NOTES.md
+
+    - name: Update schema references in TOML files
+      shell: bash -euxo pipefail {0}
+      env:
+        REPOSITORY: ${{ github.repository }}
+        VERSION: ${{ steps.update-version.outputs.version }}
+      run: build/ci/update-schema-refs.sh "${REPOSITORY:?}" "${VERSION:?}"

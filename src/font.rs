@@ -74,7 +74,7 @@ impl FontFile {
                     result = attempt();
                     match &result {
                         Ok(_) => break,
-                        Err(ureq::Error::StatusCode(..=428 | 430..=499 | 501 | 505..)) => break,
+                        Err(e) if !is_transient(e) => break,
                         Err(e) => match delay {
                             Some(delay) => {
                                 log::debug!("Retry in {delay:?} due to {e:?}");
@@ -146,6 +146,21 @@ impl FontFile {
             family,
         })
     }
+}
+
+/// Checks whether a failed font download may succeed if retried.
+fn is_transient(e: &ureq::Error) -> bool {
+    use ureq::Error;
+
+    matches!(
+        e,
+        Error::StatusCode(429 | 500 | 502..=504)
+            | Error::Io(_)
+            | Error::Timeout(_)
+            | Error::HostNotFound
+            | Error::ConnectionFailed
+            | Error::Protocol(_)
+    )
 }
 
 /// Represents the location of a font file, either a file path or a URL.

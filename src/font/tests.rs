@@ -1,6 +1,6 @@
 use url::Url;
 
-use crate::font::{FontFile, Location};
+use crate::font::{FontFile, Location, is_transient};
 
 #[test]
 fn test_font_location_from_str() {
@@ -73,6 +73,44 @@ fn test_font_file_load_invalid_file_url() {
     let url = Url::parse(url).unwrap();
     let err = FontFile::load_url(url).err().unwrap();
     assert!(err.to_string().starts_with("invalid file URL"));
+}
+
+#[test]
+fn test_font_file_load_invalid_url_fails_immediately() {
+    let url = Url::parse(r"c:\fonts\font.ttf").unwrap();
+    let started = std::time::Instant::now();
+    let err = FontFile::load_url(url).err().unwrap();
+    assert!(started.elapsed() < std::time::Duration::from_secs(1));
+    assert!(matches!(
+        err.downcast_ref::<ureq::Error>(),
+        Some(ureq::Error::Http(_))
+    ));
+}
+
+#[test]
+fn test_is_transient() {
+    use ureq::Error;
+
+    for status in [429, 500, 502, 503, 504] {
+        assert!(is_transient(&Error::StatusCode(status)), "{status}");
+    }
+    for status in [400, 403, 404, 428, 430, 501, 505] {
+        assert!(!is_transient(&Error::StatusCode(status)), "{status}");
+    }
+
+    assert!(is_transient(&Error::Io(
+        std::io::ErrorKind::ConnectionReset.into()
+    )));
+    assert!(is_transient(&Error::Timeout(ureq::Timeout::Global)));
+    assert!(is_transient(&Error::HostNotFound));
+    assert!(is_transient(&Error::ConnectionFailed));
+
+    assert!(!is_transient(&Error::BadUri("font.ttf".into())));
+    assert!(!is_transient(&Error::Tls("unsupported")));
+    assert!(!is_transient(&Error::TooManyRedirects));
+    assert!(!is_transient(&Error::RequireHttpsOnly(
+        "http://example.com".into()
+    )));
 }
 
 #[test]

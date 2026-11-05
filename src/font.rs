@@ -55,7 +55,10 @@ impl FontFile {
     /// Load a font file from a URL using a specific agent.
     pub fn load_url_with_agent(url: Url, agent: &ureq::Agent) -> Result<Self> {
         match url.scheme() {
-            "file" | "" => Self::load_file(url.path().into()),
+            "file" => Self::load_file(
+                url.to_file_path()
+                    .map_err(|()| anyhow!("invalid file URL {url}"))?,
+            ),
             _ => {
                 let attempt = || agent.get(url.as_ref()).call()?.body_mut().read_to_vec();
 
@@ -157,11 +160,12 @@ impl Location {
         }
     }
 
-    /// Get the URL if the location is a URL.
-    pub fn url(&self) -> Option<&Url> {
+    /// Get the location as a URL, converting a file path to a `file://` URL.
+    pub fn to_url(&self) -> Result<Url> {
         match self {
-            Self::Url(url) => Some(url),
-            Self::File(_) => None,
+            Self::Url(url) => Ok(url.clone()),
+            Self::File(path) => Url::from_file_path(std::path::absolute(path)?)
+                .map_err(|()| anyhow!("invalid file path {}", path.display())),
         }
     }
 }

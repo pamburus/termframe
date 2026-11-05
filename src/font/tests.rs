@@ -1,4 +1,6 @@
-use crate::font::Location;
+use url::Url;
+
+use crate::font::{FontFile, Location};
 
 #[test]
 fn test_font_location_from_str() {
@@ -22,6 +24,51 @@ fn test_font_location_from_str() {
     if let Location::File(path) = location {
         assert_eq!(path.to_string_lossy(), "./fonts/font.ttf");
     }
+}
+
+#[test]
+fn test_font_location_to_url() {
+    let location = Location::from("https://example.com/fonts/font.ttf");
+    assert_eq!(
+        location.to_url().unwrap().as_str(),
+        "https://example.com/fonts/font.ttf"
+    );
+
+    let path = std::env::temp_dir().join("font.ttf");
+    let location = Location::File(path.clone());
+    assert_eq!(location.to_url().unwrap().to_file_path().unwrap(), path);
+
+    let location = Location::from("fonts/font.ttf");
+    let url = location.to_url().unwrap();
+    assert_eq!(url.scheme(), "file");
+    assert_eq!(
+        url.to_file_path().unwrap(),
+        std::env::current_dir().unwrap().join("fonts/font.ttf")
+    );
+}
+
+#[test]
+fn test_font_file_load_file_url() {
+    let path = std::env::temp_dir().join("termframe test font that does not exist.ttf");
+    let url = Url::from_file_path(&path).unwrap();
+    assert!(url.as_str().contains("%20"));
+
+    let err = FontFile::load_url(url).err().unwrap();
+    let err = err.downcast_ref::<std::io::Error>().unwrap();
+    assert_eq!(err.kind(), std::io::ErrorKind::NotFound);
+}
+
+#[test]
+fn test_font_file_load_invalid_file_url() {
+    // A file URL with a host is a valid UNC path on Windows, and one without a drive letter is a valid path elsewhere.
+    let url = if cfg!(windows) {
+        "file:///fonts/font.ttf"
+    } else {
+        "file://example.com/fonts/font.ttf"
+    };
+    let url = Url::parse(url).unwrap();
+    let err = FontFile::load_url(url).err().unwrap();
+    assert!(err.to_string().starts_with("invalid file URL"));
 }
 
 #[test]

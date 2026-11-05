@@ -17,7 +17,7 @@ use termwiz::{
     surface::{Line, Surface, line::CellRef},
 };
 
-use super::{FontFace, FontStyle, FontWeight, Padding, Render, Theme};
+use super::{FontFace, FontStyle, FontWeight, Padding, Render, Theme, glyphs};
 use crate::config::{
     types::Number,
     winstyle::{
@@ -90,6 +90,22 @@ impl SvgRenderer {
             }
         };
 
+        let resolve_text = |palette: &mut PaletteBuilder, attrs: &CellAttributes| {
+            if attrs.reverse() {
+                palette.bg(attrs.background())
+            } else {
+                resolve_fg(palette, attrs)
+            }
+        };
+
+        let resolve_opacity = |attrs: &CellAttributes| {
+            if attrs.intensity() == Intensity::Half && cfg.rendering.faint_opacity.f32() < 1.0 {
+                cfg.rendering.faint_opacity.f32()
+            } else {
+                1.0
+            }
+        };
+
         let resolve_bg = |palette: &mut PaletteBuilder, attrs: &CellAttributes| {
             if attrs.reverse() {
                 Some(resolve_fg(palette, attrs))
@@ -122,7 +138,12 @@ impl SvgRenderer {
                     d.push(' ');
                 }
 
-                build_svg_path(&mut d, contour, lh, fw, fp);
+                build_svg_path(
+                    &mut d,
+                    contour,
+                    |x| (x as f32 * fw).r2p(fp),
+                    |y| (y as f32 * lh).r2p(fp),
+                );
             }
 
             let color = shape.key;
@@ -134,13 +155,24 @@ impl SvgRenderer {
             bg_group = bg_group.add(path);
         }
 
-        group = group.add(
-            container()
-                .set("viewBox", format!("0 0 {w} {h}", w = size.0, h = size.1))
-                .set("width", format!("{}", size_p.0))
-                .set("height", format!("{}", size_p.1))
-                .add(bg_group),
-        );
+        let mut shapes = container()
+            .set("viewBox", format!("0 0 {w} {h}", w = size.0, h = size.1))
+            .set("width", format!("{}", size_p.0))
+            .set("height", format!("{}", size_p.1))
+            .add(bg_group);
+
+        let cell = glyphs::Cell {
+            width: fw,
+            height: lh,
+        };
+        let glyph_group = build_glyph_group(&lines, dimensions.0, cell, opt, |attrs| {
+            (resolve_text(&mut palette, attrs), resolve_opacity(attrs))
+        });
+        if let Some(glyph_group) = glyph_group {
+            shapes = shapes.add(glyph_group);
+        }
+
+        group = group.add(shapes);
 
         let mut unresolved = IndexSet::new();
 
@@ -186,16 +218,11 @@ impl SvgRenderer {
                         range.end = range.start + 1;
                     }
 
-                    let color = if cluster.attrs.reverse() {
-                        palette.bg(cluster.attrs.background())
-                    } else {
-                        resolve_fg(&mut palette, &cluster.attrs)
-                    };
+                    let color = resolve_text(&mut palette, &cluster.attrs);
 
-                    if cluster.attrs.intensity() == Intensity::Half
-                        && cfg.rendering.faint_opacity.f32() < 1.0
-                    {
-                        span.assign("opacity", cfg.rendering.faint_opacity.r2p(fp));
+                    let opacity = resolve_opacity(&cluster.attrs);
+                    if opacity < 1.0 {
+                        span.assign("opacity", opacity.r2p(fp));
                     }
 
                     if color != ColorStyleId::DefaultForeground {
@@ -353,11 +380,13 @@ impl SvgRenderer {
     }
 }
 
-/// Builds an SVG path string from a contour.
-fn build_svg_path(d: &mut String, contour: &[(i32, i32)], lh: f32, fw: f32, fp: u8) {
-    let fx = |x| (x as f32 * fw).r2p(fp);
-    let fy = |y| (y as f32 * lh).r2p(fp);
-
+/// Builds an SVG path string from a contour, mapping grid coordinates with `fx` and `fy`.
+fn build_svg_path(
+    d: &mut String,
+    contour: &[(i32, i32)],
+    fx: impl Fn(i32) -> f32,
+    fy: impl Fn(i32) -> f32,
+) {
     let mut prev = None;
     for &(x, y) in contour {
         match prev {
@@ -377,6 +406,243 @@ fn build_svg_path(d: &mut String, contour: &[(i32, i32)], lh: f32, fw: f32, fp: 
         prev = Some((x, y));
     }
     d.push('Z');
+}
+
+/// Builds a group of shapes for the block elements and box-drawing characters on the surface.
+///
+/// The characters are drawn as shapes on a grid that subdivides every cell at all edges used by
+/// the shapes, so that shapes of the same style in adjacent cells merge into a single outline
+/// without seams. Returns `None` if there are no such characters.
+///
+/// Translucent shapes, such as shades, must not overlap, because overlapping parts would be
+/// painted twice and show up as darker seams. So shapes of the same color are drawn as nested
+/// layers instead: the first layer covers all cells of the color, every next layer covers only
+/// the cells of the next higher opacity and adds just enough opacity to reach it. A boundary
+/// between two opacities is then an inner part of every layer below it. The opacity of a layer
+/// is applied to all of its shapes as a whole, so that their overlaps are not painted twice.
+fn build_glyph_group(
+    lines: &[Cow<'_, Line>],
+    cols: usize,
+    cell: glyphs::Cell,
+    opt: &Options,
+    mut style: impl FnMut(&CellAttributes) -> (ColorStyle, f32),
+) -> Option<element::Group> {
+    if !opt.settings.rendering.builtin_glyphs {
+        return None;
+    }
+
+    let fp = opt.settings.rendering.svg.precision;
+
+    // Distinct colors and, for each color, its distinct opacities in ascending order.
+    let mut colors: Vec<(ColorStyle, Vec<f32>)> = Vec::new();
+    let mut items = Vec::new();
+    for (row, line) in lines.iter().enumerate() {
+        for cell_ref in line.visible_cells() {
+            let Some(glyph) = cell_ref
+                .str()
+                .chars()
+                .next()
+                .and_then(|ch| glyphs::glyph(ch, cell))
+            else {
+                continue;
+            };
+
+            let (color, opacity) = style(cell_ref.attrs());
+            let opacity = (opacity * glyph.opacity).r2p(fp);
+            let key = match colors.iter().position(|c| c.0 == color) {
+                Some(key) => key,
+                None => {
+                    colors.push((color, Vec::new()));
+                    colors.len() - 1
+                }
+            };
+            colors[key].1.push(opacity);
+            items.push((cell_ref.cell_index(), row, glyph, key, opacity));
+        }
+    }
+
+    if items.is_empty() {
+        return None;
+    }
+
+    for (_, levels) in &mut colors {
+        levels.sort_by(f32::total_cmp);
+        levels.dedup();
+    }
+    let items: Vec<_> = items
+        .into_iter()
+        .map(|(col, row, glyph, key, opacity)| {
+            let level = colors[key].1.partition_point(|&o| o < opacity);
+            (col, row, glyph, key, level)
+        })
+        .collect();
+    let depth = colors.iter().map(|c| c.1.len()).max().unwrap_or_default();
+
+    // Edges of the subdivided cell, snapped to the output precision so that equal edges
+    // computed in different ways fall on the same grid line.
+    let snap = |v: f32| v.r2p(fp);
+    let mut xs = vec![0.0, cell.width];
+    let mut ys = vec![0.0, cell.height];
+    for rect in items.iter().flat_map(|item| &item.2.rects) {
+        xs.extend([snap(rect.x0), snap(rect.x1)]);
+        ys.extend([snap(rect.y0), snap(rect.y1)]);
+    }
+    for edges in [&mut xs, &mut ys] {
+        edges.sort_by(f32::total_cmp);
+        edges.dedup();
+    }
+    let (nx, ny) = (xs.len() - 1, ys.len() - 1);
+
+    let grid_cols = cols * nx;
+    let grid_rows = lines.len() * ny;
+    let mut grid = vec![None; grid_cols * grid_rows];
+    for (col, row, glyph, key, level) in &items {
+        for rect in &glyph.rects {
+            let x_range = xs.partition_point(|&x| x < snap(rect.x0))
+                ..xs.partition_point(|&x| x < snap(rect.x1));
+            let y_range = ys.partition_point(|&y| y < snap(rect.y0))
+                ..ys.partition_point(|&y| y < snap(rect.y1));
+            for y in y_range.clone() {
+                let offset = (row * ny + y) * grid_cols + col * nx;
+                grid[offset + x_range.start..offset + x_range.end].fill(Some((*key, *level)));
+            }
+        }
+    }
+
+    let fx = |x: i32| (((x as usize / nx) as f32) * cell.width + xs[x as usize % nx]).r2p(fp);
+    let fy = |y: i32| (((y as usize / ny) as f32) * cell.height + ys[y as usize % ny]).r2p(fp);
+
+    // Paths of each layer, indexed by color.
+    let mut layers = Vec::with_capacity(depth);
+    for layer in 0..depth {
+        let mut rects = vec![String::new(); colors.len()];
+        let mut polygons = vec![String::new(); colors.len()];
+        let mut curves = vec![String::new(); colors.len()];
+
+        let shapes = super::tracing::trace(grid_cols, grid_rows, |x, y| {
+            grid[y * grid_cols + x].and_then(|(key, level)| (level >= layer).then_some(key))
+        });
+        for shape in shapes {
+            let d = &mut rects[shape.key];
+            for contour in &shape.path {
+                if !d.is_empty() {
+                    d.push(' ');
+                }
+                build_svg_path(d, contour, fx, fy);
+            }
+        }
+
+        for (col, row, glyph, key, _) in items.iter().filter(|item| item.4 >= layer) {
+            let x = |v: f32| (*col as f32 * cell.width + v).r2p(fp);
+            let y = |v: f32| (*row as f32 * cell.height + v).r2p(fp);
+
+            // Polygons of the same color are combined into a single path, so that polygons in
+            // adjacent cells are rasterized together and join without seams.
+            let d = &mut polygons[*key];
+            for polygon in &glyph.polygons {
+                for (i, &(px, py)) in polygon.iter().enumerate() {
+                    if !d.is_empty() {
+                        d.push(' ');
+                    }
+                    d.push_str(&format!(
+                        "{}{},{}",
+                        if i == 0 { "M" } else { "L" },
+                        x(px),
+                        y(py)
+                    ));
+                }
+                d.push_str(" Z");
+            }
+
+            // Curves of the same color are combined into a single path.
+            let d = &mut curves[*key];
+            for curve in &glyph.curves {
+                if !d.is_empty() {
+                    d.push(' ');
+                }
+                d.push_str(&format!("M{},{}", x(curve.start.0), y(curve.start.1)));
+                for segment in &curve.segments {
+                    match *segment {
+                        glyphs::Segment::Line((px, py)) => {
+                            d.push_str(&format!(" L{},{}", x(px), y(py)));
+                        }
+                        glyphs::Segment::Arc {
+                            to: (px, py),
+                            radius,
+                            clockwise,
+                        } => {
+                            let r = radius.r2p(fp);
+                            let sweep = u8::from(clockwise);
+                            d.push_str(&format!(" A{r},{r} 0 0 {sweep} {},{}", x(px), y(py)));
+                        }
+                    }
+                }
+            }
+        }
+
+        layers.push((rects, polygons, curves));
+    }
+
+    let mut group = element::Group::new();
+    let stroke = opt.settings.rendering.svg.stroke;
+    if let Some(stroke) = stroke {
+        group = group.set("stroke-width", stroke.r2p(fp));
+    }
+
+    for (key, (color, levels)) in colors.iter().enumerate() {
+        let mut below = 0.0;
+        for (layer, &level) in levels.iter().enumerate() {
+            // Opacity that brings the layers below up to the opacity of this layer.
+            let opacity = ((level - below) / (1.0 - below)).r2p(fp);
+            below = level;
+
+            // Filled shapes are widened by the extra stroke, so curves are widened by the same amount.
+            let curve_width = (glyphs::LIGHT + stroke.map(|s| s.f32()).unwrap_or_default()).r2p(fp);
+
+            let (rects, polygons, curves) = &layers[layer];
+            let mut paths = Vec::new();
+            for d in [&rects[key], &polygons[key]] {
+                if d.is_empty() {
+                    continue;
+                }
+                let mut path = element::Path::new()
+                    .set("fill", color.clone())
+                    .set("d", d.clone());
+                if stroke.is_some() {
+                    path = path.set("stroke", color.clone());
+                }
+                paths.push(path);
+            }
+            if !curves[key].is_empty() {
+                paths.push(
+                    element::Path::new()
+                        .set("fill", "none")
+                        .set("stroke", color.clone())
+                        .set("stroke-width", curve_width)
+                        .set("d", curves[key].clone()),
+                );
+            }
+
+            match (opacity < 1.0, paths.len()) {
+                (false, _) => {
+                    for path in paths {
+                        group = group.add(path);
+                    }
+                }
+                (true, 1) => group = group.add(paths.remove(0).set("opacity", opacity)),
+                (true, _) => {
+                    // The paths overlap where they join, so the opacity is applied to them as a whole.
+                    let mut layer = element::Group::new().set("opacity", opacity);
+                    for path in paths {
+                        layer = layer.add(path);
+                    }
+                    group = group.add(layer);
+                }
+            }
+        }
+    }
+
+    Some(group)
 }
 
 /// Creates a new SVG container element.
@@ -1148,6 +1414,20 @@ impl<'a> Iterator for Subclusters<'a> {
             };
 
             let ch = next.str().chars().next();
+
+            // Characters drawn as shapes are left out of the text.
+            if self.opt.settings.rendering.builtin_glyphs && ch.is_some_and(glyphs::is_builtin) {
+                if let Some(segment) = self.split() {
+                    return Some(segment);
+                }
+                self.cell_range.end += next.width();
+                self.cell_range.start = self.cell_range.end;
+                self.text_range.end += next.str().len();
+                self.text_range.start = self.text_range.end;
+                self.next = None;
+                continue;
+            }
+
             let font = ch.and_then(|ch| find_matching_font(ch, self.weight, self.style, self.opt));
             let old_font = std::mem::replace(&mut self.font, font);
 

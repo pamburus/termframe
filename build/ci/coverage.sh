@@ -87,6 +87,10 @@ function test() {
         rm -f ${tmp:?}
     done
 
+    echo "test font glyphs instead of built-in glyphs"
+    ${MAIN_EXECUTABLE:?} --config - --mode dark --builtin-glyphs false <assets/test/input/glyphs.ansi -o target/coverage/tmp/font-glyphs-test.svg
+    rm -f target/coverage/tmp/font-glyphs-test.svg
+
     echo "test font subsetting"
     ${MAIN_EXECUTABLE:?} --config - --mode dark -W 80 -H 24 --embed-fonts true --subset-fonts true <assets/test/input/sample.ansi -o target/coverage/tmp/subset-test.svg
     rm -f target/coverage/tmp/subset-test.svg

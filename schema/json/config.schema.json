@@ -216,6 +216,9 @@
         "bold-is-bright": {
           "type": "boolean"
         },
+        "builtin-glyphs": {
+          "type": "boolean"
+        },
         "faint-opacity": {
           "type": "number"
         },

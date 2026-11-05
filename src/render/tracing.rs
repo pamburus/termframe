@@ -24,10 +24,21 @@ where
     let clusters = find_clusters(cols, rows, group);
     let mut result = Vec::new();
     for (key, cluster) in clusters {
-        let mask = create_mask(&cluster, cols, rows);
+        // Trace within the bounding box of the cluster to keep the mask small on large grids.
+        let x0 = cluster.iter().map(|p| p.0).min().unwrap_or(0);
+        let y0 = cluster.iter().map(|p| p.1).min().unwrap_or(0);
+        let x1 = cluster.iter().map(|p| p.0).max().unwrap_or(0);
+        let y1 = cluster.iter().map(|p| p.1).max().unwrap_or(0);
+        let local: Vec<_> = cluster.iter().map(|&(x, y)| (x - x0, y - y0)).collect();
+
+        let mask = create_mask(&local, x1 - x0 + 1, y1 - y0 + 1);
         let contours = extract_contours(&mask);
         let oriented = reorient_contours(contours);
-        let path = oriented.into_iter().map(optimize_contour).collect();
+        let offset = |(x, y): Point| (x + x0 as i32, y + y0 as i32);
+        let path = oriented
+            .into_iter()
+            .map(|contour| optimize_contour(contour).into_iter().map(offset).collect())
+            .collect();
         result.push(Shape { key, path });
     }
     result

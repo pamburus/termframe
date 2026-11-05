@@ -104,6 +104,18 @@ pub struct Opt {
     )]
     pub bold_is_bright: bool,
 
+    /// Draw block elements and box-drawing characters as shapes instead of using font glyphs.
+    #[arg(
+        long,
+        num_args = 0..=1,
+        default_value_t = cfg().rendering.builtin_glyphs,
+        default_missing_value = "true",
+        hide_possible_values = true,
+        overrides_with = "builtin_glyphs",
+        value_name = "ENABLED",
+    )]
+    pub builtin_glyphs: bool,
+
     /// Bold text font weight.
     #[arg(long, default_value_t = cfg().font.weights.bold.into(), overrides_with = "bold_font_weight", value_name = "WEIGHT")]
     pub bold_font_weight: FontWeight,
@@ -316,6 +328,7 @@ impl config::Patch for Opt {
         settings.rendering.faint_opacity = self.faint_opacity.into();
         settings.rendering.line_height = self.line_height.into();
         settings.rendering.bold_is_bright = self.bold_is_bright;
+        settings.rendering.builtin_glyphs = self.builtin_glyphs;
         settings.theme = self.theme.clone();
         if let Some(theme) = &self.syntax_theme {
             settings.syntax.theme = Some(theme.clone());

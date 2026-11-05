@@ -13,6 +13,7 @@ use crate::{
 };
 
 // modules
+mod glyphs;
 pub mod svg;
 mod tracing;
 

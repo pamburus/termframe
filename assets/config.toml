@@ -1,4 +1,4 @@
-#:schema https://raw.githubusercontent.com/pamburus/termframe/v0.9.3/schema/json/config.schema.json
+#:schema ../schema/json/config.schema.json
 
 # Dark or light mode.
 # Possible values: [auto, dark, light].
@@ -108,6 +108,10 @@ line-height = 1.2
 #
 # Use bright colors for bold text.
 bold-is-bright = false
+#
+# Draw block elements and box-drawing characters as shapes instead of using font glyphs,
+# so that adjacent characters join without gaps regardless of the font and line height.
+builtin-glyphs = true
 #
 # Faint/dim text opacity.
 faint-opacity = 0.5

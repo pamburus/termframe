@@ -162,6 +162,7 @@ pub struct Rendering {
     pub line_height: Number,
     pub faint_opacity: Number,
     pub bold_is_bright: bool,
+    pub builtin_glyphs: bool,
     pub svg: Svg,
 }
 

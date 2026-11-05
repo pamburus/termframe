@@ -1,0 +1,556 @@
+<svg height="567.2" width="659.2" xmlns="http://www.w3.org/2000/svg">
+<g transform="translate(32,16)">
+<filter filterUnits="userSpaceOnUse" height="575.2" id="shadow" width="667.2" x="-32" y="-24">
+<feGaussianBlur stdDeviation="12"/>
+</filter>
+<rect fill="#000000c0" filter="url(#shadow)" height="503.2" rx="10" ry="10" width="595.2" x="4" y="12"/>
+<rect fill="#282c34" height="503.2" rx="10" ry="10" width="595.2"/>
+<clipPath id="header">
+<rect height="28" width="595.2"/>
+</clipPath>
+<rect clip-path="url(#header)" fill="#383837" height="56" rx="10" ry="10" width="595.2"/>
+<line stroke="#000000c0" stroke-width="0.5" x1="0" x2="595.2" y1="28" y2="28"/>
+<g>
+<circle cx="14" cy="14" fill="#ff5f56" r="6" stroke="#ff5f56" stroke-width="0.5"/>
+<circle cx="34" cy="14" fill="#ffbd2e" r="6" stroke="#ffbd2e" stroke-width="0.5"/>
+<circle cx="54" cy="14" fill="#28c941" r="6" stroke="#28c941" stroke-width="0.5"/>
+</g>
+<svg class="terminal" font-family="JetBrains Mono, Fira Code, Source Code Pro, Cascadia Code, Consolas, Menlo, Monaco, DejaVu Sans Mono, monospace, Symbols Nerd Font Mono, Cascadia Mono" font-size="12" height="475.2" width="595.2" y="28">
+<svg fill="#dcdfe4" x="9.6" y="7.2">
+<g>
+<svg height="460.8" viewBox="0 0 48 38.4" width="576">
+<g stroke-width="0.025">
+<path d="M0,6 H0.6 V7.2 H0 Z" fill="#f2c130" stroke="#f2c130"/>
+<path d="M0.6,6 H1.2 V7.2 H0.6 Z" fill="#f2de30" stroke="#f2de30"/>
+<path d="M1.2,6 H1.8 V7.2 H1.2 Z" fill="#e8f230" stroke="#e8f230"/>
+<path d="M1.8,6 H2.4 V7.2 H1.8 Z" fill="#cbf230" stroke="#cbf230"/>
+<path d="M2.4,6 H3 V7.2 H2.4 Z" fill="#aef230" stroke="#aef230"/>
+<path d="M3,6 H3.6 V7.2 H3 Z" fill="#91f230" stroke="#91f230"/>
+<path d="M3.6,6 H4.2 V7.2 H3.6 Z" fill="#74f230" stroke="#74f230"/>
+<path d="M4.2,6 H4.8 V7.2 H4.2 Z" fill="#57f230" stroke="#57f230"/>
+<path d="M4.8,6 H5.4 V7.2 H4.8 Z" fill="#3af230" stroke="#3af230"/>
+<path d="M5.4,6 H6 V7.2 H5.4 Z" fill="#30f243" stroke="#30f243"/>
+<path d="M6,6 H6.6 V7.2 H6 Z" fill="#30f260" stroke="#30f260"/>
+<path d="M6.6,6 H7.2 V7.2 H6.6 Z" fill="#30f27d" stroke="#30f27d"/>
+<path d="M7.2,6 H7.8 V7.2 H7.2 Z" fill="#30f29b" stroke="#30f29b"/>
+<path d="M7.8,6 H8.4 V7.2 H7.8 Z" fill="#30f2b8" stroke="#30f2b8"/>
+<path d="M8.4,6 H9 V7.2 H8.4 Z" fill="#30f2d5" stroke="#30f2d5"/>
+<path d="M9,6 H9.6 V7.2 H9 Z" fill="#30f2f2" stroke="#30f2f2"/>
+<path d="M9.6,6 H10.2 V7.2 H9.6 Z" fill="#30d5f2" stroke="#30d5f2"/>
+<path d="M10.2,6 H10.8 V7.2 H10.2 Z" fill="#30b8f2" stroke="#30b8f2"/>
+<path d="M10.8,6 H11.4 V7.2 H10.8 Z" fill="#309bf2" stroke="#309bf2"/>
+<path d="M11.4,6 H12 V7.2 H11.4 Z" fill="#307df2" stroke="#307df2"/>
+<path d="M12,6 H12.6 V7.2 H12 Z" fill="#3060f2" stroke="#3060f2"/>
+<path d="M12.6,6 H13.2 V7.2 H12.6 Z" fill="#3043f2" stroke="#3043f2"/>
+<path d="M13.2,6 H13.8 V7.2 H13.2 Z" fill="#3a30f2" stroke="#3a30f2"/>
+<path d="M13.8,6 H14.4 V7.2 H13.8 Z" fill="#5730f2" stroke="#5730f2"/>
+<path d="M14.4,6 H15 V7.2 H14.4 Z" fill="#7430f2" stroke="#7430f2"/>
+<path d="M15,6 H15.6 V7.2 H15 Z" fill="#9130f2" stroke="#9130f2"/>
+<path d="M15.6,6 H16.2 V7.2 H15.6 Z" fill="#ae30f2" stroke="#ae30f2"/>
+<path d="M16.2,6 H16.8 V7.2 H16.2 Z" fill="#cb30f2" stroke="#cb30f2"/>
+<path d="M16.8,6 H17.4 V7.2 H16.8 Z" fill="#e830f2" stroke="#e830f2"/>
+<path d="M17.4,6 H18 V7.2 H17.4 Z" fill="#f230de" stroke="#f230de"/>
+<path d="M18,6 H18.6 V7.2 H18 Z" fill="#f230c1" stroke="#f230c1"/>
+<path d="M18.6,6 H19.2 V7.2 H18.6 Z" fill="#f230a4" stroke="#f230a4"/>
+<path d="M19.2,6 H19.8 V7.2 H19.2 Z" fill="#f23087" stroke="#f23087"/>
+<path d="M19.8,6 H20.4 V7.2 H19.8 Z" fill="#f2306a" stroke="#f2306a"/>
+<path d="M20.4,6 H21 V7.2 H20.4 Z" fill="#f2304d" stroke="#f2304d"/>
+<path d="M21,6 H21.6 V7.2 H21 Z" fill="#f23030" stroke="#f23030"/>
+<path d="M21.6,6 H22.2 V7.2 H21.6 Z" fill="#f24d30" stroke="#f24d30"/>
+<path d="M22.2,6 H22.8 V7.2 H22.2 Z" fill="#f26a30" stroke="#f26a30"/>
+<path d="M22.8,6 H23.4 V7.2 H22.8 Z" fill="#f28730" stroke="#f28730"/>
+<path d="M23.4,6 H24 V7.2 H23.4 Z" fill="#f2a430" stroke="#f2a430"/>
+<path d="M0,7.2 H0.6 V8.4 H0 Z" fill="#f2de30" stroke="#f2de30"/>
+<path d="M0.6,7.2 H1.2 V8.4 H0.6 Z" fill="#e8f230" stroke="#e8f230"/>
+<path d="M1.2,7.2 H1.8 V8.4 H1.2 Z" fill="#cbf230" stroke="#cbf230"/>
+<path d="M1.8,7.2 H2.4 V8.4 H1.8 Z" fill="#aef230" stroke="#aef230"/>
+<path d="M2.4,7.2 H3 V8.4 H2.4 Z" fill="#91f230" stroke="#91f230"/>
+<path d="M3,7.2 H3.6 V8.4 H3 Z" fill="#74f230" stroke="#74f230"/>
+<path d="M3.6,7.2 H4.2 V8.4 H3.6 Z" fill="#57f230" stroke="#57f230"/>
+<path d="M4.2,7.2 H4.8 V8.4 H4.2 Z" fill="#3af230" stroke="#3af230"/>
+<path d="M4.8,7.2 H5.4 V8.4 H4.8 Z" fill="#30f243" stroke="#30f243"/>
+<path d="M5.4,7.2 H6 V8.4 H5.4 Z" fill="#30f260" stroke="#30f260"/>
+<path d="M6,7.2 H6.6 V8.4 H6 Z" fill="#30f27d" stroke="#30f27d"/>
+<path d="M6.6,7.2 H7.2 V8.4 H6.6 Z" fill="#30f29b" stroke="#30f29b"/>
+<path d="M7.2,7.2 H7.8 V8.4 H7.2 Z" fill="#30f2b8" stroke="#30f2b8"/>
+<path d="M7.8,7.2 H8.4 V8.4 H7.8 Z" fill="#30f2d5" stroke="#30f2d5"/>
+<path d="M8.4,7.2 H9 V8.4 H8.4 Z" fill="#30f2f2" stroke="#30f2f2"/>
+<path d="M9,7.2 H9.6 V8.4 H9 Z" fill="#30d5f2" stroke="#30d5f2"/>
+<path d="M9.6,7.2 H10.2 V8.4 H9.6 Z" fill="#30b8f2" stroke="#30b8f2"/>
+<path d="M10.2,7.2 H10.8 V8.4 H10.2 Z" fill="#309bf2" stroke="#309bf2"/>
+<path d="M10.8,7.2 H11.4 V8.4 H10.8 Z" fill="#307df2" stroke="#307df2"/>
+<path d="M11.4,7.2 H12 V8.4 H11.4 Z" fill="#3060f2" stroke="#3060f2"/>
+<path d="M12,7.2 H12.6 V8.4 H12 Z" fill="#3043f2" stroke="#3043f2"/>
+<path d="M12.6,7.2 H13.2 V8.4 H12.6 Z" fill="#3a30f2" stroke="#3a30f2"/>
+<path d="M13.2,7.2 H13.8 V8.4 H13.2 Z" fill="#5730f2" stroke="#5730f2"/>
+<path d="M13.8,7.2 H14.4 V8.4 H13.8 Z" fill="#7430f2" stroke="#7430f2"/>
+<path d="M14.4,7.2 H15 V8.4 H14.4 Z" fill="#9130f2" stroke="#9130f2"/>
+<path d="M15,7.2 H15.6 V8.4 H15 Z" fill="#ae30f2" stroke="#ae30f2"/>
+<path d="M15.6,7.2 H16.2 V8.4 H15.6 Z" fill="#cb30f2" stroke="#cb30f2"/>
+<path d="M16.2,7.2 H16.8 V8.4 H16.2 Z" fill="#e830f2" stroke="#e830f2"/>
+<path d="M16.8,7.2 H17.4 V8.4 H16.8 Z" fill="#f230de" stroke="#f230de"/>
+<path d="M17.4,7.2 H18 V8.4 H17.4 Z" fill="#f230c1" stroke="#f230c1"/>
+<path d="M18,7.2 H18.6 V8.4 H18 Z" fill="#f230a4" stroke="#f230a4"/>
+<path d="M18.6,7.2 H19.2 V8.4 H18.6 Z" fill="#f23087" stroke="#f23087"/>
+<path d="M19.2,7.2 H19.8 V8.4 H19.2 Z" fill="#f2306a" stroke="#f2306a"/>
+<path d="M19.8,7.2 H20.4 V8.4 H19.8 Z" fill="#f2304d" stroke="#f2304d"/>
+<path d="M20.4,7.2 H21 V8.4 H20.4 Z" fill="#f23030" stroke="#f23030"/>
+<path d="M21,7.2 H21.6 V8.4 H21 Z" fill="#f24d30" stroke="#f24d30"/>
+<path d="M21.6,7.2 H22.2 V8.4 H21.6 Z" fill="#f26a30" stroke="#f26a30"/>
+<path d="M22.2,7.2 H22.8 V8.4 H22.2 Z" fill="#f28730" stroke="#f28730"/>
+<path d="M22.8,7.2 H23.4 V8.4 H22.8 Z" fill="#f2a430" stroke="#f2a430"/>
+<path d="M23.4,7.2 H24 V8.4 H23.4 Z" fill="#f2c130" stroke="#f2c130"/>
+<path d="M0,8.4 H0.6 V9.6 H0 Z" fill="#e8f230" stroke="#e8f230"/>
+<path d="M0.6,8.4 H1.2 V9.6 H0.6 Z" fill="#cbf230" stroke="#cbf230"/>
+<path d="M1.2,8.4 H1.8 V9.6 H1.2 Z" fill="#aef230" stroke="#aef230"/>
+<path d="M1.8,8.4 H2.4 V9.6 H1.8 Z" fill="#91f230" stroke="#91f230"/>
+<path d="M2.4,8.4 H3 V9.6 H2.4 Z" fill="#74f230" stroke="#74f230"/>
+<path d="M3,8.4 H3.6 V9.6 H3 Z" fill="#57f230" stroke="#57f230"/>
+<path d="M3.6,8.4 H4.2 V9.6 H3.6 Z" fill="#3af230" stroke="#3af230"/>
+<path d="M4.2,8.4 H4.8 V9.6 H4.2 Z" fill="#30f243" stroke="#30f243"/>
+<path d="M4.8,8.4 H5.4 V9.6 H4.8 Z" fill="#30f260" stroke="#30f260"/>
+<path d="M5.4,8.4 H6 V9.6 H5.4 Z" fill="#30f27d" stroke="#30f27d"/>
+<path d="M6,8.4 H6.6 V9.6 H6 Z" fill="#30f29b" stroke="#30f29b"/>
+<path d="M6.6,8.4 H7.2 V9.6 H6.6 Z" fill="#30f2b8" stroke="#30f2b8"/>
+<path d="M7.2,8.4 H7.8 V9.6 H7.2 Z" fill="#30f2d5" stroke="#30f2d5"/>
+<path d="M7.8,8.4 H8.4 V9.6 H7.8 Z" fill="#30f2f2" stroke="#30f2f2"/>
+<path d="M8.4,8.4 H9 V9.6 H8.4 Z" fill="#30d5f2" stroke="#30d5f2"/>
+<path d="M9,8.4 H9.6 V9.6 H9 Z" fill="#30b8f2" stroke="#30b8f2"/>
+<path d="M9.6,8.4 H10.2 V9.6 H9.6 Z" fill="#309bf2" stroke="#309bf2"/>
+<path d="M10.2,8.4 H10.8 V9.6 H10.2 Z" fill="#307df2" stroke="#307df2"/>
+<path d="M10.8,8.4 H11.4 V9.6 H10.8 Z" fill="#3060f2" stroke="#3060f2"/>
+<path d="M11.4,8.4 H12 V9.6 H11.4 Z" fill="#3043f2" stroke="#3043f2"/>
+<path d="M12,8.4 H12.6 V9.6 H12 Z" fill="#3a30f2" stroke="#3a30f2"/>
+<path d="M12.6,8.4 H13.2 V9.6 H12.6 Z" fill="#5730f2" stroke="#5730f2"/>
+<path d="M13.2,8.4 H13.8 V9.6 H13.2 Z" fill="#7430f2" stroke="#7430f2"/>
+<path d="M13.8,8.4 H14.4 V9.6 H13.8 Z" fill="#9130f2" stroke="#9130f2"/>
+<path d="M14.4,8.4 H15 V9.6 H14.4 Z" fill="#ae30f2" stroke="#ae30f2"/>
+<path d="M15,8.4 H15.6 V9.6 H15 Z" fill="#cb30f2" stroke="#cb30f2"/>
+<path d="M15.6,8.4 H16.2 V9.6 H15.6 Z" fill="#e830f2" stroke="#e830f2"/>
+<path d="M16.2,8.4 H16.8 V9.6 H16.2 Z" fill="#f230de" stroke="#f230de"/>
+<path d="M16.8,8.4 H17.4 V9.6 H16.8 Z" fill="#f230c1" stroke="#f230c1"/>
+<path d="M17.4,8.4 H18 V9.6 H17.4 Z" fill="#f230a4" stroke="#f230a4"/>
+<path d="M18,8.4 H18.6 V9.6 H18 Z" fill="#f23087" stroke="#f23087"/>
+<path d="M18.6,8.4 H19.2 V9.6 H18.6 Z" fill="#f2306a" stroke="#f2306a"/>
+<path d="M19.2,8.4 H19.8 V9.6 H19.2 Z" fill="#f2304d" stroke="#f2304d"/>
+<path d="M19.8,8.4 H20.4 V9.6 H19.8 Z" fill="#f23030" stroke="#f23030"/>
+<path d="M20.4,8.4 H21 V9.6 H20.4 Z" fill="#f24d30" stroke="#f24d30"/>
+<path d="M21,8.4 H21.6 V9.6 H21 Z" fill="#f26a30" stroke="#f26a30"/>
+<path d="M21.6,8.4 H22.2 V9.6 H21.6 Z" fill="#f28730" stroke="#f28730"/>
+<path d="M22.2,8.4 H22.8 V9.6 H22.2 Z" fill="#f2a430" stroke="#f2a430"/>
+<path d="M22.8,8.4 H23.4 V9.6 H22.8 Z" fill="#f2c130" stroke="#f2c130"/>
+<path d="M23.4,8.4 H24 V9.6 H23.4 Z" fill="#f2de30" stroke="#f2de30"/>
+<path d="M0,10.8 H24 V13.2 H0 Z" fill="#1e1e1e" stroke="#1e1e1e"/>
+<path d="M0,14.4 H24 V18 H0 Z" fill="#142850" stroke="#142850"/>
+<path d="M0,19.2 H24 V22.8 H0 Z" fill="#3c143c" stroke="#3c143c"/>
+<path d="M0,28.8 H24 V30 H0 Z" fill="#282878" stroke="#282878"/>
+</g>
+<g stroke-width="0.025">
+<path d="M0,1.2 H24 V4.8 H0 Z" fill="#c87828" stroke="#c87828"/>
+<path d="M0,6 H0.6 V6.6 H0 Z M23.4,7.2 H24 V7.8 H23.4 Z M22.8,8.4 H23.4 V9 H22.8 Z M0,11.4 H0.3 V12 H0 Z M0.3,12.6 H0.6 V13.2 H0.3 Z M0,14.4 H0.3 V14.8 H0 Z M0,16 H0.3 V16.4 H0 Z M0,16.8 H0.6 V17.2 H0.3 V17.6 H0 Z M0,19.5 H0.3 V19.8 H0 Z M0,20.4 H0.6 V21 H0.3 V20.7 H0 Z M0,21.6 H0.3 V21.9 H0 Z M0,22.2 H0.3 V22.5 H0 Z" fill="#f23030" stroke="#f23030"/>
+<path d="M0.6,6 H1.2 V6.6 H0.6 Z M0,7.2 H0.6 V7.8 H0 Z M23.4,8.4 H24 V9 H23.4 Z M0.9,11.4 H1.2 V12 H0.9 Z M0.6,12 H0.9 V12.6 H0.6 Z M0.9,14.8 H1.2 V15.2 H0.9 Z M0.6,15.6 H1.2 V16.4 H0.9 V16 H0.6 Z M0.6,17.2 H0.9 V16.8 H1.2 V17.6 H0.6 Z M0.9,19.2 H1.2 V19.5 H0.9 Z M0.6,19.8 H0.9 V20.1 H0.6 Z M0.9,20.7 H1.2 V21 H0.9 Z M0.6,21 H0.9 V21.3 H0.6 Z M0.6,21.6 H0.9 V21.9 H1.2 V22.2 H0.9 V22.5 H0.6 Z" fill="#f24d30" stroke="#f24d30"/>
+<path d="M1.2,6 H1.8 V6.6 H1.2 Z M0.6,7.2 H1.2 V7.8 H0.6 Z M0,8.4 H0.6 V9 H0 Z M1.2,10.8 H1.5 V11.4 H1.2 Z M1.2,12 H1.5 V12.6 H1.8 V13.2 H1.2 Z M1.2,14.4 H1.8 V15.2 H1.2 Z M1.5,15.6 H1.8 V16 H1.5 Z M1.2,16.4 H1.5 V16.8 H1.2 Z M1.5,16.8 H1.8 V17.2 H1.5 Z M1.2,17.2 H1.5 V18 H1.2 Z M1.2,19.5 H1.5 V19.2 H1.8 V19.8 H1.5 V20.1 H1.2 Z M1.2,20.4 H1.8 V20.7 H1.2 Z M1.5,21 H1.8 V21.3 H1.5 Z M1.2,21.6 H1.5 V21.9 H1.2 Z M1.5,21.9 H1.8 V22.5 H1.5 Z" fill="#f26a30" stroke="#f26a30"/>
+<path d="M1.8,6 H2.4 V6.6 H1.8 Z M1.2,7.2 H1.8 V7.8 H1.2 Z M0.6,8.4 H1.2 V9 H0.6 Z M1.8,10.8 H2.1 V11.4 H2.4 V12 H2.1 V12.6 H1.8 Z M2.1,12.6 H2.4 V13.2 H2.1 Z M1.8,14.4 H2.4 V14.8 H2.1 V15.6 H1.8 Z M2.1,15.6 H2.4 V16.4 H2.1 Z M1.8,16.4 H2.1 V17.2 H2.4 V17.6 H2.1 V18 H1.8 Z M2.1,19.2 H2.4 V20.1 H2.1 Z M1.8,20.4 H2.4 V21.3 H2.1 V21 H1.8 Z M1.8,21.9 H2.1 V22.2 H2.4 V22.5 H1.8 Z" fill="#f28730" stroke="#f28730"/>
+<path d="M2.4,6 H3 V6.6 H2.4 Z M1.8,7.2 H2.4 V7.8 H1.8 Z M1.2,8.4 H1.8 V9 H1.2 Z M2.4,10.8 H2.7 V11.4 H2.4 Z M2.4,12 H2.7 V11.4 H3 V12.6 H2.7 V13.2 H2.4 Z M2.4,14.8 H2.7 V14.4 H3 V15.2 H2.7 V16 H2.4 Z M2.7,16.4 H3 V16.8 H2.7 Z M2.4,17.2 H2.7 V17.6 H2.4 Z M2.7,17.6 H3 V18 H2.7 Z M2.4,19.2 H2.7 V19.8 H3 V20.1 H2.4 Z M2.4,21 H2.7 V20.4 H3 V21.3 H2.4 Z M2.4,21.6 H2.7 V21.9 H2.4 Z M2.4,22.5 H2.7 V22.8 H2.4 Z" fill="#f2a430" stroke="#f2a430"/>
+<path d="M3,6 H3.6 V6.6 H3 Z M2.4,7.2 H3 V7.8 H2.4 Z M1.8,8.4 H2.4 V9 H1.8 Z M3,10.8 H3.6 V11.4 H3.3 V12 H3.6 V13.2 H3.3 V12.6 H3 Z M3,14.4 H3.3 V15.2 H3 Z M3.3,15.2 H3.6 V15.6 H3.3 Z M3.3,16 H3.6 V16.8 H3.3 Z M3,17.2 H3.6 V18 H3.3 V17.6 H3 Z M3.3,19.2 H3.6 V19.5 H3.3 Z M3,20.1 H3.3 V20.4 H3.6 V20.7 H3.3 V21 H3 Z M3,21.3 H3.3 V21.6 H3 Z M3,21.9 H3.6 V22.2 H3 Z M3,22.5 H3.3 V22.8 H3 Z" fill="#f2c130" stroke="#f2c130"/>
+<path d="M3.6,6 H4.2 V6.6 H3.6 Z M3,7.2 H3.6 V7.8 H3 Z M2.4,8.4 H3 V9 H2.4 Z M3.6,10.8 H4.2 V12.6 H3.9 V11.4 H3.6 Z M3.6,14.4 H3.9 V14.8 H4.2 V15.6 H3.9 V15.2 H3.6 Z M3.6,16.4 H4.2 V17.2 H3.6 Z M3.6,17.6 H4.2 V18 H3.6 Z M3.6,19.2 H3.9 V19.5 H4.2 V19.8 H3.6 Z M3.6,20.1 H3.9 V20.4 H4.2 V20.7 H3.6 Z M3.6,21 H3.9 V21.9 H3.6 Z M3.9,21.9 H4.2 V22.2 H3.9 Z M3.6,22.2 H3.9 V22.8 H3.6 Z" fill="#f2de30" stroke="#f2de30"/>
+<path d="M4.2,6 H4.8 V6.6 H4.2 Z M3.6,7.2 H4.2 V7.8 H3.6 Z M3,8.4 H3.6 V9 H3 Z M4.5,10.8 H4.8 V11.4 H4.5 Z M4.5,12 H4.8 V12.6 H4.5 Z M4.2,12.6 H4.5 V13.2 H4.2 Z M4.2,14.8 H4.5 V15.2 H4.8 V16 H4.5 V16.4 H4.8 V18 H4.2 V17.6 H4.5 V16.8 H4.2 Z M4.2,19.2 H4.8 V19.8 H4.5 V19.5 H4.2 Z M4.2,19.8 H4.5 V20.7 H4.2 Z M4.5,21 H4.8 V21.3 H4.5 Z M4.2,21.3 H4.5 V21.6 H4.2 Z M4.5,21.6 H4.8 V21.9 H4.5 Z M4.2,21.9 H4.5 V22.2 H4.2 Z M4.5,22.2 H4.8 V22.5 H4.5 Z M4.2,22.5 H4.5 V22.8 H4.2 Z" fill="#e8f230" stroke="#e8f230"/>
+<path d="M4.8,6 H5.4 V6.6 H4.8 Z M4.2,7.2 H4.8 V7.8 H4.2 Z M3.6,8.4 H4.2 V9 H3.6 Z M5.1,10.8 H5.4 V11.4 H5.1 Z M4.8,11.4 H5.1 V12 H4.8 Z M4.8,12.6 H5.1 V12 H5.4 V13.2 H4.8 Z M4.8,14.4 H5.4 V17.2 H4.8 V16 H5.1 V15.6 H4.8 V15.2 H5.1 V14.8 H4.8 Z M4.8,19.2 H5.4 V19.5 H5.1 V19.8 H4.8 Z M5.1,19.8 H5.4 V20.1 H5.1 Z M4.8,20.1 H5.1 V20.4 H4.8 Z M4.8,20.7 H5.4 V21.3 H5.1 V21 H4.8 Z M4.8,21.3 H5.1 V21.9 H4.8 Z M4.8,22.2 H5.4 V22.5 H5.1 V22.8 H4.8 Z" fill="#cbf230" stroke="#cbf230"/>
+<path d="M5.4,6 H6 V6.6 H5.4 Z M4.8,7.2 H5.4 V7.8 H4.8 Z M4.2,8.4 H4.8 V9 H4.2 Z M5.4,11.4 H5.7 V10.8 H6 V12 H5.4 Z M5.4,13.05 H6 V13.2 H5.4 Z M5.4,14.8 H5.7 V15.2 H5.4 Z M5.4,15.6 H6 V16 H5.7 V16.4 H5.4 Z M5.7,16.8 H6 V17.6 H5.7 Z M5.7,19.2 H6 V19.5 H5.7 Z M5.4,19.8 H6 V20.1 H5.7 V20.4 H6 V20.7 H5.7 V21 H6 V21.3 H5.7 V21.6 H5.4 Z M5.4,21.9 H6 V22.5 H5.7 V22.8 H5.4 Z" fill="#aef230" stroke="#aef230"/>
+<path d="M6,6 H6.6 V6.6 H6 Z M5.4,7.2 H6 V7.8 H5.4 Z M4.8,8.4 H5.4 V9 H4.8 Z M6,11.85 H6.6 V12 H6 Z M6,12.9 H6.6 V13.2 H6 Z M6,14.4 H6.6 V15.2 H6.3 V14.8 H6 Z M6,16 H6.3 V15.6 H6.6 V16.4 H6 Z M6,16.8 H6.3 V17.2 H6 Z M6,17.6 H6.3 V18 H6 Z M6,19.2 H6.3 V19.5 H6.6 V20.1 H6.3 V20.4 H6.6 V20.7 H6 Z M6.3,21.3 H6.6 V21.6 H6.3 Z M6.3,21.9 H6.6 V22.2 H6.3 Z M6.3,22.5 H6.6 V22.8 H6.3 Z" fill="#91f230" stroke="#91f230"/>
+<path d="M6.6,6 H7.2 V6.6 H6.6 Z M6,7.2 H6.6 V7.8 H6 Z M5.4,8.4 H6 V9 H5.4 Z M6.6,11.7 H7.2 V12 H6.6 Z M6.6,12.75 H7.2 V13.2 H6.6 Z M6.9,14.4 H7.2 V14.8 H6.9 Z M6.6,15.2 H6.9 V15.6 H6.6 Z M6.9,15.6 H7.2 V16 H6.9 Z M6.6,16 H6.9 V17.2 H6.6 Z M6.9,17.2 H7.2 V17.6 H6.9 Z M6.6,17.6 H6.9 V18 H6.6 Z M6.6,19.2 H6.9 V19.5 H6.6 Z M6.9,19.5 H7.2 V19.8 H6.9 Z M6.6,20.7 H6.9 V20.1 H7.2 V21 H6.6 Z M6.6,21.6 H6.9 V21.3 H7.2 V21.9 H6.6 Z M6.6,22.2 H6.9 V22.5 H6.6 Z M6.9,22.5 H7.2 V22.8 H6.9 Z" fill="#74f230" stroke="#74f230"/>
+<path d="M7.2,6 H7.8 V6.6 H7.2 Z M6.6,7.2 H7.2 V7.8 H6.6 Z M6,8.4 H6.6 V9 H6 Z M7.2,11.55 H7.8 V12 H7.2 Z M7.2,12.6 H7.8 V13.2 H7.2 Z M7.5,14.4 H7.8 V15.2 H7.5 Z M7.2,15.2 H7.5 V16 H7.8 V16.4 H7.5 V16.8 H7.2 Z M7.5,17.6 H7.8 V18 H7.5 Z M7.2,19.5 H7.5 V20.1 H7.2 Z M7.5,20.1 H7.8 V20.4 H7.5 Z M7.2,20.4 H7.5 V20.7 H7.2 Z M7.5,20.7 H7.8 V21 H7.5 Z M7.2,21 H7.5 V21.3 H7.2 Z M7.2,21.9 H7.5 V21.3 H7.8 V22.2 H7.5 V22.5 H7.2 Z M7.5,22.5 H7.8 V22.8 H7.5 Z" fill="#57f230" stroke="#57f230"/>
+<path d="M7.8,6 H8.4 V6.6 H7.8 Z M7.2,7.2 H7.8 V7.8 H7.2 Z M6.6,8.4 H7.2 V9 H6.6 Z M7.8,11.4 H8.4 V12 H7.8 Z M7.8,12.45 H8.4 V13.2 H7.8 Z M7.8,14.4 H8.1 V14.8 H7.8 Z M8.1,15.2 H8.4 V15.6 H8.1 Z M7.8,16 H8.1 V16.4 H7.8 Z M7.8,16.8 H8.1 V16.4 H8.4 V17.2 H8.1 V17.6 H7.8 Z M8.1,17.6 H8.4 V18 H8.1 Z M7.8,19.2 H8.4 V19.8 H8.1 V20.1 H7.8 Z M8.1,20.1 H8.4 V20.7 H8.1 Z M7.8,20.7 H8.1 V21 H7.8 Z M8.1,21 H8.4 V21.6 H8.1 Z M7.8,21.9 H8.4 V22.8 H8.1 V22.2 H7.8 Z" fill="#3af230" stroke="#3af230"/>
+<path d="M8.4,6 H9 V6.6 H8.4 Z M7.8,7.2 H8.4 V7.8 H7.8 Z M7.2,8.4 H7.8 V9 H7.2 Z M8.4,11.25 H9 V12 H8.4 Z M8.4,12.3 H9 V13.2 H8.4 Z M8.7,14.8 H9 V15.6 H8.7 Z M8.4,16 H9 V18 H8.7 V17.6 H8.4 V16.8 H8.7 V16.4 H8.4 Z M8.4,19.2 H8.7 V19.5 H9 V20.7 H8.4 V20.4 H8.7 V19.8 H8.4 Z M8.4,21 H9 V21.6 H8.7 V21.3 H8.4 Z M8.4,22.2 H8.7 V21.9 H9 V22.8 H8.7 V22.5 H8.4 Z" fill="#30f243" stroke="#30f243"/>
+<path d="M9,6 H9.6 V6.6 H9 Z M8.4,7.2 H9 V7.8 H8.4 Z M7.8,8.4 H8.4 V9 H7.8 Z M9,11.1 H9.6 V12 H9 Z M9,12.15 H9.6 V13.2 H9 Z M9,15.2 H9.6 V16 H9 Z M9,16.4 H9.6 V17.2 H9.3 V16.8 H9 Z M9,17.2 H9.3 V17.6 H9.6 V18 H9 Z M9,19.2 H9.3 V19.5 H9 Z M9,19.8 H9.3 V19.5 H9.6 V21.6 H9.3 V21.3 H9 V20.7 H9.3 V20.1 H9 Z M9,21.9 H9.3 V22.2 H9 Z M9,22.5 H9.6 V22.8 H9 Z" fill="#30f260" stroke="#30f260"/>
+<path d="M9.6,6 H10.2 V6.6 H9.6 Z M9,7.2 H9.6 V7.8 H9 Z M8.4,8.4 H9 V9 H8.4 Z M9.6,10.95 H10.2 V12 H9.675 V13.2 H9.6 Z M9.6,14.4 H10.2 V14.8 H9.9 V15.2 H10.2 V16.8 H9.9 V17.2 H10.2 V18 H9.6 V16.4 H9.9 V15.6 H9.6 Z M9.6,19.2 H9.9 V19.8 H9.6 Z M9.6,20.1 H10.2 V21 H9.9 V20.4 H9.6 Z M9.6,21.3 H10.2 V22.2 H9.6 Z M9.6,22.5 H10.2 V22.8 H9.6 Z" fill="#30f27d" stroke="#30f27d"/>
+<path d="M10.2,6 H10.8 V6.6 H10.2 Z M9.6,7.2 H10.2 V7.8 H9.6 Z M9,8.4 H9.6 V9 H9 Z M10.2,10.8 H10.275 V12 H10.35 V13.2 H10.2 Z M10.2,14.8 H10.5 V14.4 H10.8 V16 H10.2 Z M10.5,16.8 H10.8 V17.2 H10.5 Z M10.2,17.2 H10.5 V17.6 H10.2 Z M10.2,19.8 H10.5 V20.1 H10.8 V20.4 H10.5 V21.3 H10.8 V22.2 H10.5 V21.6 H10.2 Z M10.2,22.2 H10.5 V22.5 H10.8 V22.8 H10.2 Z" fill="#30f29b" stroke="#30f29b"/>
+<path d="M10.8,6 H11.4 V6.6 H10.8 Z M10.2,7.2 H10.8 V7.8 H10.2 Z M9.6,8.4 H10.2 V9 H9.6 Z M10.8,10.8 H10.95 V12 H11.025 V13.2 H10.8 Z M10.8,14.4 H11.4 V14.8 H11.1 V15.2 H10.8 Z M11.1,15.6 H11.4 V16.4 H11.1 Z M10.8,16.8 H11.1 V17.2 H11.4 V17.6 H10.8 Z M10.8,19.2 H11.4 V19.8 H11.1 V19.5 H10.8 Z M10.8,19.8 H11.1 V20.1 H11.4 V20.4 H10.8 Z M10.8,21.3 H11.1 V21 H11.4 V21.6 H11.1 V22.2 H10.8 Z M10.8,22.5 H11.1 V22.2 H11.4 V22.8 H10.8 Z" fill="#30f2b8" stroke="#30f2b8"/>
+<path d="M11.4,6 H12 V6.6 H11.4 Z M10.8,7.2 H11.4 V7.8 H10.8 Z M10.2,8.4 H10.8 V9 H10.2 Z M11.4,10.8 H11.625 V12 H11.7 V13.2 H11.4 Z M11.4,14.8 H11.7 V14.4 H12 V15.2 H11.4 Z M11.4,15.6 H11.7 V16 H11.4 Z M11.4,16.4 H11.7 V16.8 H11.4 Z M11.4,17.2 H11.7 V18 H11.4 Z M11.7,19.2 H12 V19.5 H11.7 Z M11.4,19.5 H11.7 V19.8 H11.4 Z M11.4,20.1 H11.7 V19.8 H12 V21.6 H11.7 V21.9 H11.4 V21.3 H11.7 V20.7 H11.4 Z M11.4,22.2 H12 V22.8 H11.4 Z" fill="#30f2d5" stroke="#30f2d5"/>
+<path d="M12,6 H12.6 V6.6 H12 Z M11.4,7.2 H12 V7.8 H11.4 Z M10.8,8.4 H11.4 V9 H10.8 Z M12,10.8 H12.3 V12 H12.375 V13.2 H12 Z M12.3,14.4 H12.6 V14.8 H12.3 Z M12,14.8 H12.3 V16 H12 Z M12.3,16 H12.6 V16.4 H12.3 Z M12,16.4 H12.3 V16.8 H12 Z M12,17.2 H12.6 V17.6 H12.3 V18 H12 Z M12.3,19.2 H12.6 V19.5 H12.3 Z M12,19.8 H12.6 V20.4 H12 Z M12,21 H12.3 V20.7 H12.6 V21.6 H12 Z M12,21.9 H12.3 V22.2 H12 Z" fill="#30f2f2" stroke="#30f2f2"/>
+<path d="M12.6,6 H13.2 V6.6 H12.6 Z M12,7.2 H12.6 V7.8 H12 Z M11.4,8.4 H12 V9 H11.4 Z M12.6,10.8 H12.975 V12 H13.05 V13.2 H12.6 Z M12.6,14.4 H12.9 V14.8 H13.2 V15.2 H12.9 V15.6 H12.6 Z M12.6,16.8 H12.9 V16.4 H13.2 V17.2 H12.6 Z M12.9,17.6 H13.2 V18 H12.9 Z M12.9,19.2 H13.2 V19.5 H12.9 Z M12.6,19.5 H12.9 V19.8 H12.6 Z M12.6,20.7 H13.2 V21 H12.6 Z M12.9,21.6 H13.2 V21.9 H12.9 Z M12.6,22.2 H12.9 V22.5 H12.6 Z" fill="#30d5f2" stroke="#30d5f2"/>
+<path d="M13.2,6 H13.8 V6.6 H13.2 Z M12.6,7.2 H13.2 V7.8 H12.6 Z M12,8.4 H12.6 V9 H12 Z M13.2,10.8 H13.65 V12 H13.725 V13.2 H13.2 Z M13.2,14.8 H13.5 V15.2 H13.2 Z M13.2,15.6 H13.5 V15.2 H13.8 V16 H13.5 V16.4 H13.2 Z M13.2,16.8 H13.5 V16.4 H13.8 V18 H13.5 V17.2 H13.2 Z M13.2,19.2 H13.8 V19.5 H13.2 Z M13.2,19.8 H13.5 V20.1 H13.2 Z M13.2,20.4 H13.5 V20.7 H13.2 Z M13.5,20.7 H13.8 V21 H13.5 Z M13.2,21 H13.5 V21.3 H13.2 Z M13.2,21.9 H13.5 V21.6 H13.8 V22.2 H13.5 V22.5 H13.2 Z" fill="#30b8f2" stroke="#30b8f2"/>
+<path d="M13.8,6 H14.4 V6.6 H13.8 Z M13.2,7.2 H13.8 V7.8 H13.2 Z M12.6,8.4 H13.2 V9 H12.6 Z M13.8,10.8 H14.325 V12 H13.8 Z M13.8,12.6 H14.1 V13.2 H13.8 Z M13.8,14.8 H14.4 V17.2 H14.1 V16.4 H13.8 V15.6 H14.1 V15.2 H13.8 Z M13.8,17.6 H14.4 V18 H13.8 Z M13.8,19.2 H14.4 V19.8 H14.1 V20.1 H13.8 Z M13.8,20.7 H14.1 V21 H13.8 Z M14.1,21 H14.4 V21.3 H14.1 Z M14.1,21.6 H14.4 V22.5 H14.1 Z" fill="#309bf2" stroke="#309bf2"/>
+<path d="M14.4,6 H15 V6.6 H14.4 Z M13.8,7.2 H14.4 V7.8 H13.8 Z M13.2,8.4 H13.8 V9 H13.2 Z M14.4,11.4 H14.7 V12 H14.4 Z M14.7,12.6 H15 V13.2 H14.7 Z M14.4,14.4 H15 V14.8 H14.4 Z M14.4,15.2 H15 V16 H14.7 V15.6 H14.4 Z M14.4,16 H14.7 V16.4 H15 V16.8 H14.7 V17.2 H14.4 Z M14.4,17.6 H14.7 V17.2 H15 V18 H14.4 Z M14.4,19.2 H15 V20.1 H14.7 V19.5 H14.4 Z M14.4,21 H15 V21.3 H14.4 Z M14.4,21.6 H14.7 V22.2 H15 V22.5 H14.4 Z" fill="#307df2" stroke="#307df2"/>
+<path d="M15,6 H15.6 V6.6 H15 Z M14.4,7.2 H15 V7.8 H14.4 Z M13.8,8.4 H14.4 V9 H13.8 Z M15.3,11.4 H15.6 V12 H15.3 Z M15,12 H15.3 V12.6 H15 Z M15,15.2 H15.3 V14.4 H15.6 V15.6 H15.3 V16 H15.6 V17.2 H15.3 V16.8 H15 Z M15.3,19.2 H15.6 V19.5 H15.3 Z M15,19.5 H15.3 V19.8 H15.6 V20.1 H15 Z M15,20.4 H15.6 V21.3 H15 V21 H15.3 V20.7 H15 Z M15.3,21.6 H15.6 V21.9 H15.3 Z M15,22.5 H15.3 V22.8 H15 Z" fill="#3060f2" stroke="#3060f2"/>
+<path d="M15.6,6 H16.2 V6.6 H15.6 Z M15,7.2 H15.6 V7.8 H15 Z M14.4,8.4 H15 V9 H14.4 Z M15.6,10.8 H15.9 V11.4 H15.6 Z M15.6,12 H15.9 V12.6 H16.2 V13.2 H15.6 Z M15.6,14.4 H16.2 V14.8 H15.6 Z M15.9,15.6 H16.2 V16 H15.9 Z M15.6,16 H15.9 V16.4 H15.6 Z M15.6,16.8 H15.9 V17.2 H15.6 Z M15.9,17.2 H16.2 V17.6 H15.9 Z M15.6,19.2 H16.2 V19.5 H15.6 Z M15.6,20.1 H15.9 V20.4 H15.6 Z M15.9,20.7 H16.2 V21 H15.9 Z M15.6,21.3 H15.9 V21.9 H16.2 V22.2 H15.6 Z M15.6,22.5 H15.9 V22.8 H15.6 Z" fill="#3043f2" stroke="#3043f2"/>
+<path d="M16.2,6 H16.8 V6.6 H16.2 Z M15.6,7.2 H16.2 V7.8 H15.6 Z M15,8.4 H15.6 V9 H15 Z M16.2,10.8 H16.5 V11.4 H16.8 V12 H16.5 V12.6 H16.2 Z M16.5,12.6 H16.8 V13.2 H16.5 Z M16.5,14.4 H16.8 V15.2 H16.5 Z M16.2,15.6 H16.5 V16 H16.8 V16.4 H16.2 Z M16.2,17.6 H16.5 V18 H16.2 Z M16.2,19.5 H16.5 V19.2 H16.8 V19.8 H16.2 Z M16.2,20.1 H16.5 V20.4 H16.2 Z M16.2,20.7 H16.5 V21.6 H16.8 V22.2 H16.5 V21.9 H16.2 Z M16.2,22.2 H16.5 V22.8 H16.2 Z" fill="#3a30f2" stroke="#3a30f2"/>
+<path d="M16.8,6 H17.4 V6.6 H16.8 Z M16.2,7.2 H16.8 V7.8 H16.2 Z M15.6,8.4 H16.2 V9 H15.6 Z M16.8,10.8 H17.1 V11.4 H16.8 Z M16.8,12 H17.1 V11.4 H17.4 V12.6 H17.1 V13.2 H16.8 Z M16.8,14.4 H17.1 V14.8 H16.8 Z M16.8,15.2 H17.1 V15.6 H16.8 Z M16.8,16 H17.1 V16.8 H16.8 Z M17.1,17.2 H17.4 V17.6 H17.1 Z M16.8,17.6 H17.1 V18 H16.8 Z M16.8,19.5 H17.4 V19.8 H17.1 V20.4 H16.8 Z M17.1,20.4 H17.4 V20.7 H17.1 Z M17.1,21 H17.4 V21.3 H17.1 Z M16.8,21.3 H17.1 V21.6 H17.4 V21.9 H17.1 V22.2 H16.8 Z M17.1,22.2 H17.4 V22.5 H17.1 Z M16.8,22.5 H17.1 V22.8 H16.8 Z" fill="#5730f2" stroke="#5730f2"/>
+<path d="M17.4,6 H18 V6.6 H17.4 Z M16.8,7.2 H17.4 V7.8 H16.8 Z M16.2,8.4 H16.8 V9 H16.2 Z M17.4,10.8 H18 V11.4 H17.7 V12 H18 V13.2 H17.7 V12.6 H17.4 Z M17.4,14.4 H17.7 V14.8 H17.4 Z M17.7,14.8 H18 V15.2 H17.7 Z M17.4,15.2 H17.7 V15.6 H17.4 Z M17.4,16 H18 V16.4 H17.7 V16.8 H18 V17.6 H17.7 V18 H17.4 Z M17.7,19.5 H18 V20.1 H17.7 Z M17.4,20.1 H17.7 V20.7 H18 V21.3 H17.7 V21 H17.4 Z M17.4,21.3 H17.7 V21.6 H17.4 Z M17.7,21.6 H18 V21.9 H17.7 Z M17.4,22.2 H18 V22.5 H17.7 V22.8 H17.4 Z" fill="#7430f2" stroke="#7430f2"/>
+<path d="M18,6 H18.6 V6.6 H18 Z M17.4,7.2 H18 V7.8 H17.4 Z M16.8,8.4 H17.4 V9 H16.8 Z M18,10.8 H18.6 V12.6 H18.3 V11.4 H18 Z M18,15.6 H18.3 V15.2 H18.6 V16 H18 Z M18.3,16.4 H18.6 V17.2 H18.3 Z M18,17.2 H18.3 V17.6 H18 Z M18.3,17.6 H18.6 V18 H18.3 Z M18,19.2 H18.6 V19.5 H18 Z M18,19.8 H18.6 V20.1 H18.3 V20.4 H18 Z M18,21 H18.3 V20.7 H18.6 V21.3 H18.3 V21.9 H18.6 V22.5 H18.3 V22.8 H18 Z" fill="#9130f2" stroke="#9130f2"/>
+<path d="M18.6,6 H19.2 V6.6 H18.6 Z M18,7.2 H18.6 V7.8 H18 Z M17.4,8.4 H18 V9 H17.4 Z M18.9,10.8 H19.2 V11.4 H18.9 Z M18.9,12 H19.2 V12.6 H18.9 Z M18.6,12.6 H18.9 V13.2 H18.6 Z M18.6,14.4 H19.2 V14.8 H18.9 V15.2 H18.6 Z M18.6,15.6 H18.9 V15.2 H19.2 V18 H18.9 V17.6 H18.6 V17.2 H18.9 V16 H18.6 Z M18.6,19.5 H18.9 V19.2 H19.2 V20.1 H18.9 V20.4 H18.6 Z M18.6,20.7 H18.9 V21 H18.6 Z M18.9,21.3 H19.2 V21.6 H18.9 Z M18.6,21.6 H18.9 V21.9 H18.6 Z M18.9,21.9 H19.2 V22.2 H18.9 Z M18.9,22.5 H19.2 V22.8 H18.9 Z" fill="#ae30f2" stroke="#ae30f2"/>
+<path d="M19.2,6 H19.8 V6.6 H19.2 Z M18.6,7.2 H19.2 V7.8 H18.6 Z M18,8.4 H18.6 V9 H18 Z M19.5,10.8 H19.8 V11.4 H19.5 Z M19.2,11.4 H19.5 V12 H19.2 Z M19.2,12.6 H19.5 V12 H19.8 V13.2 H19.2 Z M19.2,14.4 H19.8 V16 H19.5 V15.2 H19.2 Z M19.2,16.4 H19.8 V16.8 H19.5 V17.6 H19.8 V18 H19.2 Z M19.5,19.2 H19.8 V19.8 H19.5 Z M19.2,20.4 H19.5 V20.1 H19.8 V21 H19.2 Z M19.5,21.3 H19.8 V21.6 H19.5 Z M19.2,21.9 H19.5 V22.5 H19.2 Z M19.5,22.5 H19.8 V22.8 H19.5 Z" fill="#cb30f2" stroke="#cb30f2"/>
+<path d="M19.8,6 H20.4 V6.6 H19.8 Z M19.2,7.2 H19.8 V7.8 H19.2 Z M18.6,8.4 H19.2 V9 H18.6 Z M19.8,11.4 H20.1 V10.8 H20.4 V12 H19.8 Z M19.8,13.05 H20.4 V13.2 H19.8 Z M20.1,14.4 H20.4 V14.8 H20.1 Z M19.8,14.8 H20.1 V15.2 H20.4 V15.6 H20.1 V16 H19.8 Z M19.8,16.4 H20.1 V16 H20.4 V16.8 H19.8 Z M19.8,17.2 H20.4 V18 H19.8 Z M19.8,19.2 H20.1 V20.1 H19.8 Z M20.1,20.1 H20.4 V21 H20.1 Z M19.8,21 H20.1 V21.3 H19.8 Z M19.8,21.6 H20.1 V21.3 H20.4 V22.2 H20.1 V22.5 H19.8 Z M20.1,22.5 H20.4 V22.8 H20.1 Z" fill="#e830f2" stroke="#e830f2"/>
+<path d="M20.4,6 H21 V6.6 H20.4 Z M19.8,7.2 H20.4 V7.8 H19.8 Z M19.2,8.4 H19.8 V9 H19.2 Z M20.4,11.85 H21 V12 H20.4 Z M20.4,12.9 H21 V13.2 H20.4 Z M20.4,14.4 H20.7 V14.8 H21 V16 H20.7 V15.6 H20.4 Z M20.4,16.8 H20.7 V17.6 H20.4 Z M20.4,19.2 H20.7 V19.5 H20.4 Z M20.4,20.4 H20.7 V19.8 H21 V20.7 H20.7 V21 H20.4 Z M20.7,21 H21 V21.6 H20.7 Z M20.4,21.6 H20.7 V21.9 H21 V22.8 H20.7 V22.2 H20.4 Z" fill="#f230de" stroke="#f230de"/>
+<path d="M21,6 H21.6 V6.6 H21 Z M20.4,7.2 H21 V7.8 H20.4 Z M19.8,8.4 H20.4 V9 H19.8 Z M21,11.7 H21.6 V12 H21 Z M21,12.75 H21.6 V13.2 H21 Z M21.3,14.4 H21.6 V14.8 H21.3 Z M21,14.8 H21.3 V15.2 H21 Z M21,15.6 H21.3 V16 H21 Z M21.3,16 H21.6 V16.4 H21.3 Z M21,17.2 H21.6 V17.6 H21 Z M21,19.5 H21.3 V19.2 H21.6 V20.4 H21.3 V19.8 H21 Z M21,20.7 H21.3 V21 H21.6 V21.6 H21.3 V21.3 H21 Z M21,21.6 H21.3 V21.9 H21 Z M21,22.2 H21.3 V21.9 H21.6 V22.8 H21.3 V22.5 H21 Z" fill="#f230c1" stroke="#f230c1"/>
+<path d="M21.6,6 H22.2 V6.6 H21.6 Z M21,7.2 H21.6 V7.8 H21 Z M20.4,8.4 H21 V9 H20.4 Z M21.6,11.55 H22.2 V12 H21.6 Z M21.6,12.6 H22.2 V13.2 H21.6 Z M21.6,14.4 H21.9 V14.8 H22.2 V15.2 H21.6 Z M21.6,16.4 H21.9 V16.8 H22.2 V17.2 H21.6 Z M21.6,17.6 H21.9 V18 H21.6 Z M21.6,19.8 H21.9 V19.2 H22.2 V21.6 H21.9 V21.3 H21.6 V20.4 H21.9 V20.1 H21.6 Z M21.6,21.6 H21.9 V22.2 H21.6 Z M21.6,22.5 H22.2 V22.8 H21.6 Z" fill="#f230a4" stroke="#f230a4"/>
+<path d="M22.2,6 H22.8 V6.6 H22.2 Z M21.6,7.2 H22.2 V7.8 H21.6 Z M21,8.4 H21.6 V9 H21 Z M22.2,11.4 H22.8 V12 H22.2 Z M22.2,12.45 H22.8 V13.2 H22.2 Z M22.2,14.8 H22.5 V15.6 H22.2 Z M22.5,16 H22.8 V16.4 H22.5 Z M22.2,16.4 H22.5 V16.8 H22.8 V17.6 H22.5 V17.2 H22.2 Z M22.2,17.6 H22.5 V18 H22.2 Z M22.5,19.2 H22.8 V19.5 H22.5 Z M22.2,19.5 H22.5 V19.8 H22.2 Z M22.2,20.1 H22.8 V21 H22.5 V20.7 H22.2 Z M22.2,21.3 H22.8 V21.6 H22.2 Z M22.2,22.2 H22.5 V22.5 H22.8 V22.8 H22.2 Z" fill="#f23087" stroke="#f23087"/>
+<path d="M22.8,6 H23.4 V6.6 H22.8 Z M22.2,7.2 H22.8 V7.8 H22.2 Z M21.6,8.4 H22.2 V9 H21.6 Z M22.8,11.25 H23.4 V12 H22.8 Z M22.8,12.3 H23.4 V13.2 H22.8 Z M22.8,14.8 H23.4 V15.2 H23.1 V15.6 H23.4 V16.4 H23.1 V16.8 H22.8 Z M23.1,16.8 H23.4 V17.2 H23.1 Z M23.1,17.6 H23.4 V18 H23.1 Z M22.8,19.2 H23.1 V19.5 H22.8 Z M22.8,19.8 H23.1 V20.1 H23.4 V20.7 H23.1 V20.4 H22.8 Z M22.8,20.7 H23.1 V21.3 H23.4 V22.2 H23.1 V21.9 H22.8 Z M22.8,22.2 H23.1 V22.5 H23.4 V22.8 H22.8 Z" fill="#f2306a" stroke="#f2306a"/>
+<path d="M23.4,6 H24 V6.6 H23.4 Z M22.8,7.2 H23.4 V7.8 H22.8 Z M22.2,8.4 H22.8 V9 H22.2 Z M23.4,11.1 H24 V12 H23.4 Z M23.4,12.15 H24 V13.2 H23.4 Z M23.4,14.4 H24 V14.8 H23.4 Z M23.7,15.2 H24 V16 H23.7 Z M23.4,16 H23.7 V16.4 H23.4 Z M23.7,16.4 H24 V16.8 H23.7 Z M23.4,16.8 H23.7 V17.2 H23.4 Z M23.7,17.2 H24 V18 H23.7 Z M23.4,19.5 H24 V19.8 H23.7 V20.1 H24 V20.4 H23.7 V20.7 H23.4 Z M23.4,21.3 H23.7 V21 H24 V21.9 H23.7 V21.6 H23.4 Z M23.4,21.9 H23.7 V22.2 H23.4 Z M23.4,22.5 H23.7 V22.2 H24 V22.8 H23.4 Z" fill="#f2304d" stroke="#f2304d"/>
+<path d="M0,28.8 H24 V30 H0 Z" fill="#f0f0f0" opacity="0.25" stroke="#f0f0f0"/>
+<path d="M6,28.8 H24 V30 H6 Z" fill="#f0f0f0" opacity="0.333" stroke="#f0f0f0"/>
+<path d="M12,28.8 H24 V30 H12 Z" fill="#f0f0f0" opacity="0.5" stroke="#f0f0f0"/>
+<path d="M18,28.8 H24 V30 H18 Z" fill="#f0f0f0" stroke="#f0f0f0"/>
+<path d="M9.775,31.675 H13.625 V36.725 H9.775 Z M9.858,31.758 V36.642 H13.542 V31.758 Z M5.017,31.717 H8.783 V36.683 H5.017 Z M5.183,31.883 V34.117 H6.817 V31.883 Z M5.183,34.283 V36.517 H6.817 V34.283 Z M6.983,31.883 V34.117 H8.617 V31.883 Z M6.983,34.283 V36.517 H8.617 V34.283 Z M19.458,31.717 H23.142 V36.683 H19.458 Z M19.542,31.883 V34.117 H21.258 V31.883 Z M19.542,34.283 V36.517 H21.258 V34.283 Z M21.342,31.883 V34.117 H23.058 V31.883 Z M21.342,34.283 V36.517 H23.058 V34.283 Z M32.017,31.717 H32.4 V31.883 H32.183 V32.4 H32.017 Z M32.475,31.717 H32.625 V31.883 H32.475 Z M32.775,31.717 H32.925 V31.883 H32.775 Z M33.075,31.717 H33.225 V31.883 H33.075 Z M33.375,31.717 H33.525 V31.883 H33.375 Z M33.6,31.717 H33.983 V32.4 H33.817 V31.883 H33.6 Z M0.258,31.758 H3.942 V36.642 H0.258 Z M0.342,31.842 V34.158 H2.058 V31.842 Z M0.342,34.242 V36.558 H2.058 V34.242 Z M2.142,31.842 V34.158 H3.858 V31.842 Z M2.142,34.242 V36.558 H3.858 V34.242 Z M14.658,32.058 H14.742 V34.158 H16.458 V31.842 H14.958 V31.758 H18.042 V31.842 H16.542 V34.158 H18.258 V32.058 H18.342 V36.342 H18.258 V34.242 H16.542 V36.558 H18.042 V36.642 H14.958 V36.558 H16.458 V34.242 H14.742 V36.342 H14.658 Z M24.175,31.758 H28.025 V36.642 H24.175 Z M24.258,31.842 V36.558 H24.342 V31.842 Z M24.425,31.842 V34.158 H25.975 V31.842 Z M24.425,34.242 V36.558 H25.975 V34.242 Z M26.058,31.842 V34.158 H26.142 V31.842 Z M26.058,34.242 V36.558 H26.142 V34.242 Z M26.225,31.842 V34.158 H27.775 V31.842 Z M26.225,34.242 V36.558 H27.775 V34.242 Z M27.858,31.842 V36.558 H27.942 V31.842 Z M29.058,31.758 H29.4 V31.842 H29.142 V32.4 H29.058 Z M29.45,31.758 H29.55 V31.842 H29.45 Z M29.65,31.758 H29.75 V31.842 H29.65 Z M29.85,31.758 H29.95 V31.842 H29.85 Z M30.05,31.758 H30.15 V31.842 H30.05 Z M30.25,31.758 H30.35 V31.842 H30.25 Z M30.45,31.758 H30.55 V31.842 H30.45 Z M30.6,31.758 H30.942 V32.4 H30.858 V31.842 H30.6 Z M9.942,31.842 H11.658 V34.158 H9.942 Z M10.025,31.925 V34.075 H11.575 V31.925 Z M11.742,31.842 H13.458 V34.158 H11.742 Z M11.825,31.925 V34.075 H13.375 V31.925 Z M29.058,32.5 H29.142 V32.7 H29.058 Z M30.858,32.5 H30.942 V32.7 H30.858 Z M32.017,32.55 H32.183 V32.85 H32.017 Z M33.817,32.55 H33.983 V32.85 H33.817 Z M29.058,32.9 H29.142 V33.1 H29.058 Z M30.858,32.9 H30.942 V33.1 H30.858 Z M32.017,33.15 H32.183 V33.45 H32.017 Z M33.817,33.15 H33.983 V33.45 H33.817 Z M29.058,33.3 H29.142 V33.5 H29.058 Z M30.858,33.3 H30.942 V33.5 H30.858 Z M29.058,33.675 H29.142 V33.825 H29.058 Z M30.858,33.675 H30.942 V33.825 H30.858 Z M32.017,33.675 H32.183 V33.825 H32.017 Z M33.817,33.675 H33.983 V33.825 H33.817 Z M29.058,33.975 H29.142 V34.125 H29.058 Z M30.858,33.975 H30.942 V34.125 H30.858 Z M32.017,33.975 H32.183 V34.125 H32.017 Z M33.817,33.975 H33.983 V34.125 H33.817 Z M9.942,34.242 H11.658 V36.558 H9.942 Z M10.025,34.325 V36.475 H11.575 V34.325 Z M11.742,34.242 H13.458 V36.558 H11.742 Z M11.825,34.325 V36.475 H13.375 V34.325 Z M29.058,34.275 H29.142 V34.425 H29.058 Z M30.858,34.275 H30.942 V34.425 H30.858 Z M32.017,34.275 H32.183 V34.425 H32.017 Z M33.817,34.275 H33.983 V34.425 H33.817 Z M29.058,34.575 H29.142 V34.725 H29.058 Z M30.858,34.575 H30.942 V34.725 H30.858 Z M32.017,34.575 H32.183 V34.725 H32.017 Z M33.817,34.575 H33.983 V34.725 H33.817 Z M29.058,34.9 H29.142 V35.1 H29.058 Z M30.858,34.9 H30.942 V35.1 H30.858 Z M32.017,34.95 H32.183 V35.25 H32.017 Z M33.817,34.95 H33.983 V35.25 H33.817 Z M29.058,35.3 H29.142 V35.5 H29.058 Z M30.858,35.3 H30.942 V35.5 H30.858 Z M32.017,35.55 H32.183 V35.85 H32.017 Z M33.817,35.55 H33.983 V35.85 H33.817 Z M29.058,35.7 H29.142 V35.9 H29.058 Z M30.858,35.7 H30.942 V35.9 H30.858 Z M29.058,36 H29.142 V36.558 H29.4 V36.642 H29.058 Z M30.6,36.558 H30.858 V36 H30.942 V36.642 H30.6 Z M32.017,36 H32.183 V36.517 H32.4 V36.683 H32.017 Z M33.6,36.517 H33.817 V36 H33.983 V36.683 H33.6 Z M32.438,36.517 H32.513 V36.683 H32.438 Z M32.588,36.517 H32.663 V36.683 H32.588 Z M32.738,36.517 H32.813 V36.683 H32.738 Z M32.888,36.517 H32.963 V36.683 H32.888 Z M33.038,36.517 H33.113 V36.683 H33.038 Z M33.188,36.517 H33.263 V36.683 H33.188 Z M33.338,36.517 H33.413 V36.683 H33.338 Z M33.488,36.517 H33.563 V36.683 H33.488 Z M29.438,36.558 H29.513 V36.642 H29.438 Z M29.588,36.558 H29.663 V36.642 H29.588 Z M29.738,36.558 H29.813 V36.642 H29.738 Z M29.888,36.558 H29.963 V36.642 H29.888 Z M30.038,36.558 H30.113 V36.642 H30.038 Z M30.188,36.558 H30.263 V36.642 H30.188 Z M30.338,36.558 H30.413 V36.642 H30.338 Z M30.488,36.558 H30.563 V36.642 H30.488 Z" fill="#78c8ff" stroke="#78c8ff"/>
+<path d="M15,31.8 L14.958,31.8 A0.258,0.258 0 0 0 14.7,32.058 L14.7,32.1 M18,31.8 L18.042,31.8 A0.258,0.258 0 0 1 18.3,32.058 L18.3,32.1 M15,36.6 L14.958,36.6 A0.258,0.258 0 0 1 14.7,36.342 L14.7,36.3 M18,36.6 L18.042,36.6 A0.258,0.258 0 0 0 18.3,36.342 L18.3,36.3" fill="none" stroke="#78c8ff" stroke-width="0.108"/>
+<path d="M3.858,37.2 H3.942 V37.675 H5.058 V37.2 H5.142 V37.675 H6.258 V37.2 H6.342 V38.4 H6.258 V37.925 H5.142 V38.4 H5.058 V37.925 H3.942 V38.4 H3.858 Z M3.942,37.758 V37.842 H5.058 V37.758 Z M5.142,37.758 V37.842 H6.258 V37.758 Z M7.458,37.2 H7.542 V37.675 H8.658 V37.2 H8.742 V37.675 H9.858 V37.2 H9.942 V37.925 H7.458 Z M7.542,37.758 V37.842 H9.858 V37.758 Z M13.417,37.2 H13.583 V37.758 H14.017 V37.2 H14.183 V37.758 H14.617 V37.2 H14.783 V38.4 H14.617 V37.842 H14.183 V38.4 H14.017 V37.842 H13.583 V38.4 H13.417 Z M15.817,37.2 H15.983 V37.758 H16.417 V37.2 H16.583 V37.758 H17.017 V37.2 H17.183 V37.842 H15.817 Z M19.417,37.8 H19.458 V37.2 H19.542 V37.8 H19.583 V38.4 H19.417 Z M20.017,37.2 H20.183 V37.8 H20.142 V38.4 H20.058 V37.8 H20.017 Z M21.858,37.2 H21.942 V37.8 H21.858 Z M24.217,37.2 H24.383 V37.8 H24.217 Z M0.258,37.675 H2.742 V38.4 H2.658 V37.925 H1.542 V38.4 H1.458 V37.925 H0.342 V38.4 H0.258 Z M0.342,37.758 V37.842 H2.658 V37.758 Z M18,37.758 H18.3 V37.717 H18.9 V37.758 H19.2 V37.842 H18.9 V37.883 H18.3 V37.842 H18 Z M23.4,37.717 H23.7 V37.883 H23.4 Z M24.9,37.717 H25.2 V37.883 H24.9 Z M11.017,37.758 H12.383 V38.4 H12.217 V37.842 H11.783 V38.4 H11.617 V37.842 H11.183 V38.4 H11.017 Z M21,37.758 H21.3 V37.842 H21 Z M22.5,37.758 H22.8 V37.842 H22.5 Z M23.058,37.8 H23.142 V38.4 H23.058 Z M25.417,37.8 H25.583 V38.4 H25.417 Z" fill="#ffc878" stroke="#ffc878"/>
+<path d="M26.953,37.2 L27,37.2 L27,37.293 L26.447,38.4 L26.4,38.4 L26.4,38.307 Z M27,37.2 L27.047,37.2 L27.6,38.307 L27.6,38.4 L27.553,38.4 L27,37.293 Z M28.153,37.2 L28.2,37.2 L28.2,37.293 L27.647,38.4 L27.6,38.4 L27.6,38.307 Z M27.6,37.2 L27.647,37.2 L28.2,38.307 L28.2,38.4 L28.153,38.4 L27.6,37.293 Z M29.353,37.2 L29.4,37.2 L29.4,37.293 L28.847,38.4 L28.8,38.4 L28.8,38.307 Z M29.4,37.2 L29.447,37.2 L30,38.307 L30,38.4 L29.953,38.4 L29.4,37.293 Z M30.553,37.2 L30.6,37.2 L30.6,37.293 L30.047,38.4 L30,38.4 L30,38.307 Z M30.6,37.2 L30.647,37.2 L31.2,38.307 L31.2,38.4 L31.153,38.4 L30.6,37.293 Z" fill="#ffc878" stroke="#ffc878"/>
+</g>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="0">
+<text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">full </tspan><tspan fill="#dcdfe4">blocks, </tspan><tspan fill="#dcdfe4">single </tspan><tspan fill="#dcdfe4">color: </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="14.4">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="28.8">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="43.2">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="57.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">upper </tspan><tspan fill="#dcdfe4">half </tspan><tspan fill="#dcdfe4">blocks, </tspan><tspan fill="#dcdfe4">fg/bg </tspan><tspan fill="#dcdfe4">gradient: </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="72">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="86.4">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="100.8">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="115.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">quadrants </tspan><tspan fill="#dcdfe4">and </tspan><tspan fill="#dcdfe4">eighths: </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="129.6">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="144">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="158.4">
+<text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">sextants: </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="172.8">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="187.2">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="201.6">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="216">
+<text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">octants: </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="230.4">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="244.8">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="259.2">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="273.6">
+<text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">braille: </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="288">
+<text xml:space="preserve" y="0.96em"></text>
+<text textLength="0.6em" x="0em" xml:space="preserve" y="0.96em"><tspan fill="#f23030">⠀</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan> </tspan></text>
+<text textLength="0.6em" x="0.6em" xml:space="preserve" y="0.96em"><tspan fill="#f24d30">⠥</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>  </tspan></text>
+<text textLength="0.6em" x="1.2em" xml:space="preserve" y="0.96em"><tspan fill="#f26a30">⡊</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>   </tspan></text>
+<text textLength="0.6em" x="1.8em" xml:space="preserve" y="0.96em"><tspan fill="#f28730">⡯</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>    </tspan></text>
+<text textLength="0.6em" x="2.4em" xml:space="preserve" y="0.96em"><tspan fill="#f2a430">⢔</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>     </tspan></text>
+<text textLength="0.6em" x="3em" xml:space="preserve" y="0.96em"><tspan fill="#f2c130">⢹</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>      </tspan></text>
+<text textLength="0.6em" x="3.6em" xml:space="preserve" y="0.96em"><tspan fill="#f2de30">⣞</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>       </tspan></text>
+<text textLength="0.6em" x="4.2em" xml:space="preserve" y="0.96em"><tspan fill="#e8f230">⠃</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>        </tspan></text>
+<text textLength="0.6em" x="4.8em" xml:space="preserve" y="0.96em"><tspan fill="#cbf230">⠨</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>         </tspan></text>
+<text textLength="0.6em" x="5.4em" xml:space="preserve" y="0.96em"><tspan fill="#aef230">⡍</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>          </tspan></text>
+<text textLength="0.6em" x="6em" xml:space="preserve" y="0.96em"><tspan fill="#91f230">⡲</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>           </tspan></text>
+<text textLength="0.6em" x="6.6em" xml:space="preserve" y="0.96em"><tspan fill="#74f230">⢗</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>            </tspan></text>
+<text textLength="0.6em" x="7.2em" xml:space="preserve" y="0.96em"><tspan fill="#57f230">⢼</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>             </tspan></text>
+<text textLength="0.6em" x="7.8em" xml:space="preserve" y="0.96em"><tspan fill="#3af230">⣡</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>              </tspan></text>
+<text textLength="0.6em" x="8.4em" xml:space="preserve" y="0.96em"><tspan fill="#30f243">⠆</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>               </tspan></text>
+<text textLength="0.6em" x="9em" xml:space="preserve" y="0.96em"><tspan fill="#30f260">⠫</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                </tspan></text>
+<text textLength="0.6em" x="9.6em" xml:space="preserve" y="0.96em"><tspan fill="#30f27d">⡐</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                 </tspan></text>
+<text textLength="0.6em" x="10.2em" xml:space="preserve" y="0.96em"><tspan fill="#30f29b">⡵</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                  </tspan></text>
+<text textLength="0.6em" x="10.8em" xml:space="preserve" y="0.96em"><tspan fill="#30f2b8">⢚</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                   </tspan></text>
+<text textLength="0.6em" x="11.4em" xml:space="preserve" y="0.96em"><tspan fill="#30f2d5">⢿</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                    </tspan></text>
+<text textLength="0.6em" x="12em" xml:space="preserve" y="0.96em"><tspan fill="#30f2f2">⣤</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                     </tspan></text>
+<text textLength="0.6em" x="12.6em" xml:space="preserve" y="0.96em"><tspan fill="#30d5f2">⠉</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                      </tspan></text>
+<text textLength="0.6em" x="13.2em" xml:space="preserve" y="0.96em"><tspan fill="#30b8f2">⠮</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                       </tspan></text>
+<text textLength="0.6em" x="13.8em" xml:space="preserve" y="0.96em"><tspan fill="#309bf2">⡓</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                        </tspan></text>
+<text textLength="0.6em" x="14.4em" xml:space="preserve" y="0.96em"><tspan fill="#307df2">⡸</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                         </tspan></text>
+<text textLength="0.6em" x="15em" xml:space="preserve" y="0.96em"><tspan fill="#3060f2">⢝</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                          </tspan></text>
+<text textLength="0.6em" x="15.6em" xml:space="preserve" y="0.96em"><tspan fill="#3043f2">⣂</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                           </tspan></text>
+<text textLength="0.6em" x="16.2em" xml:space="preserve" y="0.96em"><tspan fill="#3a30f2">⣧</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                            </tspan></text>
+<text textLength="0.6em" x="16.8em" xml:space="preserve" y="0.96em"><tspan fill="#5730f2">⠌</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                             </tspan></text>
+<text textLength="0.6em" x="17.4em" xml:space="preserve" y="0.96em"><tspan fill="#7430f2">⠱</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                              </tspan></text>
+<text textLength="0.6em" x="18em" xml:space="preserve" y="0.96em"><tspan fill="#9130f2">⡖</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                               </tspan></text>
+<text textLength="0.6em" x="18.6em" xml:space="preserve" y="0.96em"><tspan fill="#ae30f2">⡻</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                </tspan></text>
+<text textLength="0.6em" x="19.2em" xml:space="preserve" y="0.96em"><tspan fill="#cb30f2">⢠</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                 </tspan></text>
+<text textLength="0.6em" x="19.8em" xml:space="preserve" y="0.96em"><tspan fill="#e830f2">⣅</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                  </tspan></text>
+<text textLength="0.6em" x="20.4em" xml:space="preserve" y="0.96em"><tspan fill="#f230de">⣪</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                   </tspan></text>
+<text textLength="0.6em" x="21em" xml:space="preserve" y="0.96em"><tspan fill="#f230c1">⠏</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                    </tspan></text>
+<text textLength="0.6em" x="21.6em" xml:space="preserve" y="0.96em"><tspan fill="#f230a4">⠴</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                     </tspan></text>
+<text textLength="0.6em" x="22.2em" xml:space="preserve" y="0.96em"><tspan fill="#f23087">⡙</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                      </tspan></text>
+<text textLength="0.6em" x="22.8em" xml:space="preserve" y="0.96em"><tspan fill="#f2306a">⡾</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                       </tspan></text>
+<text textLength="0.6em" x="23.4em" xml:space="preserve" y="0.96em"><tspan fill="#f2304d">⢣</tspan></text>
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="302.4">
+<text xml:space="preserve" y="0.96em"></text>
+<text textLength="0.6em" x="0em" xml:space="preserve" y="0.96em"><tspan fill="#f23030">⠍</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan> </tspan></text>
+<text textLength="0.6em" x="0.6em" xml:space="preserve" y="0.96em"><tspan fill="#f24d30">⠲</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>  </tspan></text>
+<text textLength="0.6em" x="1.2em" xml:space="preserve" y="0.96em"><tspan fill="#f26a30">⡗</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>   </tspan></text>
+<text textLength="0.6em" x="1.8em" xml:space="preserve" y="0.96em"><tspan fill="#f28730">⡼</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>    </tspan></text>
+<text textLength="0.6em" x="2.4em" xml:space="preserve" y="0.96em"><tspan fill="#f2a430">⢡</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>     </tspan></text>
+<text textLength="0.6em" x="3em" xml:space="preserve" y="0.96em"><tspan fill="#f2c130">⣆</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>      </tspan></text>
+<text textLength="0.6em" x="3.6em" xml:space="preserve" y="0.96em"><tspan fill="#f2de30">⣫</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>       </tspan></text>
+<text textLength="0.6em" x="4.2em" xml:space="preserve" y="0.96em"><tspan fill="#e8f230">⠐</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>        </tspan></text>
+<text textLength="0.6em" x="4.8em" xml:space="preserve" y="0.96em"><tspan fill="#cbf230">⠵</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>         </tspan></text>
+<text textLength="0.6em" x="5.4em" xml:space="preserve" y="0.96em"><tspan fill="#aef230">⡚</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>          </tspan></text>
+<text textLength="0.6em" x="6em" xml:space="preserve" y="0.96em"><tspan fill="#91f230">⡿</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>           </tspan></text>
+<text textLength="0.6em" x="6.6em" xml:space="preserve" y="0.96em"><tspan fill="#74f230">⢤</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>            </tspan></text>
+<text textLength="0.6em" x="7.2em" xml:space="preserve" y="0.96em"><tspan fill="#57f230">⣉</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>             </tspan></text>
+<text textLength="0.6em" x="7.8em" xml:space="preserve" y="0.96em"><tspan fill="#3af230">⣮</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>              </tspan></text>
+<text textLength="0.6em" x="8.4em" xml:space="preserve" y="0.96em"><tspan fill="#30f243">⠓</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>               </tspan></text>
+<text textLength="0.6em" x="9em" xml:space="preserve" y="0.96em"><tspan fill="#30f260">⠸</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                </tspan></text>
+<text textLength="0.6em" x="9.6em" xml:space="preserve" y="0.96em"><tspan fill="#30f27d">⡝</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                 </tspan></text>
+<text textLength="0.6em" x="10.2em" xml:space="preserve" y="0.96em"><tspan fill="#30f29b">⢂</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                  </tspan></text>
+<text textLength="0.6em" x="10.8em" xml:space="preserve" y="0.96em"><tspan fill="#30f2b8">⢧</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                   </tspan></text>
+<text textLength="0.6em" x="11.4em" xml:space="preserve" y="0.96em"><tspan fill="#30f2d5">⣌</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                    </tspan></text>
+<text textLength="0.6em" x="12em" xml:space="preserve" y="0.96em"><tspan fill="#30f2f2">⣱</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                     </tspan></text>
+<text textLength="0.6em" x="12.6em" xml:space="preserve" y="0.96em"><tspan fill="#30d5f2">⠖</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                      </tspan></text>
+<text textLength="0.6em" x="13.2em" xml:space="preserve" y="0.96em"><tspan fill="#30b8f2">⠻</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                       </tspan></text>
+<text textLength="0.6em" x="13.8em" xml:space="preserve" y="0.96em"><tspan fill="#309bf2">⡠</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                        </tspan></text>
+<text textLength="0.6em" x="14.4em" xml:space="preserve" y="0.96em"><tspan fill="#307df2">⢅</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                         </tspan></text>
+<text textLength="0.6em" x="15em" xml:space="preserve" y="0.96em"><tspan fill="#3060f2">⢪</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                          </tspan></text>
+<text textLength="0.6em" x="15.6em" xml:space="preserve" y="0.96em"><tspan fill="#3043f2">⣏</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                           </tspan></text>
+<text textLength="0.6em" x="16.2em" xml:space="preserve" y="0.96em"><tspan fill="#3a30f2">⣴</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                            </tspan></text>
+<text textLength="0.6em" x="16.8em" xml:space="preserve" y="0.96em"><tspan fill="#5730f2">⠙</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                             </tspan></text>
+<text textLength="0.6em" x="17.4em" xml:space="preserve" y="0.96em"><tspan fill="#7430f2">⠾</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                              </tspan></text>
+<text textLength="0.6em" x="18em" xml:space="preserve" y="0.96em"><tspan fill="#9130f2">⡣</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                               </tspan></text>
+<text textLength="0.6em" x="18.6em" xml:space="preserve" y="0.96em"><tspan fill="#ae30f2">⢈</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                </tspan></text>
+<text textLength="0.6em" x="19.2em" xml:space="preserve" y="0.96em"><tspan fill="#cb30f2">⢭</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                 </tspan></text>
+<text textLength="0.6em" x="19.8em" xml:space="preserve" y="0.96em"><tspan fill="#e830f2">⣒</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                  </tspan></text>
+<text textLength="0.6em" x="20.4em" xml:space="preserve" y="0.96em"><tspan fill="#f230de">⣷</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                   </tspan></text>
+<text textLength="0.6em" x="21em" xml:space="preserve" y="0.96em"><tspan fill="#f230c1">⠜</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                    </tspan></text>
+<text textLength="0.6em" x="21.6em" xml:space="preserve" y="0.96em"><tspan fill="#f230a4">⡁</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                     </tspan></text>
+<text textLength="0.6em" x="22.2em" xml:space="preserve" y="0.96em"><tspan fill="#f23087">⡦</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                      </tspan></text>
+<text textLength="0.6em" x="22.8em" xml:space="preserve" y="0.96em"><tspan fill="#f2306a">⢋</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                       </tspan></text>
+<text textLength="0.6em" x="23.4em" xml:space="preserve" y="0.96em"><tspan fill="#f2304d">⢰</tspan></text>
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="316.8">
+<text xml:space="preserve" y="0.96em"></text>
+<text textLength="0.6em" x="0em" xml:space="preserve" y="0.96em"><tspan fill="#f23030">⠚</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan> </tspan></text>
+<text textLength="0.6em" x="0.6em" xml:space="preserve" y="0.96em"><tspan fill="#f24d30">⠿</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>  </tspan></text>
+<text textLength="0.6em" x="1.2em" xml:space="preserve" y="0.96em"><tspan fill="#f26a30">⡤</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>   </tspan></text>
+<text textLength="0.6em" x="1.8em" xml:space="preserve" y="0.96em"><tspan fill="#f28730">⢉</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>    </tspan></text>
+<text textLength="0.6em" x="2.4em" xml:space="preserve" y="0.96em"><tspan fill="#f2a430">⢮</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>     </tspan></text>
+<text textLength="0.6em" x="3em" xml:space="preserve" y="0.96em"><tspan fill="#f2c130">⣓</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>      </tspan></text>
+<text textLength="0.6em" x="3.6em" xml:space="preserve" y="0.96em"><tspan fill="#f2de30">⣸</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>       </tspan></text>
+<text textLength="0.6em" x="4.2em" xml:space="preserve" y="0.96em"><tspan fill="#e8f230">⠝</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>        </tspan></text>
+<text textLength="0.6em" x="4.8em" xml:space="preserve" y="0.96em"><tspan fill="#cbf230">⡂</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>         </tspan></text>
+<text textLength="0.6em" x="5.4em" xml:space="preserve" y="0.96em"><tspan fill="#aef230">⡧</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>          </tspan></text>
+<text textLength="0.6em" x="6em" xml:space="preserve" y="0.96em"><tspan fill="#91f230">⢌</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>           </tspan></text>
+<text textLength="0.6em" x="6.6em" xml:space="preserve" y="0.96em"><tspan fill="#74f230">⢱</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>            </tspan></text>
+<text textLength="0.6em" x="7.2em" xml:space="preserve" y="0.96em"><tspan fill="#57f230">⣖</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>             </tspan></text>
+<text textLength="0.6em" x="7.8em" xml:space="preserve" y="0.96em"><tspan fill="#3af230">⣻</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>              </tspan></text>
+<text textLength="0.6em" x="8.4em" xml:space="preserve" y="0.96em"><tspan fill="#30f243">⠠</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>               </tspan></text>
+<text textLength="0.6em" x="9em" xml:space="preserve" y="0.96em"><tspan fill="#30f260">⡅</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                </tspan></text>
+<text textLength="0.6em" x="9.6em" xml:space="preserve" y="0.96em"><tspan fill="#30f27d">⡪</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                 </tspan></text>
+<text textLength="0.6em" x="10.2em" xml:space="preserve" y="0.96em"><tspan fill="#30f29b">⢏</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                  </tspan></text>
+<text textLength="0.6em" x="10.8em" xml:space="preserve" y="0.96em"><tspan fill="#30f2b8">⢴</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                   </tspan></text>
+<text textLength="0.6em" x="11.4em" xml:space="preserve" y="0.96em"><tspan fill="#30f2d5">⣙</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                    </tspan></text>
+<text textLength="0.6em" x="12em" xml:space="preserve" y="0.96em"><tspan fill="#30f2f2">⣾</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                     </tspan></text>
+<text textLength="0.6em" x="12.6em" xml:space="preserve" y="0.96em"><tspan fill="#30d5f2">⠣</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                      </tspan></text>
+<text textLength="0.6em" x="13.2em" xml:space="preserve" y="0.96em"><tspan fill="#30b8f2">⡈</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                       </tspan></text>
+<text textLength="0.6em" x="13.8em" xml:space="preserve" y="0.96em"><tspan fill="#309bf2">⡭</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                        </tspan></text>
+<text textLength="0.6em" x="14.4em" xml:space="preserve" y="0.96em"><tspan fill="#307df2">⢒</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                         </tspan></text>
+<text textLength="0.6em" x="15em" xml:space="preserve" y="0.96em"><tspan fill="#3060f2">⢷</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                          </tspan></text>
+<text textLength="0.6em" x="15.6em" xml:space="preserve" y="0.96em"><tspan fill="#3043f2">⣜</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                           </tspan></text>
+<text textLength="0.6em" x="16.2em" xml:space="preserve" y="0.96em"><tspan fill="#3a30f2">⠁</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                            </tspan></text>
+<text textLength="0.6em" x="16.8em" xml:space="preserve" y="0.96em"><tspan fill="#5730f2">⠦</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                             </tspan></text>
+<text textLength="0.6em" x="17.4em" xml:space="preserve" y="0.96em"><tspan fill="#7430f2">⡋</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                              </tspan></text>
+<text textLength="0.6em" x="18em" xml:space="preserve" y="0.96em"><tspan fill="#9130f2">⡰</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                               </tspan></text>
+<text textLength="0.6em" x="18.6em" xml:space="preserve" y="0.96em"><tspan fill="#ae30f2">⢕</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                </tspan></text>
+<text textLength="0.6em" x="19.2em" xml:space="preserve" y="0.96em"><tspan fill="#cb30f2">⢺</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                 </tspan></text>
+<text textLength="0.6em" x="19.8em" xml:space="preserve" y="0.96em"><tspan fill="#e830f2">⣟</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                  </tspan></text>
+<text textLength="0.6em" x="20.4em" xml:space="preserve" y="0.96em"><tspan fill="#f230de">⠄</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                   </tspan></text>
+<text textLength="0.6em" x="21em" xml:space="preserve" y="0.96em"><tspan fill="#f230c1">⠩</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                    </tspan></text>
+<text textLength="0.6em" x="21.6em" xml:space="preserve" y="0.96em"><tspan fill="#f230a4">⡎</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                     </tspan></text>
+<text textLength="0.6em" x="22.2em" xml:space="preserve" y="0.96em"><tspan fill="#f23087">⡳</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                      </tspan></text>
+<text textLength="0.6em" x="22.8em" xml:space="preserve" y="0.96em"><tspan fill="#f2306a">⢘</tspan></text>
+<text xml:space="preserve" y="0.96em"><tspan>                                       </tspan></text>
+<text textLength="0.6em" x="23.4em" xml:space="preserve" y="0.96em"><tspan fill="#f2304d">⢽</tspan></text>
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="331.2">
+<text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">shades: </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="345.6">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="360">
+<text xml:space="preserve" y="0.96em"><tspan fill="#dcdfe4">box </tspan><tspan fill="#dcdfe4">drawing: </tspan></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="374.4">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="388.8">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="403.2">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="417.6">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="432">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+<svg height="14.4" overflow="hidden" width="576" y="446.4">
+<text xml:space="preserve" y="0.96em"></text>
+</svg>
+</g>
+</svg>
+</svg>
+<rect fill="none" height="503.2" rx="10" ry="10" stroke="#000000" stroke-width="0.5" width="595.2"/>
+<rect fill="none" height="501.2" rx="9" ry="9" stroke="#f0f0f080" stroke-width="0.5" width="593.2" x="1" y="1"/>
+</g>
+<style>
+@font-face {
+	font-family: Cascadia Mono;
+	font-weight: 200 700;
+	font-style: normal;
+	src: url(https://fonts.gstatic.com/s/cascadiamono/v5/TUZ2zw5pquJF3iuizJDZYqr1aTwG9WDA-2l5cTc.woff2) format('woff2');
+}
+@font-face {
+	font-family: JetBrains Mono;
+	font-weight: 100 800;
+	font-style: normal;
+	src: url(https://raw.githubusercontent.com/pamburus/fonts/refs/heads/main/JetBrainsMono/fonts/variable/JetBrainsMono%5Bwght%5D.woff2) format('woff2');
+}
+</style>
+</svg>

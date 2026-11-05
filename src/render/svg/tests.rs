@@ -651,6 +651,21 @@ fn test_subclusters_plain() {
 }
 
 #[test]
+fn test_subclusters_skip_builtin_glyphs() {
+    let mut surface = Surface::new(6, 1);
+    surface.add_change(Change::Text("a─b▌█c".into()));
+    let options = Options::sample();
+
+    let lines = surface.screen_lines();
+    let line = &lines[0];
+    let clusters = line.cluster(None);
+    assert_eq!(clusters.len(), 1);
+
+    let subclusters = subdivide(line, &clusters[0], &options).collect_vec();
+    assert_eq!(subclusters, [("a", 0..1), ("b", 2..3), ("c", 5..6)]);
+}
+
+#[test]
 fn test_subclusters_combining_characters() {
     let mut surface = Surface::new(5, 2);
     surface.add_change(Change::Text("◌́".into()));
@@ -768,6 +783,30 @@ fn test_render_underline_color() {
 
     let svg = String::from_utf8(output).unwrap();
     assert!(svg.contains(r##"text-decoration-color="#ff0000""##));
+}
+
+#[test]
+fn test_render_faint_builtin_glyphs() {
+    let mut attrs = CellAttributes::default();
+    attrs.set_intensity(Intensity::Half);
+
+    let mut surface = Surface::new(4, 1);
+    surface.add_change(Change::AllAttributes(attrs));
+    surface.add_change(Change::Text("╭─░▒".into()));
+
+    let renderer = SvgRenderer::new(Options::sample());
+    let mut output = Vec::new();
+    renderer.render(&surface, &mut output).unwrap();
+    let svg = String::from_utf8(output).unwrap();
+
+    // The layers are nested: 0.125 for all shapes, 0.143 more to reach 0.25 for the darker
+    // shade and the line, and 0.333 more to reach 0.5 for the line.
+    // The straight parts and the curve of the line overlap, so they share the opacity as a whole.
+    for opacity in ["0.125", "0.143", "0.333"] {
+        let start = svg.find(&format!(r#"<g opacity="{opacity}">"#)).unwrap();
+        let layer = &svg[start..start + svg[start..].find("</g>").unwrap()];
+        assert!(layer.contains(r#"fill="none""#), "{opacity}");
+    }
 }
 
 #[test]

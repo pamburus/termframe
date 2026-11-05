@@ -291,7 +291,7 @@ impl App {
 
         for (family, file) in &files {
             let font = file.font().unwrap();
-            let url = file.location().url().unwrap().to_string();
+            let url = file.location().to_url()?.to_string();
             fonts.push((url, family, font));
         }
 

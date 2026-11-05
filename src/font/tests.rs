@@ -18,6 +18,10 @@ fn test_font_location_from_str() {
         assert_eq!(url.to_string(), "https://example.com/fonts/font.ttf");
     }
 
+    // Test Windows absolute path, which is only a file path on Windows
+    let location = Location::from(r"C:\fonts\font.ttf");
+    assert_eq!(matches!(location, Location::File(_)), cfg!(windows));
+
     // Test relative path
     let location = Location::from("./fonts/font.ttf");
     assert!(matches!(location, Location::File(_)));

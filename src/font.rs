@@ -1,5 +1,9 @@
 // std imports
-use std::{path::PathBuf, sync::LazyLock, time::Duration};
+use std::{
+    path::{Path, PathBuf},
+    sync::LazyLock,
+    time::Duration,
+};
 
 // third-party imports
 use allsorts::{
@@ -154,9 +158,17 @@ pub enum Location {
 impl Location {
     /// Automatically determine the location type from a string.
     pub fn auto<S: AsRef<str>>(s: S) -> Self {
-        match Url::parse(s.as_ref()) {
+        let s = s.as_ref();
+
+        // An absolute path is checked first, because a Windows path such as
+        // `C:\fonts\font.ttf` is also a valid URL with scheme `c`.
+        if Path::new(s).is_absolute() {
+            return Self::File(PathBuf::from(s));
+        }
+
+        match Url::parse(s) {
             Ok(url) => Self::Url(url),
-            Err(_) => Self::File(PathBuf::from(s.as_ref())),
+            Err(_) => Self::File(PathBuf::from(s)),
         }
     }
 

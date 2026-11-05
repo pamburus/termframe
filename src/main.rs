@@ -260,8 +260,10 @@ impl App {
         let mut width: Option<f32> = None;
         let mut ascender: f32 = 0.0;
         let mut descender: f32 = 0.0;
+        let mut metrics_family = None;
 
         let families = settings.font.family.resolve();
+        let preferred = settings.font.family.primary();
 
         let mut files = settings
             .fonts
@@ -324,6 +326,7 @@ impl App {
                 width = Some(font.width());
                 ascender = font.ascender();
                 descender = font.descender();
+                metrics_family = Some(**family);
             };
 
             let used = used.clone();
@@ -364,6 +367,16 @@ impl App {
         } else {
             DEFAULT_FONT_METRICS
         };
+
+        if metrics_family.map(String::as_str) != Some(preferred) {
+            let source = match metrics_family {
+                Some(family) => format!("metrics of font family {family:?}"),
+                None => "generic metrics".to_owned(),
+            };
+            log::warn!(
+                "font family {preferred:?} is not configured in [[fonts]], using {source} instead; add a [[fonts]] entry with its font files to avoid misaligned text"
+            );
+        }
 
         log::debug!(
             "font metrics: width={width} ascender={ascender} descender={descender}",

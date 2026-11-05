@@ -57,6 +57,8 @@ function test() {
     ${MAIN_EXECUTABLE:?} --config - --mode dark > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --mode dark --show-command -- echo hello > /dev/null
     ${MAIN_EXECUTABLE:?} --config - --mode dark --show-command --syntax-theme - -- echo hello > /dev/null 2>&1
+    ${MAIN_EXECUTABLE:?} --config - --mode dark --font-family "Unconfigured Font" -- echo hello > /dev/null 2>&1
+    ${MAIN_EXECUTABLE:?} --config - --mode dark --font-family "Unconfigured Font" "JetBrains Mono" -- echo hello > /dev/null 2>&1
 
     mkdir -p target/coverage/tmp
     ${TIDY_THEMES_EXE:?} assets/themes target/coverage/tmp/.aliases.json

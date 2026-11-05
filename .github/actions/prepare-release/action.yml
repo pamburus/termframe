@@ -37,6 +37,8 @@ runs:
       env:
         # renovate: datasource=crate depName=cargo-edit
         CARGO_EDIT_VERSION: "0.13.13"
+        # Authenticates cargo-binstall's GitHub API requests; the unauthenticated rate limit is shared across hosted runners.
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: cargo quickinstall --force --version "${CARGO_EDIT_VERSION:?}" cargo-edit
 
     - name: Update version in Cargo.toml

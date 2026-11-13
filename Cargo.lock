@@ -672,12 +672,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "closure"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6173fd61b610d15a7566dd7b7620775627441c4ab9dac8906e17cb93a24b782"
-
-[[package]]
 name = "colorchoice"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3536,7 +3530,7 @@ dependencies = [
 
 [[package]]
 name = "termframe"
-version = "0.10.1-alpha.2"
+version = "0.10.1-alpha.3"
 dependencies = [
  "allsorts",
  "anyhow",
@@ -3547,7 +3541,6 @@ dependencies = [
  "clap",
  "clap_complete",
  "clap_mangen",
- "closure",
  "config",
  "csscolorparser 0.9.0",
  "dark-light",
@@ -3587,7 +3580,6 @@ dependencies = [
  "unicode-width 0.2.3",
  "ureq",
  "url",
- "voca_rs",
  "wild",
  "yaml-peg",
 ]

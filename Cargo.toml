@@ -1,6 +1,6 @@
 [package]
 name = "termframe"
-version = "0.10.1-alpha.2"
+version = "0.10.1-alpha.3"
 edition = "2024"
 rust-version = "1.95.0"
 description = "Terminal output SVG screenshot tool"
@@ -33,7 +33,6 @@ cacache = "13"
 clap = { version = "4", features = ["derive", "env", "string", "wrap_help"] }
 clap_complete = "4"
 clap_mangen = "0.3"
-closure = "0.3"
 config = { version = "0.15", features = ["json", "toml", "yaml"] }
 csscolorparser = { version = "0.9", features = ["serde"] }
 dark-light = "3"
@@ -51,7 +50,6 @@ hex = "0.4"
 http = "1"
 indexmap = "2"
 itertools = "0.15"
-known-folders = "1"
 log = "0.4"
 lumis = { version = "0.19", default-features = false, features = ["lang-bash"] }
 num-integer = "0.1"
@@ -73,7 +71,6 @@ thiserror = "2"
 toml = "1.0"
 unicode-width = "0.2"
 url = "2"
-voca_rs = "1"
 wild = "2"
 yaml-peg = "1"
 
@@ -92,6 +89,7 @@ ureq = "3"
 # (especially important for ARM64, but simpler to use everywhere on Windows)
 # Use rustls (default) on all other platforms
 [target.'cfg(windows)'.dependencies]
+known-folders = "1"
 ureq = { version = "3", default-features = false, features = ["gzip", "native-tls", "platform-verifier"] }
 
 [target.'cfg(windows)'.build-dependencies]

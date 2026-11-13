@@ -14,6 +14,8 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: "-Dwarnings"
+  # Cargo reports some warnings itself, such as unused dependencies, which RUSTFLAGS do not cover
+  CARGO_BUILD_WARNINGS: deny
 
 defaults:
   run:

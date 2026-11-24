@@ -757,3 +757,40 @@ fn test_show_command_with_special_chars() {
     assert!(line0.contains("$ "), "line 0 missing prompt: {line0:?}");
     assert!(line0.contains("echo"), "line 0 missing command: {line0:?}");
 }
+
+#[test]
+#[cfg(unix)]
+fn test_run_keeps_configured_cwd() {
+    let mut term = make_term(20, 3);
+    let mut cmd = CommandBuilder::new("pwd");
+    cmd.cwd("/");
+    term.run(cmd, Some(Duration::from_secs(10))).unwrap();
+    assert_eq!(visible_line_text(&term, 0).trim_end(), "/");
+}
+
+#[test]
+fn test_threaded_writer_reports_broken_pipe() {
+    struct FailingWriter;
+
+    impl io::Write for FailingWriter {
+        fn write(&mut self, _: &[u8]) -> io::Result<usize> {
+            Err(io::ErrorKind::Other.into())
+        }
+
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+
+    let mut writer = ThreadedWriter::new(Box::new(FailingWriter));
+    io::Write::write(&mut writer, b"data").unwrap();
+
+    // The writer thread exits after the failed write, so a flush eventually fails.
+    let err = (0..1000)
+        .find_map(|_| {
+            std::thread::sleep(Duration::from_millis(1));
+            io::Write::flush(&mut writer).err()
+        })
+        .unwrap();
+    assert_eq!(err.kind(), io::ErrorKind::BrokenPipe);
+}

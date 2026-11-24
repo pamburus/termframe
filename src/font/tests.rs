@@ -1,6 +1,7 @@
 use url::Url;
 
 use crate::font::{FontFile, Location, is_transient};
+use crate::fontformat::FontFormat;
 
 #[test]
 fn test_font_location_from_str() {
@@ -151,4 +152,21 @@ fn test_font_metrics() {
 fn mock_font_data() -> Vec<u8> {
     // This is not a real font, just a placeholder for testing
     vec![0, 1, 2, 3, 4, 5]
+}
+
+#[test]
+fn test_font_file_format() {
+    let format = |bytes: &[u8]| {
+        FontFile::load_bytes(bytes, Location::from("font"))
+            .unwrap()
+            .format()
+    };
+
+    assert_eq!(format(b"\x00\x01\x00\x00rest"), Some(FontFormat::Ttf));
+    assert_eq!(format(b"OTTOrest"), Some(FontFormat::Otf));
+    assert_eq!(format(b"ttcfrest"), Some(FontFormat::Ttf));
+    assert_eq!(format(b"wOFFrest"), Some(FontFormat::Woff));
+    assert_eq!(format(b"wOF2rest"), Some(FontFormat::Woff2));
+    assert_eq!(format(b"abcd"), None);
+    assert_eq!(format(b"abc"), None);
 }

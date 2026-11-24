@@ -94,6 +94,26 @@ function test() {
     echo "test font subsetting"
     ${MAIN_EXECUTABLE:?} --config - --mode dark -W 80 -H 24 --embed-fonts true --subset-fonts true <assets/test/input/sample.ansi -o target/coverage/tmp/subset-test.svg
     rm -f target/coverage/tmp/subset-test.svg
+
+    echo "test trace logging"
+    TERMFRAME_DEBUG_LOG=trace ${MAIN_EXECUTABLE:?} --config - --mode dark -W 80 -H 24 --embed-fonts true --subset-fonts true <assets/test/input/sample.ansi -o /dev/null 2>/dev/null
+
+    echo "test height with maximum only"
+    ${MAIN_EXECUTABLE:?} --config - --mode dark -H ..30 <assets/test/input/sample.ansi -o /dev/null
+
+    echo "test unknown syntax theme"
+    if ${MAIN_EXECUTABLE:?} --config - --mode dark --show-command --syntax-theme no-such-theme -- echo hello >/dev/null 2>&1; then
+        echo "Unknown syntax theme was accepted"
+        exit 1
+    fi
+
+    echo "test missing font file"
+    printf '[[fonts]]\nfamily = "Missing Font"\nfiles = ["target/coverage/tmp/missing-font.ttf"]\n' >target/coverage/tmp/missing-font.toml
+    if ${MAIN_EXECUTABLE:?} --config - --config target/coverage/tmp/missing-font.toml --mode dark --font-family "Missing Font" -- echo hello >/dev/null 2>&1; then
+        echo "Missing font file was accepted"
+        exit 1
+    fi
+    rm -f target/coverage/tmp/missing-font.toml
 }
 
 function merge() {

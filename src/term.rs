@@ -294,26 +294,18 @@ impl Terminal {
         for line in lines {
             let this_wrapped = line.last_cell_was_wrapped();
 
-            if state.prev_wrapped {
+            match current_line.as_mut() {
                 // Continue the current logical line
-                if let Some(ref mut current) = current_line {
-                    current.append_line(line, seq);
-                }
-            } else {
+                Some(current) if state.prev_wrapped => current.append_line(line, seq),
                 // Finish previous logical line and start new one
-                if let Some(completed) = current_line.take() {
-                    result.push(completed);
-                }
-                current_line = Some(line);
+                _ => result.extend(current_line.replace(line)),
             }
 
             state.prev_wrapped = this_wrapped;
         }
 
         // Push the final logical line
-        if let Some(final_line) = current_line {
-            result.push(final_line);
-        }
+        result.extend(current_line);
 
         result
     }
@@ -868,10 +860,8 @@ impl State {
     /// The new bottom row is cleared (no wrap).
     fn rotate_on_scroll(&mut self) {
         if !self.wrap_flags.is_empty() {
-            self.wrap_flags.rotate_left(1);
-            if let Some(last) = self.wrap_flags.last_mut() {
-                *last = false;
-            }
+            self.wrap_flags.remove(0);
+            self.wrap_flags.push(false);
         }
     }
 

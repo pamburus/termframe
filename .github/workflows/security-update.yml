@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-26.04
     env:
       # renovate: datasource=crate depName=cargo-audit
-      CARGO_AUDIT_VERSION: "0.22.2"
+      CARGO_AUDIT_VERSION: "0.23.0"
     steps:
       - name: Generate GitHub App Token
         id: generate-token

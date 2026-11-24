@@ -96,3 +96,10 @@ fn test_reorient_contours() {
         ],
     );
 }
+
+#[test]
+fn test_optimize_open_contour() {
+    let contour = vec![(0, 0), (1, 0), (2, 0), (2, 2), (0, 2)];
+    let optimized = optimize_contour(contour);
+    assert_eq!(optimized, vec![(0, 0), (2, 0), (2, 2), (0, 2)]);
+}

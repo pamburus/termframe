@@ -810,6 +810,78 @@ fn test_render_faint_builtin_glyphs() {
 }
 
 #[test]
+fn test_render_without_stroke_with_var_palette() {
+    let mut attrs = CellAttributes::default();
+    attrs.set_background(ColorAttribute::PaletteIndex(1));
+
+    let mut surface = Surface::new(8, 1);
+    surface.add_change(Change::Text("ab".into()));
+    surface.add_change(Change::AllAttributes(attrs));
+    surface.add_change(Change::Text("cd".into()));
+    surface.add_change(Change::AllAttributes(CellAttributes::default()));
+    surface.add_change(Change::Text("╭─".into()));
+
+    let mut settings = Settings::default();
+    settings.rendering.svg.stroke = None;
+    settings.rendering.svg.var_palette = true;
+    let options = Options {
+        settings: Rc::new(settings),
+        ..Options::sample()
+    };
+
+    let renderer = SvgRenderer::new(options);
+    let mut output = Vec::new();
+    renderer.render(&surface, &mut output).unwrap();
+    let svg = String::from_utf8(output).unwrap();
+
+    // Background and glyph shapes are filled without an extra stroke.
+    assert!(
+        svg.contains(r#"<path d="M1.2,0 H2.4 V1.2 H1.2 Z" fill="var(--c-1)"/>"#),
+        "{svg}"
+    );
+    assert!(svg.contains(r#"Z" fill="var(--fg)"/>"#), "{svg}");
+}
+
+#[test]
+fn test_make_buttons_icon_kinds() {
+    let icon = |kind| {
+        Some(WindowButtonIcon {
+            kind,
+            size: Number::from(6.0),
+            stroke: SelectiveColor::Uniform(Color::from_rgba8(0x12, 0x34, 0x56, 255)),
+            stroke_width: None,
+            stroke_linecap: Some(LineCap::Round),
+            roundness: None,
+        })
+    };
+    let button = |offset: f32, kind| WindowButton {
+        offset: Number::from(offset),
+        fill: None,
+        stroke: None,
+        stroke_width: None,
+        icon: icon(kind),
+    };
+
+    let mut options = Options::sample();
+    options.window.buttons = WindowButtons {
+        position: WindowButtonsPosition::Left,
+        shape: Some(WindowButtonShape::Circle),
+        size: Number::from(10.0),
+        roundness: None,
+        items: vec![
+            button(10.0, WindowButtonIconKind::Close),
+            button(30.0, WindowButtonIconKind::Minimize),
+        ],
+    };
+
+    let svg = make_buttons(&options, 100.0).to_string();
+    assert_eq!(svg.matches("<circle").count(), 2);
+    assert!(svg.contains(r#"d="M7,11 13,17 M7,17 13,11""#), "{svg}");
+    assert!(svg.contains(r#"d="M27,14 33,14""#), "{svg}");
+    assert_eq!(svg.matches(r#"stroke-linecap="round""#).count(), 2);
+}
+
+#[test]
 fn test_make_buttons_icon_stroke() {
     let mut options = Options::sample();
     options.window.buttons = WindowButtons {
